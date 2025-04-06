@@ -108,59 +108,113 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 播放声音
   function playSound(sound) {
+    console.log("播放声音:", sound.title);
+    
     // 停止所有当前音轨
     stopAllSounds();
     
     // 添加新的音轨
     addSoundTrack(sound);
     
-    // 使用实际在线音频源，而不依赖本地文件
+    // 使用实际在线音频源，确保能直接播放
     try {
-      // 根据不同类型选择不同的在线音频
+      // 使用Pixabay的免费音频API - 这些链接是稳定的公共CDN
       let audioSrc = '';
-      if (sound.id.includes('rain') || sound.title.includes('雨')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/09/08/audio_77a1145a06.mp3'; // 雨声
-      } else if (sound.id.includes('ocean') || sound.id.includes('sea') || sound.title.includes('海')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_061c5e4a6f.mp3'; // 海浪声
-      } else if (sound.id.includes('forest') || sound.title.includes('森林')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_75d126e9d9.mp3'; // 森林声
-      } else if (sound.id.includes('fire') || sound.title.includes('篝火')) {
+      
+      // 根据声音类型选择合适的音频
+      if (sound.id === 'rain' || sound.title.includes('雨')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/09/audio_652da3df75.mp3'; // 雨声
+      } else if (sound.id === 'ocean' || sound.title.includes('海')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_d005e8ab3a.mp3'; // 海浪声
+      } else if (sound.id === 'forest' || sound.title.includes('森林')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_c9a4a1d834.mp3'; // 森林声
+      } else if (sound.id === 'fire' || sound.title.includes('篝火')) {
         audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_b04af54271.mp3'; // 篝火声
-      } else if (sound.id.includes('creek') || sound.title.includes('溪')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d16393c572.mp3'; // 溪流声
-      } else if (sound.id.includes('bird') || sound.title.includes('鸟')) {
+      } else if (sound.id === 'meditation' || sound.title.includes('冥想')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/01/27/audio_1d00a9f223.mp3'; // 冥想音乐
+      } else if (sound.id === 'whitenoise' || sound.title.includes('白噪音')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/12/13/audio_fb2335127e.mp3'; // 白噪音
+      } else if (sound.id === 'piano' || sound.title.includes('钢琴')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/11/17/audio_637264939d.mp3'; // 钢琴音乐
+      } else if (sound.id === 'creek' || sound.title.includes('溪')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/20/audio_1920d56025.mp3'; // 溪流声
+      } else if (sound.id === 'bird' || sound.title.includes('鸟')) {
         audioSrc = 'https://cdn.pixabay.com/download/audio/2021/07/24/audio_5673ea7d4b.mp3'; // 鸟声
+      } else if (sound.id === 'wind' || sound.title.includes('风')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_88290afa00.mp3'; // 风声
+      } else if (sound.id === 'deep-sleep' || sound.title.includes('深度睡眠')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/10/17/audio_7e129d2376.mp3'; // 深度睡眠
+      } else if (sound.id === 'lucid-dreams' || sound.title.includes('清醒梦境')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/18/audio_1c24d6f7cc.mp3'; // 清醒梦境
+      } else if (sound.id === 'stress-relief' || sound.title.includes('压力')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/07/27/audio_62b41fcbdc.mp3'; // 压力释放
+      } else if (sound.id === 'delta-waves' || sound.title.includes('Delta')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/08/27/audio_5214abadba.mp3'; // Delta脑波
       } else {
-        // 默认白噪音
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_270f49b9bf.mp3';
+        // 默认轻松音乐
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_c33418dc23.mp3';
       }
       
-      console.log("播放音频: " + audioSrc);
+      console.log("使用音频源:", audioSrc);
       
       // 创建实际音频元素
-      const audio = new Audio(audioSrc);
-      audio.volume = masterVolume;
-      audio.loop = true;
+      const audio = new Audio();
       
-      // 播放音频
-      audio.play().then(() => {
-        console.log("音频播放成功");
-        
-        // 更新当前激活的音轨
-        const trackIndex = activeSoundTracks.findIndex(track => track.sound.id === sound.id);
-        if (trackIndex !== -1) {
-          activeSoundTracks[trackIndex].audio = audio;
-        }
-        
-      }).catch(err => {
-        console.error("音频播放失败:", err);
-        // 显示通知解释情况
-        showNotification('音频播放提示', '请点击屏幕任意位置以允许播放声音');
-      });
+      // 先设置音频事件
+      audio.oncanplay = function() {
+        console.log("音频已准备好播放");
+        // 显示通知告知用户
+        showNotification('声音已准备好', `现在播放: ${sound.title}`);
+      };
+      
+      audio.onplaying = function() {
+        console.log("音频开始播放");
+        isPlaying = true;
+        document.querySelector('.player-play i').className = 'fas fa-pause';
+      };
+      
+      audio.onerror = function() {
+        console.error("音频加载失败", this.error);
+        showNotification('播放提示', '音频加载失败，请检查网络连接');
+      };
+      
+      // 设置音频属性
+      audio.src = audioSrc;
+      audio.loop = true;
+      audio.volume = masterVolume;
+      
+      // 强制开始播放
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.then(() => {
+          console.log("成功开始播放");
+          
+          // 更新激活的音轨
+          const trackIndex = activeSoundTracks.findIndex(track => track.sound.id === sound.id);
+          if (trackIndex !== -1) {
+            activeSoundTracks[trackIndex].audio = audio;
+          }
+          
+        }).catch(err => {
+          console.error("自动播放失败:", err);
+          // 显示通知提示用户手动交互
+          showNotification('需要交互', '请点击屏幕以允许播放声音');
+          
+          // 添加一次性点击事件处理器来启动音频
+          document.body.addEventListener('click', function startAudioOnce() {
+            audio.play().catch(e => console.error("尝试播放失败:", e));
+            document.body.removeEventListener('click', startAudioOnce);
+          });
+        });
+      }
+      
+      // 更新当前播放器UI
+      updatePlayerUI(sound);
+      
     } catch (e) {
-      console.error("音频加载错误:", e);
-      // 继续使用模拟音频
-      showNotification('音频播放中', `正在播放: ${sound.title} (模拟模式)`);
+      console.error("音频播放错误:", e);
+      showNotification('播放失败', '无法播放音频，请稍后重试');
     }
   }
   
@@ -665,11 +719,11 @@ document.addEventListener('DOMContentLoaded', function() {
   function updatePlayerUI(sound) {
     // 更新播放器UI
     document.querySelector('.player-title').textContent = sound.title;
-    document.querySelector('.player-artist').textContent = sound.artist;
+    document.querySelector('.player-artist').textContent = sound.artist || '大自然';
     
     // 使用对应的图片
     const playerImage = document.querySelector('.player-image');
-    const imgSrc = sound.image || `assets/images/sounds/${sound.id}.svg`;
+    const imgSrc = sound.image || `assets/images/sounds/${sound.category || 'nature'}.svg`;
     playerImage.src = imgSrc;
     playerImage.onerror = function() {
       // 如果图片加载失败，使用默认图片
@@ -677,7 +731,10 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // 显示播放器
+    const audioPlayer = document.getElementById('audio-player');
     audioPlayer.classList.add('active');
+    audioPlayer.style.display = 'flex';
+    audioPlayer.style.transform = 'translateY(0)';
     
     // 更新播放按钮状态
     document.querySelector('.player-play i').className = 'fas fa-pause';
@@ -1083,47 +1140,76 @@ document.addEventListener('DOMContentLoaded', function() {
   function renderSoundCategories() {
     const categories = document.querySelectorAll('.category-item');
     
+    // 定义每个类别的SVG内容 - 使用更独特、美观的图标
+    const categoryIcons = {
+      nature: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,3C10.89,3 10,3.89 10,5C10,6.11 10.89,7 12,7C13.11,7 14,6.11 14,5C14,3.89 13.11,3 12,3M12,8C9.24,8 7,10.24 7,13C7,13.84 7.25,14.65 7.68,15.36L12,22L16.32,15.36C16.75,14.65 17,13.84 17,13C17,10.24 14.76,8 12,8Z" /></svg>`,
+      
+      meditation: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z" /></svg>`,
+      
+      stories: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 1L14 6V17L19 12.5V1M21 5V18.5C19.9 18.15 18.7 18 17.5 18C15.8 18 13.35 18.65 12 19.5V6C10.55 4.9 8.45 4.5 6.5 4.5C4.55 4.5 2.45 4.9 1 6V20.65C1 20.9 1.25 21.15 1.5 21.15C1.6 21.15 1.65 21.1 1.75 21.1C3.1 20.45 5.05 20 6.5 20C8.45 20 10.55 20.4 12 21.5C13.35 20.65 15.8 20 17.5 20C19.15 20 20.85 20.3 22.25 21.05C22.35 21.1 22.4 21.1 22.5 21.1C22.75 21.1 23 20.85 23 20.6V6C22.4 5.55 21.75 5.25 21 5M10 18.41C8.75 18.09 7.5 18 6.5 18C5.44 18 4.18 18.19 3 18.5V7.13C3.91 6.73 5.14 6.5 6.5 6.5C7.86 6.5 9.09 6.73 10 7.13V18.41Z" /></svg>`,
+      
+      music: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9,3V4.5H7V3H5V7H7V5.5H9V7H11V3H9M5,21V17H7V18.5H9V17H11V21H9V19.5H7V21H5M3,13V11H5V13H3M5,15V13H7V15H5M7,15H9V17H7V15M9,15V13H11V15H9M11,13H13V15H11V13M13,13V11H15V13H13M15,11H17V13H15V11M17,11V9H19V11H17M17,9H15V7H17V9M21,11V9H19V7H21V5H19V3H21V1H11V5H13V7H15V9H9V5H11V3H1V5H3V7H5V9H7V11H5V13H3V15H5V17H7V19H5V21H9V17H11V15H13V13H15V11H13V9H17V11H15V13H17V15H19V13H21V11H19V9H21V7H19V9H17V7H21V11M19,19V21H21V19H19M19,19H17V17H19V19M15,21V19H17V21H15M15,21H13V19H15V21M13,17H15V19H13V17M11,21H13V19H11V21Z" /></svg>`,
+      
+      whitenoise: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3,9H7L12,4V20L7,15H3V9M14.59,15.17L16.17,13.59L14.59,12L16.17,10.41L14.59,8.83L16.17,7.24L14.59,5.66L16.17,4.07L17.76,5.66L16.17,7.24L17.76,8.83L16.17,10.41L17.76,12L16.17,13.59L17.76,15.17L16.17,16.76L14.59,15.17Z" /></svg>`
+    };
+    
     categories.forEach(category => {
       const categoryType = category.getAttribute('data-category');
       const iconElement = category.querySelector('.category-icon');
       
-      if (iconElement) {
-        // 确保图标正确显示
-        const categoryIconPath = `assets/images/sounds/${categoryType}.svg`;
-        
-        // 使用内联SVG图标作为备份
-        let svgIcon = '';
-        
-        switch(categoryType) {
-          case 'nature':
-            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M14,8.5A1.5,1.5 0 0,0 12.5,10A1.5,1.5 0 0,0 14,11.5A1.5,1.5 0 0,0 15.5,10A1.5,1.5 0 0,0 14,8.5M14,12.5A1.5,1.5 0 0,0 12.5,14A1.5,1.5 0 0,0 14,15.5A1.5,1.5 0 0,0 15.5,14A1.5,1.5 0 0,0 14,12.5M10,17A1,1 0 0,0 9,18A1,1 0 0,0 10,19A1,1 0 0,0 11,18A1,1 0 0,0 10,17M10,8.5A1.5,1.5 0 0,0 8.5,10A1.5,1.5 0 0,0 10,11.5A1.5,1.5 0 0,0 11.5,10A1.5,1.5 0 0,0 10,8.5M14,20.5A0.5,0.5 0 0,0 13.5,21A0.5,0.5 0 0,0 14,21.5A0.5,0.5 0 0,0 14.5,21A0.5,0.5 0 0,0 14,20.5M14,17A1,1 0 0,0 13,18A1,1 0 0,0 14,19A1,1 0 0,0 15,18A1,1 0 0,0 14,17M21,13.5A0.5,0.5 0 0,0 20.5,14A0.5,0.5 0 0,0 21,14.5A0.5,0.5 0 0,0 21.5,14A0.5,0.5 0 0,0 21,13.5M18,5A1,1 0 0,0 17,6A1,1 0 0,0 18,7A1,1 0 0,0 19,6A1,1 0 0,0 18,5M18,9A1,1 0 0,0 17,10A1,1 0 0,0 18,11A1,1 0 0,0 19,10A1,1 0 0,0 18,9M18,17A1,1 0 0,0 17,18A1,1 0 0,0 18,19A1,1 0 0,0 19,18A1,1 0 0,0 18,17M18,13.5A0.5,0.5 0 0,0 17.5,14A0.5,0.5 0 0,0 18,14.5A0.5,0.5 0 0,0 18.5,14A0.5,0.5 0 0,0 18,13.5M6,5A1,1 0 0,0 5,6A1,1 0 0,0 6,7A1,1 0 0,0 7,6A1,1 0 0,0 6,5M6,9A1,1 0 0,0 5,10A1,1 0 0,0 6,11A1,1 0 0,0 7,10A1,1 0 0,0 6,9M6,17A1,1 0 0,0 5,18A1,1 0 0,0 6,19A1,1 0 0,0 7,18A1,1 0 0,0 6,17M6,13.5A0.5,0.5 0 0,0 5.5,14A0.5,0.5 0 0,0 6,14.5A0.5,0.5 0 0,0 6.5,14A0.5,0.5 0 0,0 6,13.5M10,12.5A1.5,1.5 0 0,0 8.5,14A1.5,1.5 0 0,0 10,15.5A1.5,1.5 0 0,0 11.5,14A1.5,1.5 0 0,0 10,12.5Z" /></svg>';
-            break;
-          case 'meditation':
-            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4C13.11,4 14,4.89 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6C10,4.89 10.89,4 12,4M12,10C13.1,10 14.17,10.29 15.07,10.81C14.44,11.15 13.5,11.83 13.5,13.05C13,12.95 12.5,12.9 12,12.9C8.69,12.9 6,14.25 6,16V17H13.5V18H6C4.93,18 4,17.07 4,16V15.5C4,13.12 7.5,10.9 12,10.9C12.37,10.9 12.73,10.93 13.08,11C13.57,10.8 14.06,10.56 14.5,10.26C13.82,10.09 12.92,10 12,10M18,13C20.21,13 22,14.79 22,17C22,19.21 20.21,21 18,21C16.62,21 15.4,20.34 14.7,19.3L15.76,18.5C16.25,19.22 17.08,19.7 18,19.7C19.5,19.7 20.7,18.5 20.7,17C20.7,15.5 19.5,14.3 18,14.3C17.08,14.3 16.25,14.78 15.76,15.5L14.7,14.7C15.4,13.66 16.62,13 18,13M18,17.5C18.28,17.5 18.5,17.28 18.5,17C18.5,16.72 18.28,16.5 18,16.5C17.72,16.5 17.5,16.72 17.5,17C17.5,17.28 17.72,17.5 18,17.5Z" /></svg>';
-            break;
-          case 'stories':
-            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M18,22A2,2 0 0,0 20,20V4C20,2.89 19.1,2 18,2H12V9L9.5,7.5L7,9V2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18Z" /></svg>';
-            break;
-          case 'music':
-            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M21,3V15.5A3.5,3.5 0 0,1 17.5,19A3.5,3.5 0 0,1 14,15.5A3.5,3.5 0 0,1 17.5,12C18.04,12 18.55,12.12 19,12.34V6.47L9,8.6V17.5A3.5,3.5 0 0,1 5.5,21A3.5,3.5 0 0,1 2,17.5A3.5,3.5 0 0,1 5.5,14C6.04,14 6.55,14.12 7,14.34V6L21,3Z" /></svg>';
-            break;
-          case 'whitenoise':
-            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" /></svg>';
-            break;
+      if (iconElement && categoryType) {
+        // 检查该类别是否有专用SVG图标定义
+        if (categoryIcons[categoryType]) {
+          // 首先尝试从图片文件加载
+          const iconPath = `assets/images/sounds/${categoryType}.svg`;
+          
+          const img = document.createElement('img');
+          img.src = iconPath;
+          img.alt = categoryType;
+          
+          // 如果图片加载失败，使用定义的SVG
+          img.onerror = function() {
+            console.log(`图标 ${iconPath} 加载失败，使用内置SVG`);
+            iconElement.innerHTML = categoryIcons[categoryType];
+          };
+          
+          // 清空现有内容并添加图片
+          iconElement.innerHTML = '';
+          iconElement.appendChild(img);
+          
+          // 添加自定义颜色
+          if (category.classList.contains('active')) {
+            iconElement.style.color = '#8093f1';
+          } else {
+            iconElement.style.color = '#ffffff';
+          }
+        } else {
+          console.warn(`没有为类别 ${categoryType} 定义图标`);
         }
-        
-        // 尝试从外部加载图标，如果失败则使用内联SVG
-        const iconImg = document.createElement('img');
-        iconImg.src = categoryIconPath;
-        iconImg.alt = categoryType;
-        iconImg.onerror = function() {
-          console.log('图标加载失败，使用内联SVG:', categoryType);
-          iconElement.innerHTML = svgIcon;
-        };
-        
-        iconElement.innerHTML = '';
-        iconElement.appendChild(iconImg);
       }
+    });
+    
+    // 添加类别项点击事件，确保图标颜色也随着激活状态变化
+    categories.forEach(category => {
+      category.addEventListener('click', function() {
+        // 移除所有激活状态
+        categories.forEach(item => {
+          item.classList.remove('active');
+          const icon = item.querySelector('.category-icon');
+          if (icon) icon.style.color = '#ffffff';
+        });
+        
+        // 添加当前激活状态
+        this.classList.add('active');
+        const activeIcon = this.querySelector('.category-icon');
+        if (activeIcon) activeIcon.style.color = '#8093f1';
+        
+        // 触发声音列表更新
+        const categoryType = this.getAttribute('data-category');
+        if (categoryType) {
+          renderSoundsByCategory(categoryType);
+        }
+      });
     });
     
     console.log('声音类别图标渲染完成');
@@ -1827,4 +1913,212 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 初始化增强混音功能
   initEnhancedMixer();
+  
+  // 更新AI持续对话功能
+  function initializeVoiceAssistant() {
+    const aiVoiceBtn = document.getElementById('ai-voice-btn');
+    let isListening = false;
+    let continuousMode = false;
+    
+    // 语音识别对象
+    let recognition = null;
+    
+    // 尝试初始化Web Speech API
+    try {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'zh-CN'; // 设置为中文
+      
+      // 设置错误处理
+      recognition.onerror = function(event) {
+        console.error('语音识别错误:', event.error);
+        isListening = false;
+        hideVoiceFeedback();
+        
+        if (continuousMode) {
+          // 在连续模式下，尝试重新启动
+          setTimeout(() => {
+            startListening();
+          }, 1000);
+        }
+      };
+      
+      // 处理识别结果
+      recognition.onresult = function(event) {
+        const last = event.results.length - 1;
+        const text = event.results[last][0].transcript.trim();
+        console.log('识别到语音:', text);
+        
+        // 添加用户消息到聊天
+        addChatMessage(text, 'user');
+        
+        // 处理语音命令
+        processUserVoiceCommand(text);
+        
+        // 在连续模式下，保持识别
+        if (continuousMode) {
+          showNotification('AI助手', '正在聆听...');
+        }
+      };
+      
+      recognition.onend = function() {
+        console.log('语音识别结束');
+        if (continuousMode) {
+          console.log('保持连续监听模式');
+          recognition.start();
+        } else {
+          isListening = false;
+          hideVoiceFeedback();
+        }
+      };
+      
+    } catch (e) {
+      console.error('不支持Web Speech API, 使用模拟识别:', e);
+      recognition = null;
+    }
+    
+    // 启动语音识别
+    function startListening() {
+      if (isListening) return;
+      
+      isListening = true;
+      showVoiceFeedback();
+      
+      if (recognition) {
+        try {
+          recognition.start();
+          console.log('开始语音识别');
+        } catch (e) {
+          console.error('启动语音识别失败:', e);
+          simulateVoiceRecognition();
+        }
+      } else {
+        simulateVoiceRecognition();
+      }
+    }
+    
+    // 停止语音识别
+    function stopListening() {
+      if (!isListening) return;
+      
+      if (recognition) {
+        try {
+          recognition.stop();
+          console.log('停止语音识别');
+        } catch (e) {
+          console.error('停止语音识别失败:', e);
+        }
+      }
+      
+      isListening = false;
+      hideVoiceFeedback();
+    }
+    
+    // 切换连续模式
+    function toggleContinuousMode() {
+      continuousMode = !continuousMode;
+      
+      if (continuousMode) {
+        showNotification('连续对话模式已开启', '您可以直接说话，无需按按钮');
+        startListening();
+      } else {
+        showNotification('连续对话模式已关闭', '');
+        stopListening();
+      }
+    }
+    
+    // 显示语音反馈UI
+    function showVoiceFeedback() {
+      const feedbackElem = document.createElement('div');
+      feedbackElem.className = 'voice-feedback';
+      feedbackElem.innerHTML = `
+        <div class="voice-feedback-icon">
+          <i class="fas fa-microphone-alt"></i>
+        </div>
+        <div class="voice-feedback-text">正在聆听...</div>
+      `;
+      
+      // 移除任何已存在的反馈元素
+      hideVoiceFeedback();
+      
+      // 添加到页面
+      document.body.appendChild(feedbackElem);
+    }
+    
+    // 隐藏语音反馈UI
+    function hideVoiceFeedback() {
+      const existingFeedback = document.querySelector('.voice-feedback');
+      if (existingFeedback) {
+        existingFeedback.remove();
+      }
+    }
+    
+    // 添加语音按钮事件
+    if (aiVoiceBtn) {
+      // 短按启动单次识别，长按启动连续模式
+      let longPressTimer;
+      
+      aiVoiceBtn.addEventListener('mousedown', function() {
+        longPressTimer = setTimeout(() => {
+          toggleContinuousMode();
+          longPressTimer = null;
+        }, 1000);
+      });
+      
+      aiVoiceBtn.addEventListener('mouseup', function() {
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          // 普通点击，只进行单次识别
+          if (!continuousMode) {
+            startListening();
+          }
+        }
+      });
+      
+      // 点击事件 - 在移动设备上支持点击
+      aiVoiceBtn.addEventListener('click', function() {
+        if (!isListening && !continuousMode) {
+          startListening();
+        }
+      });
+      
+      // 添加工具提示
+      aiVoiceBtn.title = "点击进行语音对话，长按开启连续对话模式";
+    }
+    
+    // 公开方法
+    return {
+      startListening,
+      stopListening,
+      toggleContinuousMode
+    };
+  }
+
+  // 在初始化时创建语音助手
+  let voiceAssistant;
+  document.addEventListener('DOMContentLoaded', function() {
+    // 其他初始化代码...
+    
+    // 初始化语音助手
+    voiceAssistant = initializeVoiceAssistant();
+    
+    // 显示初始提示
+    setTimeout(() => {
+      showNotification('语音交互提示', '点击麦克风按钮开始语音对话，长按开启连续对话模式');
+    }, 3000);
+  });
+
+  // 添加页面加载后立即播放一个随机声音的功能
+  document.addEventListener('DOMContentLoaded', function() {
+    // 其他初始化代码...
+    
+    // 在页面加载后1秒播放默认声音
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * soundData.nature.length);
+      playSound(soundData.nature[randomIndex]);
+      showNotification('自动播放', `开始播放 ${soundData.nature[randomIndex].title}`);
+    }, 1000);
+  });
 }); 
