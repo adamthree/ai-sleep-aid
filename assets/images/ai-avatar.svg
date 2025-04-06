@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- 头部背景 -->
+  <circle cx="100" cy="100" r="90" fill="#5c6bc0" />
+  
+  <!-- 内部光环 -->
+  <circle cx="100" cy="100" r="75" fill="#7986cb" />
+  
+  <!-- 脸部 -->
+  <circle cx="100" cy="100" r="60" fill="#c5cae9" />
+  
+  <!-- 眼睛 -->
+  <circle cx="70" cy="85" r="10" fill="#3f51b5" />
+  <circle cx="130" cy="85" r="10" fill="#3f51b5" />
+  
+  <!-- 眼睛亮点 -->
+  <circle cx="73" cy="82" r="3" fill="white" />
+  <circle cx="133" cy="82" r="3" fill="white" />
+  
+  <!-- 嘴巴 - 柔和的曲线 -->
+  <path d="M75,120 Q100,140 125,120" stroke="#3f51b5" stroke-width="5" fill="none" />
+  
+  <!-- 装饰性元素 - 头部光芒 -->
+  <g opacity="0.7">
+    <path d="M100,10 L100,30" stroke="#e8eaf6" stroke-width="3" />
+    <path d="M100,170 L100,190" stroke="#e8eaf6" stroke-width="3" />
+    <path d="M10,100 L30,100" stroke="#e8eaf6" stroke-width="3" />
+    <path d="M170,100 L190,100" stroke="#e8eaf6" stroke-width="3" />
+    
+    <path d="M30,30 L45,45" stroke="#e8eaf6" stroke-width="3" />
+    <path d="M155,155 L170,170" stroke="#e8eaf6" stroke-width="3" />
+    <path d="M30,170 L45,155" stroke="#e8eaf6" stroke-width="3" />
+    <path d="M155,45 L170,30" stroke="#e8eaf6" stroke-width="3" />
+  </g>
+  
+  <!-- 装饰性音符元素 -->
+  <g transform="translate(160, 60) scale(0.6)">
+    <path d="M10,0 L10,20 C10,30 0,30 0,20 C0,10 10,10 10,20" fill="#e8eaf6" />
+    <circle cx="2" cy="20" r="5" fill="#e8eaf6" />
+  </g>
+  
+  <g transform="translate(40, 150) scale(0.6)">
+    <path d="M0,0 L0,20 C0,30 10,30 10,20 C10,10 0,10 0,20" fill="#e8eaf6" />
+    <circle cx="8" cy="20" r="5" fill="#e8eaf6" />
+  </g>
+</svg> 
