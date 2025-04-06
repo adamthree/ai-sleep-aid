@@ -118,19 +118,19 @@ document.addEventListener('DOMContentLoaded', function() {
       updatePlayerUI(sound);
       showNotification('开始播放', `${sound.title} 正在加载...`);
       
-      // 使用第二套备用音频源 - 使用公共域名直链音频
+      // 使用可靠的MP3直链音频源
       const audioSources = {
-        rain: 'https://audio.jukehost.co.uk/iuKb7XwhqyMyEMVL03tF1nt8fvaMKEPB', // 雨声
-        ocean: 'https://audio.jukehost.co.uk/YG7LELvBEvQgWJINvfnvUWUurGy27jPm', // 海浪声
-        forest: 'https://audio.jukehost.co.uk/IzGC1EInEmktYZCw82VxJHoqxZXhYIoK', // 森林声
-        fire: 'https://audio.jukehost.co.uk/TpfCPWl2JWcJOmtKVKXIH6DnDI31FLUw', // 篝火
-        birds: 'https://audio.jukehost.co.uk/m5wELbRFwCTYUTXsntEZzm9M5i6WOaKs', // 鸟鸣
-        wind: 'https://audio.jukehost.co.uk/1f4fyvdG4f9tnDkAGIeGl7vaBYJ18tqJ', // 风声
-        thunder: 'https://audio.jukehost.co.uk/Cs4Hfl03bYY93eM6gKMDQvqG7QZsBCmt', // 雷声
-        whitenoise: 'https://audio.jukehost.co.uk/pfj0B2owdkDx85qULJZ9ta9KP0Y6SqeM', // 白噪音
-        meditation: 'https://audio.jukehost.co.uk/WDmuXQBj1dLcqP6vRkiZIBQRd24bWb7s', // 冥想
-        piano: 'https://audio.jukehost.co.uk/vKKhBVMrlGIYY9tFRWMEZW4QYecJM9r2', // 钢琴
-        default: 'https://audio.jukehost.co.uk/n4sHDDcm28zZrLGOlrRFu669P6PyrFai' // 默认
+        rain: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', // 雨声
+        ocean: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // 海浪声
+        forest: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', // 森林声
+        fire: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', // 篝火
+        birds: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', // 鸟鸣
+        wind: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3', // 风声
+        thunder: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3', // 雷声
+        whitenoise: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3', // 白噪音
+        meditation: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3', // 冥想
+        piano: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3', // 钢琴
+        default: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3' // 默认
       };
       
       // 根据声音ID或名称选择适合的音频源
@@ -163,46 +163,68 @@ document.addEventListener('DOMContentLoaded', function() {
       
       console.log("使用音频源:", audioSrc);
       
-      // 强制直接使用HTML5音频元素并添加到页面
-      let audioElement = document.createElement('audio');
-      audioElement.src = audioSrc;
-      audioElement.autoplay = true;
-      audioElement.loop = true;
-      audioElement.volume = 0.7;
-      document.body.appendChild(audioElement);
+      // 创建新的Audio元素
+      const audio = new Audio();
       
-      // 开始播放
-      let playPromise = audioElement.play();
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log("成功播放音频");
-          showNotification('播放中', `${sound.title} 正在播放中`);
+      // 添加事件处理
+      audio.oncanplaythrough = function() {
+        console.log("音频加载完成，开始播放");
+        
+        // 开始播放
+        audio.play().then(() => {
+          console.log("音频播放成功");
+          showNotification('播放中', `${sound.title} 正在播放`);
           
-          // 存储到活动音轨列表
-          activeSoundTracks.push({
-            sound: sound,
-            audio: audioElement,
-            volume: 0.7
-          });
+          // 更新播放按钮
+          const playBtn = document.querySelector('.player-play i');
+          if (playBtn) playBtn.className = 'fas fa-pause';
           
-          // 显示播放器
-          const audioPlayer = document.getElementById('audio-player');
-          if (audioPlayer) {
-            audioPlayer.style.display = 'flex';
-          }
-          
+          // 更新播放状态
+          isPlaying = true;
         }).catch(err => {
           console.error("自动播放失败:", err);
           showNotification('需要交互', '请点击页面任意位置允许播放');
           
           // 添加一次性点击事件
           const startPlayOnce = function() {
-            audioElement.play().catch(e => console.error("播放失败:", e));
+            audio.play().catch(e => console.error("播放失败:", e));
             document.body.removeEventListener('click', startPlayOnce);
           };
           document.body.addEventListener('click', startPlayOnce);
         });
+      };
+      
+      // 错误处理
+      audio.onerror = function(e) {
+        console.error("音频加载错误:", e);
+        showNotification('加载错误', '无法加载音频，请尝试其他音频');
+      };
+      
+      // 设置音频属性
+      audio.src = audioSrc;
+      audio.loop = true;
+      audio.volume = 0.7;
+      audio.preload = "auto";
+      
+      // 开始加载
+      audio.load();
+      
+      // 存储到活动音轨列表
+      activeSoundTracks.push({
+        sound: sound,
+        audio: audio,
+        volume: 0.7
+      });
+      
+      // 显示播放器
+      const audioPlayer = document.getElementById('audio-player');
+      if (audioPlayer) {
+        audioPlayer.style.display = 'flex';
+        audioPlayer.classList.add('active');
       }
+      
+      // 定期更新进度条
+      updateProgress(audio);
       
     } catch (e) {
       console.error("音频播放错误:", e);

@@ -13,29 +13,38 @@
   <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
   <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
   <style>
-    /* 修复手机应用演示样式 - 确保不倾斜 */
+    /* 完全重置样式以确保不倾斜 */
+    *, *:before, *:after {
+      box-sizing: border-box;
+      transform: none !important;
+      perspective: none !important;
+      transform-style: flat !important;
+      transition: none !important;
+    }
+    
     html, body {
       margin: 0;
       padding: 0;
-      background-color: #333; /* 衬底颜色 */
+      background-color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       width: 100vw;
       overflow: hidden;
-      transform: none !important; /* 防止整体倾斜 */
+      perspective: none !important;
+      transform-style: flat !important;
     }
     
     .app-container {
-      width: 414px; /* 固定iPhone尺寸宽度 */
-      height: 896px; /* 固定iPhone尺寸高度 */
+      width: 414px;
+      height: 896px;
       overflow: hidden;
       position: relative;
       background-color: #14152e;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
       border-radius: 32px;
-      transform: none !important; /* 防止容器倾斜 */
+      margin: 0 auto;
     }
     
     @media (max-width: 500px) {
@@ -51,11 +60,10 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 60px; /* 底部导航高度 */
+      bottom: 60px;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding: 0;
-      transform: none !important; /* 防止内容倾斜 */
     }
     
     .tab-bar {
@@ -72,7 +80,6 @@
       -webkit-backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 999;
-      transform: none !important; /* 防止标签栏倾斜 */
     }
     
     .tab-content {
@@ -84,7 +91,7 @@
       display: block;
     }
     
-    /* 修复音频播放器 - 确保不倾斜且正确显示 */
+    /* 修复音频播放器 - 完全重写避免变形 */
     .audio-player {
       display: flex;
       align-items: center;
@@ -93,12 +100,11 @@
       border-radius: 12px;
       margin-bottom: 10px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      position: fixed;
+      position: absolute;
       bottom: 75px;
-      left: 50%;
-      transform: translateX(-50%) !important; /* 仅使用水平居中变换 */
-      width: calc(100% - 30px);
-      max-width: 400px;
+      left: 7px;
+      right: 7px;
+      width: calc(100% - 14px);
       z-index: 990;
     }
     
@@ -108,11 +114,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
       max-width: 150px;
-    }
-    
-    /* 防止所有元素倾斜 */
-    * {
-      transform-style: flat;
     }
   </style>
 </head>
