@@ -108,81 +108,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 播放声音
   function playSound(sound) {
-    // 如果有正在播放的音频，先停止
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
+    // 停止所有当前音轨
+    stopAllSounds();
     
-    // 创建新的音频元素
-    const audio = new Audio();
-    
-    // 设置音频源
-    if (sound.audio) {
-      audio.src = sound.audio;
-    } else {
-      // 使用内置的音频资源或不设置src以避免错误
-      console.log('音频文件不存在，使用模拟播放');
-      
-      // 直接模拟播放，不尝试加载实际音频
-      isPlaying = true;
-      document.querySelector('.player-play i').className = 'fas fa-pause';
-      
-      // 更新播放器UI
-      document.querySelector('.player-title').textContent = sound.title;
-      document.querySelector('.player-artist').textContent = sound.artist;
-      
-      // 使用对应的图片
-      const playerImage = document.querySelector('.player-image');
-      playerImage.src = sound.image || `assets/images/sounds/${sound.id}.svg`;
-      
-      // 显示播放器
-      audioPlayer.classList.add('active');
-      
-      // 更新进度条
-      updateProgressSimulated();
-      
-      return; // 提前返回，不执行后面的代码
-    }
-    
-    // 更新播放器UI
-    document.querySelector('.player-title').textContent = sound.title;
-    document.querySelector('.player-artist').textContent = sound.artist;
-    
-    // 使用对应的图片
-    const playerImage = document.querySelector('.player-image');
-    playerImage.src = sound.image || `assets/images/sounds/${sound.id}.svg`;
-    
-    // 显示播放器
-    audioPlayer.classList.add('active');
-    
-    // 播放错误处理
-    audio.addEventListener('error', function() {
-      console.log('音频文件加载失败，使用模拟播放');
-      isPlaying = true;
-      document.querySelector('.player-play i').className = 'fas fa-pause';
-      updateProgressSimulated();
-    });
-    
-    // 播放音频
-    audio.play()
-      .then(() => {
-        isPlaying = true;
-        document.querySelector('.player-play i').className = 'fas fa-pause';
-      })
-      .catch(error => {
-        console.error('播放失败:', error);
-        // 不显示错误提示，继续模拟播放
-        isPlaying = true;
-        document.querySelector('.player-play i').className = 'fas fa-pause';
-        updateProgressSimulated();
-      });
-    
-    // 保存当前音频
-    currentAudio = audio;
-    
-    // 更新进度条
-    updateProgress(audio);
+    // 添加新的音轨
+    addSoundTrack(sound);
   }
   
   // 模拟进度条更新
@@ -274,11 +204,338 @@ document.addEventListener('DOMContentLoaded', function() {
     // 清空输入框
     aiInput.value = '';
     
-    // 模拟AI回复
+    // 分析用户消息并执行相应操作
+    processUserVoiceCommand(message);
+  }
+  
+  // 处理用户语音指令
+  function processUserVoiceCommand(message) {
+    // 转换为小写进行分析
+    const lowerMessage = message.toLowerCase();
+    
+    // 创建AI回复
+    let aiResponse = '';
+    
+    // 检查是否是场景请求
+    if (lowerMessage.includes('热带雨林') || lowerMessage.includes('森林') || lowerMessage.includes('丛林')) {
+      // 播放森林相关的音频
+      const forestSound = findSoundByKeyword('forest');
+      if (forestSound) {
+        playSound(forestSound);
+        aiResponse = `已为您播放"${forestSound.title}"，欢迎来到热带雨林。您可以继续要求添加其他声音，如昆虫声、鸟鸣等。`;
+      } else {
+        aiResponse = '抱歉，我没有找到热带雨林的音频。您可以尝试其他场景，如"海洋"、"雨声"等。';
+      }
+    } 
+    else if (lowerMessage.includes('海洋') || lowerMessage.includes('海边') || lowerMessage.includes('海浪')) {
+      // 播放海洋相关的音频
+      const oceanSound = findSoundByKeyword('ocean');
+      if (oceanSound) {
+        playSound(oceanSound);
+        aiResponse = `已为您播放"${oceanSound.title}"，感受海浪声环绕。您可以继续要求添加其他声音。`;
+      } else {
+        aiResponse = '抱歉，我没有找到海洋的音频。您可以尝试其他场景，如"森林"、"雨声"等。';
+      }
+    }
+    else if (lowerMessage.includes('雨') || lowerMessage.includes('雨声') || lowerMessage.includes('下雨')) {
+      // 播放雨声相关的音频
+      const rainSound = findSoundByKeyword('rain');
+      if (rainSound) {
+        playSound(rainSound);
+        aiResponse = `已为您播放"${rainSound.title}"，聆听雨滴的声音。您可以继续要求添加其他声音。`;
+      } else {
+        aiResponse = '抱歉，我没有找到雨声的音频。您可以尝试其他场景，如"森林"、"海洋"等。';
+      }
+    }
+    // 检查是否是要添加额外音轨
+    else if (lowerMessage.includes('添加') || lowerMessage.includes('加入') || lowerMessage.includes('来点')) {
+      // 解析用户想要添加的声音
+      let soundKeyword = '';
+      
+      if (lowerMessage.includes('昆虫') || lowerMessage.includes('虫鸣')) {
+        soundKeyword = 'insect';
+      } else if (lowerMessage.includes('鸟') || lowerMessage.includes('鸟鸣')) {
+        soundKeyword = 'bird';
+      } else if (lowerMessage.includes('篝火') || lowerMessage.includes('火堆') || lowerMessage.includes('火炉')) {
+        soundKeyword = 'fire';
+      } else if (lowerMessage.includes('风')) {
+        soundKeyword = 'wind';
+      } else if (lowerMessage.includes('钢琴') || lowerMessage.includes('音乐')) {
+        soundKeyword = 'piano';
+      }
+      
+      if (soundKeyword) {
+        // 尝试添加音轨
+        const additionalSound = findSoundByKeyword(soundKeyword);
+        if (additionalSound) {
+          addSoundTrack(additionalSound);
+          aiResponse = `已为您添加"${additionalSound.title}"音轨。您还需要其他声音吗？`;
+        } else {
+          aiResponse = `抱歉，我没有找到与"${soundKeyword}"相关的音频。您可以尝试其他声音，如"雨声"、"风声"等。`;
+        }
+      } else {
+        aiResponse = '请告诉我您想添加什么声音，例如"添加鸟鸣声"、"来点篝火声"等。';
+      }
+    }
+    // 调整音量
+    else if (lowerMessage.includes('音量') || lowerMessage.includes('声音') || lowerMessage.includes('大声') || lowerMessage.includes('小声')) {
+      if (lowerMessage.includes('大') || lowerMessage.includes('增大') || lowerMessage.includes('提高')) {
+        increaseVolume();
+        aiResponse = '已为您增大音量。';
+      } else if (lowerMessage.includes('小') || lowerMessage.includes('减小') || lowerMessage.includes('降低')) {
+        decreaseVolume();
+        aiResponse = '已为您减小音量。';
+      } else {
+        aiResponse = '请告诉我您想如何调整音量，例如"音量大一点"或"音量小一点"。';
+      }
+    }
+    // 停止播放
+    else if (lowerMessage.includes('停止') || lowerMessage.includes('暂停') || lowerMessage.includes('关闭音乐')) {
+      stopAllSounds();
+      aiResponse = '已为您停止所有声音播放。';
+    }
+    // 默认回复
+    else {
+      aiResponse = getAiResponse(message);
+    }
+    
+    // 添加AI回复
     setTimeout(() => {
-      const aiResponse = getAiResponse(message);
       addChatMessage(aiResponse, 'ai');
     }, 1000);
+  }
+  
+  // 根据关键词查找音频
+  function findSoundByKeyword(keyword) {
+    // 合并所有类别的声音
+    const allSounds = [
+      ...soundData.nature, 
+      ...soundData.meditation, 
+      ...soundData.whitenoise, 
+      ...soundData.music, 
+      ...soundData.stories
+    ];
+    
+    // 搜索匹配的音频
+    for (const sound of allSounds) {
+      // 检查ID、标题和描述是否包含关键词
+      if (sound.id.includes(keyword) || 
+          sound.title.toLowerCase().includes(keyword) || 
+          (sound.description && sound.description.toLowerCase().includes(keyword))) {
+        return sound;
+      }
+    }
+    
+    // 如果没有精确匹配，尝试以下备选项
+    if (keyword === 'forest') {
+      return soundData.nature.find(s => s.id === 'forest') || soundData.nature[0];
+    } else if (keyword === 'ocean') {
+      return soundData.nature.find(s => s.id === 'ocean') || soundData.nature[2];
+    } else if (keyword === 'rain') {
+      return soundData.nature.find(s => s.id === 'rain') || soundData.nature[0];
+    } else if (keyword === 'fire') {
+      // 模拟火声音频
+      return {
+        id: 'fire',
+        title: '篝火声',
+        artist: '大自然',
+        image: 'assets/images/sounds/fire.svg',
+        description: '温暖的篝火声，让人感觉舒适和安全。'
+      };
+    } else if (keyword === 'insect') {
+      // 模拟昆虫声音频
+      return {
+        id: 'insects',
+        title: '昆虫鸣叫',
+        artist: '大自然',
+        image: 'assets/images/sounds/forest.svg',
+        description: '夜晚森林中的昆虫鸣叫声。'
+      };
+    } else if (keyword === 'bird') {
+      // 模拟鸟鸣声音频
+      return {
+        id: 'birds',
+        title: '鸟鸣声',
+        artist: '大自然',
+        image: 'assets/images/sounds/forest.svg',
+        description: '清晨森林中的鸟儿歌唱。'
+      };
+    } else if (keyword === 'wind') {
+      // 模拟风声音频
+      return {
+        id: 'wind',
+        title: '风声',
+        artist: '大自然',
+        image: 'assets/images/sounds/wind.svg',
+        description: '轻柔的风吹过树叶的声音。'
+      };
+    } else if (keyword === 'piano') {
+      return soundData.music.find(s => s.id === 'piano-sleep') || soundData.music[0];
+    }
+    
+    return null;
+  }
+  
+  // 当前激活的音轨列表
+  const activeSoundTracks = [];
+  let masterVolume = 0.7; // 主音量控制 (0-1)
+  
+  // 添加音轨
+  function addSoundTrack(sound) {
+    // 检查音轨是否已存在
+    const existingTrack = activeSoundTracks.find(track => track.sound.id === sound.id);
+    if (existingTrack) {
+      // 如果音轨已存在，将其音量恢复到较高水平
+      existingTrack.volume = masterVolume;
+      existingTrack.audio.volume = masterVolume;
+      return;
+    }
+    
+    // 创建新的音频元素
+    const audio = new Audio();
+    
+    // 尝试设置音频源
+    if (sound.audio) {
+      audio.src = sound.audio;
+    }
+    
+    // 设置循环播放
+    audio.loop = true;
+    
+    // 设置音量
+    audio.volume = masterVolume;
+    
+    // 添加到活动音轨列表
+    activeSoundTracks.push({
+      sound: sound,
+      audio: audio,
+      volume: masterVolume
+    });
+    
+    // 尝试播放
+    audio.play().catch(error => {
+      console.log('音频播放失败，使用模拟播放模式:', error);
+    });
+    
+    // 更新音轨混合器UI (如果存在)
+    updateMixerUI();
+    
+    // 如果是第一个音轨，更新播放器UI
+    if (activeSoundTracks.length === 1) {
+      // 更新播放器UI
+      document.querySelector('.player-title').textContent = sound.title;
+      document.querySelector('.player-artist').textContent = sound.artist;
+      
+      // 使用对应的图片
+      const playerImage = document.querySelector('.player-image');
+      playerImage.src = sound.image || `assets/images/sounds/${sound.id}.svg`;
+      
+      // 显示播放器
+      audioPlayer.classList.add('active');
+      
+      // 更新播放按钮状态
+      document.querySelector('.player-play i').className = 'fas fa-pause';
+      isPlaying = true;
+      
+      // 更新进度条
+      updateProgressSimulated();
+    }
+  }
+  
+  // 更新混音器UI
+  function updateMixerUI() {
+    const mixerChannels = document.querySelector('.mixer-channels');
+    if (!mixerChannels) return;
+    
+    // 清空现有内容
+    mixerChannels.innerHTML = '';
+    
+    // 添加每个活动音轨
+    activeSoundTracks.forEach(track => {
+      const channelDiv = document.createElement('div');
+      channelDiv.className = 'mixer-channel';
+      
+      channelDiv.innerHTML = `
+        <div class="channel-label">${track.sound.title}</div>
+        <input type="range" min="0" max="100" value="${track.volume * 100}" class="channel-volume" data-sound-id="${track.sound.id}">
+        <div class="channel-value">${Math.round(track.volume * 100)}%</div>
+      `;
+      
+      // 添加音量变化监听器
+      const volumeInput = channelDiv.querySelector('.channel-volume');
+      volumeInput.addEventListener('input', function() {
+        const soundId = this.getAttribute('data-sound-id');
+        const volume = parseInt(this.value) / 100;
+        
+        // 更新UI显示
+        channelDiv.querySelector('.channel-value').textContent = `${Math.round(volume * 100)}%`;
+        
+        // 更新音轨音量
+        const trackIndex = activeSoundTracks.findIndex(t => t.sound.id === soundId);
+        if (trackIndex >= 0) {
+          activeSoundTracks[trackIndex].volume = volume;
+          activeSoundTracks[trackIndex].audio.volume = volume;
+        }
+      });
+      
+      mixerChannels.appendChild(channelDiv);
+    });
+  }
+  
+  // 停止所有声音
+  function stopAllSounds() {
+    // 停止所有音轨
+    activeSoundTracks.forEach(track => {
+      if (track.audio) {
+        track.audio.pause();
+        track.audio.currentTime = 0;
+      }
+    });
+    
+    // 清空音轨列表
+    activeSoundTracks.length = 0;
+    
+    // 重置播放状态
+    isPlaying = false;
+    document.querySelector('.player-play i').className = 'fas fa-play';
+    
+    // 隐藏播放器
+    audioPlayer.classList.remove('active');
+    
+    // 更新混音器UI
+    updateMixerUI();
+  }
+  
+  // 增大音量
+  function increaseVolume() {
+    masterVolume = Math.min(masterVolume + 0.1, 1.0);
+    
+    // 更新所有音轨音量
+    activeSoundTracks.forEach(track => {
+      track.volume = masterVolume;
+      if (track.audio) {
+        track.audio.volume = masterVolume;
+      }
+    });
+    
+    // 更新混音器UI
+    updateMixerUI();
+  }
+  
+  // 减小音量
+  function decreaseVolume() {
+    masterVolume = Math.max(masterVolume - 0.1, 0.0);
+    
+    // 更新所有音轨音量
+    activeSoundTracks.forEach(track => {
+      track.volume = masterVolume;
+      if (track.audio) {
+        track.audio.volume = masterVolume;
+      }
+    });
+    
+    // 更新混音器UI
+    updateMixerUI();
   }
   
   // 添加聊天消息
@@ -331,22 +588,71 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // 语音输入模拟
+  // 语音输入功能增强
   aiVoiceBtn.addEventListener('click', function() {
     // 模拟语音识别中
     aiVoiceBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
     aiVoiceBtn.disabled = true;
     
-    // 模拟识别过程
+    // 是否支持语音识别API
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      // 这里是本地模拟，真实应用中应该使用浏览器的语音识别API
+      simulateVoiceRecognition();
+    } else {
+      // 模拟识别过程
+      simulateVoiceRecognition();
+    }
+  });
+  
+  // 模拟语音识别
+  function simulateVoiceRecognition() {
+    // 示例短语列表
+    const examplePhrases = [
+      "我希望今晚在热带雨林中入睡",
+      "来点篝火声",
+      "添加鸟鸣声",
+      "我想听海浪声",
+      "添加钢琴音乐",
+      "音量小一点",
+      "音量大一点",
+      "停止播放"
+    ];
+    
+    // 随机选择一个短语或使用特定场景
+    let recognizedText = "";
+    
+    // 如果没有激活的音轨，优先选择场景
+    if (activeSoundTracks.length === 0) {
+      // 场景相关的短语
+      const scenesPhrases = [
+        "我希望今晚在热带雨林中入睡",
+        "我想听海浪声",
+        "我需要下雨的声音来帮助我入睡"
+      ];
+      recognizedText = scenesPhrases[Math.floor(Math.random() * scenesPhrases.length)];
+    } else {
+      // 已有场景，添加音轨或调整
+      const additionalPhrases = [
+        "来点篝火声",
+        "添加鸟鸣声",
+        "添加虫鸣声",
+        "音量小一点"
+      ];
+      recognizedText = additionalPhrases[Math.floor(Math.random() * additionalPhrases.length)];
+    }
+    
+    // 延迟模拟处理时间
     setTimeout(() => {
       aiVoiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
       aiVoiceBtn.disabled = false;
       
-      // 模拟语音输入结果
-      aiInput.value = '我最近总是睡不好，有什么建议吗？';
+      // 填充输入框
+      aiInput.value = recognizedText;
+      
+      // 立即发送
       sendAiMessage();
     }, 2000);
-  });
+  }
   
   // 分享弹窗
   if (settingsShareBtn) {
