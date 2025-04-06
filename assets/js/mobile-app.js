@@ -133,10 +133,67 @@ document.addEventListener('DOMContentLoaded', function() {
           currentTime = 0;
         }
         
-        const progress = (currentTime / duration) * 100;
-        document.querySelector('.player-progress-current').style.width = progress + '%';
+        try {
+          const progress = (currentTime / duration) * 100;
+          const progressBar = document.querySelector('.player-progress-current');
+          if (progressBar) {
+            progressBar.style.width = progress + '%';
+          }
+        } catch (error) {
+          console.log('更新进度条失败:', error);
+        }
       }
     }, 1000);
+    
+    // 添加通知
+    showNotification('音频播放中', '当前使用模拟播放模式');
+  }
+  
+  // 显示通知
+  function showNotification(title, message) {
+    // 检查是否已存在通知元素
+    let notification = document.querySelector('.audio-notification');
+    
+    if (!notification) {
+      notification = document.createElement('div');
+      notification.className = 'audio-notification';
+      
+      // 添加样式
+      notification.style.position = 'fixed';
+      notification.style.bottom = '80px';
+      notification.style.left = '50%';
+      notification.style.transform = 'translateX(-50%)';
+      notification.style.background = 'rgba(20, 21, 46, 0.9)';
+      notification.style.color = 'white';
+      notification.style.padding = '10px 15px';
+      notification.style.borderRadius = '8px';
+      notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.3)';
+      notification.style.zIndex = '1000';
+      notification.style.maxWidth = '80%';
+      notification.style.textAlign = 'center';
+      notification.style.transition = 'opacity 0.3s ease';
+      
+      document.body.appendChild(notification);
+    }
+    
+    // 设置内容
+    notification.innerHTML = `
+      <div style="font-weight:bold;margin-bottom:5px;">${title}</div>
+      <div style="font-size:12px;opacity:0.8;">${message}</div>
+    `;
+    
+    // 显示通知
+    notification.style.opacity = '1';
+    
+    // 3秒后淡出
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      
+      // 完全隐藏
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, 300);
+    }, 3000);
   }
   
   // 更新进度条
@@ -162,13 +219,23 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 播放/暂停切换
   document.querySelector('.player-play').addEventListener('click', function() {
-    if (!currentAudio) return;
+    if (activeSoundTracks.length === 0) return;
     
     if (isPlaying) {
-      currentAudio.pause();
+      // 暂停所有音轨
+      activeSoundTracks.forEach(track => {
+        if (track.audio) {
+          track.audio.pause();
+        }
+      });
       this.querySelector('i').className = 'fas fa-play';
     } else {
-      currentAudio.play();
+      // 播放所有音轨
+      activeSoundTracks.forEach(track => {
+        if (track.audio) {
+          track.audio.play();
+        }
+      });
       this.querySelector('i').className = 'fas fa-pause';
     }
     
@@ -294,6 +361,10 @@ document.addEventListener('DOMContentLoaded', function() {
       stopAllSounds();
       aiResponse = '已为您停止所有声音播放。';
     }
+    // 模拟播放模式提示
+    else if (lowerMessage.includes('无法播放') || lowerMessage.includes('播放失败') || lowerMessage.includes('没有声音')) {
+      aiResponse = '当前使用模拟播放模式，由于浏览器安全限制，需要用户主动点击才能播放声音。请尝试点击任意声音图标启动播放，或者确保您的设备没有静音。';
+    }
     // 默认回复
     else {
       aiResponse = getAiResponse(message);
@@ -387,59 +458,76 @@ document.addEventListener('DOMContentLoaded', function() {
     if (existingTrack) {
       // 如果音轨已存在，将其音量恢复到较高水平
       existingTrack.volume = masterVolume;
-      existingTrack.audio.volume = masterVolume;
+      if (existingTrack.audio) {
+        existingTrack.audio.volume = masterVolume;
+      }
       return;
     }
     
-    // 创建新的音频元素
-    const audio = new Audio();
+    // 更新播放器UI（无论音频是否加载成功，都更新UI）
+    updatePlayerUI(sound);
     
-    // 尝试设置音频源
-    if (sound.audio) {
-      audio.src = sound.audio;
-    }
-    
-    // 设置循环播放
-    audio.loop = true;
-    
-    // 设置音量
-    audio.volume = masterVolume;
+    // 使用完全模拟播放模式
+    const simulatedAudio = createSimulatedAudio();
     
     // 添加到活动音轨列表
     activeSoundTracks.push({
       sound: sound,
-      audio: audio,
+      audio: simulatedAudio,
       volume: masterVolume
     });
     
-    // 尝试播放
-    audio.play().catch(error => {
-      console.log('音频播放失败，使用模拟播放模式:', error);
-    });
-    
-    // 更新音轨混合器UI (如果存在)
+    // 更新音轨混合器UI
     updateMixerUI();
     
-    // 如果是第一个音轨，更新播放器UI
-    if (activeSoundTracks.length === 1) {
-      // 更新播放器UI
-      document.querySelector('.player-title').textContent = sound.title;
-      document.querySelector('.player-artist').textContent = sound.artist;
+    // 更新进度条
+    updateProgressSimulated();
+  }
+  
+  // 创建模拟音频对象
+  function createSimulatedAudio() {
+    // 创建模拟音频对象
+    const simulatedAudio = {
+      volume: masterVolume,
+      currentTime: 0,
+      duration: 300,
+      paused: false,
+      loop: true,
       
-      // 使用对应的图片
-      const playerImage = document.querySelector('.player-image');
-      playerImage.src = sound.image || `assets/images/sounds/${sound.id}.svg`;
+      play: function() {
+        this.paused = false;
+        return Promise.resolve();
+      },
       
-      // 显示播放器
-      audioPlayer.classList.add('active');
-      
-      // 更新播放按钮状态
-      document.querySelector('.player-play i').className = 'fas fa-pause';
-      isPlaying = true;
-      
-      // 更新进度条
-      updateProgressSimulated();
-    }
+      pause: function() {
+        this.paused = true;
+      }
+    };
+    
+    return simulatedAudio;
+  }
+  
+  // 更新播放器UI
+  function updatePlayerUI(sound) {
+    // 更新播放器UI
+    document.querySelector('.player-title').textContent = sound.title;
+    document.querySelector('.player-artist').textContent = sound.artist;
+    
+    // 使用对应的图片
+    const playerImage = document.querySelector('.player-image');
+    const imgSrc = sound.image || `assets/images/sounds/${sound.id}.svg`;
+    playerImage.src = imgSrc;
+    playerImage.onerror = function() {
+      // 如果图片加载失败，使用默认图片
+      this.src = 'assets/images/app-icon.svg';
+    };
+    
+    // 显示播放器
+    audioPlayer.classList.add('active');
+    
+    // 更新播放按钮状态
+    document.querySelector('.player-play i').className = 'fas fa-pause';
+    isPlaying = true;
   }
   
   // 更新混音器UI
@@ -474,7 +562,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const trackIndex = activeSoundTracks.findIndex(t => t.sound.id === soundId);
         if (trackIndex >= 0) {
           activeSoundTracks[trackIndex].volume = volume;
-          activeSoundTracks[trackIndex].audio.volume = volume;
+          if (activeSoundTracks[trackIndex].audio) {
+            activeSoundTracks[trackIndex].audio.volume = volume;
+          }
         }
       });
       
@@ -488,7 +578,9 @@ document.addEventListener('DOMContentLoaded', function() {
     activeSoundTracks.forEach(track => {
       if (track.audio) {
         track.audio.pause();
-        track.audio.currentTime = 0;
+        if (typeof track.audio.currentTime !== 'undefined') {
+          track.audio.currentTime = 0;
+        }
       }
     });
     
@@ -504,6 +596,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 更新混音器UI
     updateMixerUI();
+    
+    // 清除进度条更新
+    if (window.progressInterval) {
+      clearInterval(window.progressInterval);
+      window.progressInterval = null;
+    }
   }
   
   // 增大音量
