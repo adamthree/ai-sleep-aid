@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频切割 - AI睡眠助手</title>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/video-cut.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <nav class="navbar">
+                <div class="logo">
+                    <img src="assets/img/logo.png" alt="AI睡眠助手">
+                    <span>AI睡眠助手</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html">首页</a></li>
+                    <li><a href="index.html#features">功能</a></li>
+                    <li><a href="index.html#sounds">声音</a></li>
+                    <li><a href="index.html#about">关于</a></li>
+                    <li><a href="mobile-app.html">体验App</a></li>
+                    <li><a href="video-cut.html" class="active">视频切割</a></li>
+                </ul>
+                <div class="burger">
+                    <div class="line1"></div>
+                    <div class="line2"></div>
+                    <div class="line3"></div>
+                </div>
+            </nav>
+        </header>
+
+        <main class="video-cut-container">
+            <section class="video-cut-section">
+                <h1>视频切割工具</h1>
+                <p class="section-desc">上传视频，设置起始和结束时间，一键切割出你需要的视频片段</p>
+                
+                <div class="video-upload-area">
+                    <div class="upload-container" id="upload-container">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>拖放视频到这里或点击上传</p>
+                        <span class="file-info">支持格式: MP4, MOV, AVI, MKV (最大: 500MB)</span>
+                        <input type="file" id="video-upload" accept="video/*" hidden>
+                    </div>
+                    
+                    <div class="video-preview-container" id="video-preview-container" style="display: none;">
+                        <video id="video-preview" controls></video>
+                        <div class="video-info">
+                            <span id="video-name"></span>
+                            <span id="video-duration"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="video-controls" id="video-controls" style="display: none;">
+                    <div class="time-range-container">
+                        <div class="time-control">
+                            <label for="start-time">开始时间:</label>
+                            <div class="time-inputs">
+                                <input type="number" id="start-hours" min="0" max="23" value="0">
+                                <span>:</span>
+                                <input type="number" id="start-minutes" min="0" max="59" value="0">
+                                <span>:</span>
+                                <input type="number" id="start-seconds" min="0" max="59" value="0">
+                            </div>
+                            <button class="set-current-btn" id="set-start-btn">设为当前时间</button>
+                        </div>
+                        
+                        <div class="time-control">
+                            <label for="end-time">结束时间:</label>
+                            <div class="time-inputs">
+                                <input type="number" id="end-hours" min="0" max="23" value="0">
+                                <span>:</span>
+                                <input type="number" id="end-minutes" min="0" max="59" value="0">
+                                <span>:</span>
+                                <input type="number" id="end-seconds" min="0" max="59" value="0">
+                            </div>
+                            <button class="set-current-btn" id="set-end-btn">设为当前时间</button>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-container">
+                        <div class="timeline" id="timeline">
+                            <div class="timeline-progress" id="timeline-progress"></div>
+                            <div class="timeline-marker start-marker" id="start-marker"></div>
+                            <div class="timeline-marker end-marker" id="end-marker"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="preview-btn" class="action-btn"><i class="fas fa-play"></i> 预览切割片段</button>
+                        <button id="cut-btn" class="action-btn primary-btn"><i class="fas fa-cut"></i> 切割视频</button>
+                        <button id="reset-btn" class="action-btn"><i class="fas fa-redo"></i> 重置</button>
+                    </div>
+                </div>
+                
+                <div class="result-container" id="result-container" style="display: none;">
+                    <h3>处理结果</h3>
+                    <div class="processing-spinner" id="processing-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>正在处理视频，请稍候...</p>
+                    </div>
+                    <div class="result-success" id="result-success" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <p>视频切割成功！</p>
+                        <a href="#" id="download-link" class="download-btn"><i class="fas fa-download"></i> 下载切割后的视频</a>
+                    </div>
+                    <div class="result-error" id="result-error" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p id="error-message">处理视频时出错</p>
+                        <button id="try-again-btn" class="action-btn">重试</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="video-cut-instructions">
+                <h2>如何使用视频切割工具</h2>
+                <div class="instructions-grid">
+                    <div class="instruction-card">
+                        <div class="instruction-icon">
+                            <i class="fas fa-upload"></i>
+                        </div>
+                        <h3>1. 上传视频</h3>
+                        <p>点击上传区域或直接拖放视频文件到指定区域</p>
+                    </div>
+                    <div class="instruction-card">
+                        <div class="instruction-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <h3>2. 设置时间</h3>
+                        <p>确定你想要切割的视频片段的开始和结束时间</p>
+                    </div>
+                    <div class="instruction-card">
+                        <div class="instruction-icon">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <h3>3. 切割视频</h3>
+                        <p>点击"切割视频"按钮开始处理</p>
+                    </div>
+                    <div class="instruction-card">
+                        <div class="instruction-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h3>4. 下载结果</h3>
+                        <p>处理完成后，点击下载按钮保存切割后的视频</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/img/logo.png" alt="AI睡眠助手">
+                    <span>AI睡眠助手</span>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h3>关于我们</h3>
+                        <ul>
+                            <li><a href="#">公司简介</a></li>
+                            <li><a href="#">联系我们</a></li>
+                            <li><a href="#">隐私政策</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>产品</h3>
+                        <ul>
+                            <li><a href="mobile-app.html">移动应用</a></li>
+                            <li><a href="#">音频库</a></li>
+                            <li><a href="video-cut.html">视频工具</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h3>支持</h3>
+                        <ul>
+                            <li><a href="#">帮助中心</a></li>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">反馈</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 AI睡眠助手. 保留所有权利</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/video-cut.js"></script>
+</body>
+</html> 
