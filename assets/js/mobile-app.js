@@ -118,19 +118,19 @@ document.addEventListener('DOMContentLoaded', function() {
       updatePlayerUI(sound);
       showNotification('开始播放', `${sound.title} 正在加载...`);
       
-      // 使用可靠的MP3直链音频源
+      // 使用真正的大自然声音源
       const audioSources = {
-        rain: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', // 雨声
-        ocean: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', // 海浪声
-        forest: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', // 森林声
-        fire: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', // 篝火
-        birds: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', // 鸟鸣
-        wind: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3', // 风声
-        thunder: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3', // 雷声
-        whitenoise: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3', // 白噪音
-        meditation: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3', // 冥想
-        piano: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3', // 钢琴
-        default: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3' // 默认
+        rain: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0f6c318b4.mp3', // 雨声
+        ocean: 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_d6f899a183.mp3', // 海浪声
+        forest: 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_dca145d650.mp3', // 森林声
+        fire: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_5c4d07a6a6.mp3', // 篝火
+        birds: 'https://cdn.pixabay.com/download/audio/2022/07/04/audio_fcc2b3e25f.mp3', // 鸟鸣
+        wind: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_4f66bee6c5.mp3', // 风声
+        thunder: 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_9788d2a482.mp3', // 雷声
+        whitenoise: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8b8a21bc5.mp3', // 白噪音
+        meditation: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_f9eb8b8420.mp3', // 冥想
+        piano: 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_b5e66836e0.mp3', // 钢琴
+        default: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0f6c318b4.mp3' // 默认雨声
       };
       
       // 根据声音ID或名称选择适合的音频源
@@ -2134,6 +2134,20 @@ document.addEventListener('DOMContentLoaded', function() {
       const randomIndex = Math.floor(Math.random() * soundData.nature.length);
       playSound(soundData.nature[randomIndex]);
       showNotification('自动播放', `开始播放 ${soundData.nature[randomIndex].title}`);
+    }, 1000);
+  });
+
+  // 在DOMContentLoaded时自动播放第一个声音
+  document.addEventListener('DOMContentLoaded', function() {
+    // 等待页面完全加载后播放第一个声音
+    setTimeout(() => {
+      if (soundData && soundData.nature && soundData.nature.length > 0) {
+        console.log("自动播放第一个声音");
+        playSound(soundData.nature[0]);
+        
+        // 显示播放提示
+        showNotification('自动播放', '正在播放自然声音，为您创造宁静环境');
+      }
     }, 1000);
   });
 }); 

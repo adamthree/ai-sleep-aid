@@ -13,38 +13,39 @@
   <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
   <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
   <style>
-    /* 完全重置样式以确保不倾斜 */
-    *, *:before, *:after {
+    /* 完全重写保证不倾斜 */
+    html {
       box-sizing: border-box;
-      transform: none !important;
-      perspective: none !important;
-      transform-style: flat !important;
-      transition: none !important;
-    }
-    
-    html, body {
+      height: 100%;
+      width: 100%;
       margin: 0;
       padding: 0;
-      background-color: #333;
+    }
+    
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      width: 100vw;
+      background: #333;
       overflow: hidden;
-      perspective: none !important;
-      transform-style: flat !important;
     }
     
     .app-container {
+      position: relative;
       width: 414px;
       height: 896px;
-      overflow: hidden;
-      position: relative;
-      background-color: #14152e;
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      background: #14152e;
       border-radius: 32px;
-      margin: 0 auto;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
     }
     
     @media (max-width: 500px) {
@@ -91,7 +92,7 @@
       display: block;
     }
     
-    /* 修复音频播放器 - 完全重写避免变形 */
+    /* 音频播放器 */
     .audio-player {
       display: flex;
       align-items: center;
@@ -108,7 +109,7 @@
       z-index: 990;
     }
     
-    /* 修复播放器信息显示 */
+    /* 播放器信息显示 */
     .player-title, .player-artist {
       white-space: nowrap;
       overflow: hidden;
