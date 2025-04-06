@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#14152e">
@@ -13,14 +13,69 @@
   <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
   <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
   <style>
+    /* 确保全屏适配移动设备 */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: hidden;
+    }
+    
+    .app-container {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      width: 100%;
+      height: 100%;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 移除旧的内联样式 */
+    .card {
+      margin-bottom: 15px;
+    }
+    
+    .main-content {
+      height: calc(100% - 60px);
+      overflow-y: auto;
+      padding-bottom: 70px;
+    }
+    
+    /* 确保底部导航栏固定且显示正确 */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 65px;
+      z-index: 9999;
+    }
+    
+    /* 修复滚动和点击问题 */
+    .tab-content {
+      display: none;
+      min-height: calc(100vh - 120px);
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
     /* 改进布局样式 */
     .app-container {
       max-width: 100%;
       overflow-x: hidden;
-    }
-    
-    .card {
-      margin-bottom: 15px; /* 减少卡片间距 */
     }
     
     .hero-section {
@@ -42,10 +97,6 @@
     
     .category-item {
       padding: 5px; /* 减少类别项内边距 */
-    }
-    
-    .tab-content {
-      padding-bottom: 70px; /* 增加底部内边距，避免被底部导航遮挡 */
     }
     
     /* 提高主要内容区域的可见性 */

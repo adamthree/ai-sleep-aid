@@ -114,8 +114,54 @@ document.addEventListener('DOMContentLoaded', function() {
     // 添加新的音轨
     addSoundTrack(sound);
     
-    // 确保显示"音频播放中"的通知，即使没有实际音频文件
-    showNotification('音频播放中', `正在播放: ${sound.title}`);
+    // 使用实际在线音频源，而不依赖本地文件
+    try {
+      // 根据不同类型选择不同的在线音频
+      let audioSrc = '';
+      if (sound.id.includes('rain') || sound.title.includes('雨')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/09/08/audio_77a1145a06.mp3'; // 雨声
+      } else if (sound.id.includes('ocean') || sound.id.includes('sea') || sound.title.includes('海')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_061c5e4a6f.mp3'; // 海浪声
+      } else if (sound.id.includes('forest') || sound.title.includes('森林')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_75d126e9d9.mp3'; // 森林声
+      } else if (sound.id.includes('fire') || sound.title.includes('篝火')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_b04af54271.mp3'; // 篝火声
+      } else if (sound.id.includes('creek') || sound.title.includes('溪')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d16393c572.mp3'; // 溪流声
+      } else if (sound.id.includes('bird') || sound.title.includes('鸟')) {
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/07/24/audio_5673ea7d4b.mp3'; // 鸟声
+      } else {
+        // 默认白噪音
+        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_270f49b9bf.mp3';
+      }
+      
+      console.log("播放音频: " + audioSrc);
+      
+      // 创建实际音频元素
+      const audio = new Audio(audioSrc);
+      audio.volume = masterVolume;
+      audio.loop = true;
+      
+      // 播放音频
+      audio.play().then(() => {
+        console.log("音频播放成功");
+        
+        // 更新当前激活的音轨
+        const trackIndex = activeSoundTracks.findIndex(track => track.sound.id === sound.id);
+        if (trackIndex !== -1) {
+          activeSoundTracks[trackIndex].audio = audio;
+        }
+        
+      }).catch(err => {
+        console.error("音频播放失败:", err);
+        // 显示通知解释情况
+        showNotification('音频播放提示', '请点击屏幕任意位置以允许播放声音');
+      });
+    } catch (e) {
+      console.error("音频加载错误:", e);
+      // 继续使用模拟音频
+      showNotification('音频播放中', `正在播放: ${sound.title} (模拟模式)`);
+    }
   }
   
   // 模拟进度条更新
@@ -984,34 +1030,118 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab-item');
     const tabContents = document.querySelectorAll('.tab-content');
     
+    // 首先移除所有事件监听器（防止重复绑定）
     tabs.forEach(tab => {
+      const newTab = tab.cloneNode(true);
+      tab.parentNode.replaceChild(newTab, tab);
+    });
+    
+    // 重新获取所有tab元素
+    const newTabs = document.querySelectorAll('.tab-item');
+    
+    newTabs.forEach(tab => {
       tab.addEventListener('click', function(e) {
         e.preventDefault();
         
-        // 移除当前控制台日志，查看点击事件是否被触发
+        // 添加更多的日志来帮助调试
         console.log('Tab clicked:', this.getAttribute('data-tab'));
         
         // 获取目标tab ID
         const tabId = this.getAttribute('data-tab');
         
         // 切换tab样式
-        tabs.forEach(t => t.classList.remove('active'));
+        newTabs.forEach(t => {
+          console.log('移除tab激活状态:', t.getAttribute('data-tab'));
+          t.classList.remove('active');
+        });
+        
         this.classList.add('active');
+        console.log('添加tab激活状态:', tabId);
         
         // 切换内容
-        tabContents.forEach(content => content.classList.remove('active'));
+        tabContents.forEach(content => {
+          console.log('隐藏内容:', content.id);
+          content.classList.remove('active');
+          content.style.display = 'none';
+        });
+        
         const targetContent = document.getElementById(tabId);
         if (targetContent) {
+          console.log('显示内容:', tabId);
           targetContent.classList.add('active');
+          targetContent.style.display = 'block';
         } else {
           console.error('Tab content not found:', tabId);
         }
       });
     });
+    
+    console.log('底部导航修复完成，绑定了', newTabs.length, '个tab事件');
   }
   
-  // 额外调用一次以确保事件监听器正确绑定
-  fixTabNavigation();
+  // 渲染声音类别图标
+  function renderSoundCategories() {
+    const categories = document.querySelectorAll('.category-item');
+    
+    categories.forEach(category => {
+      const categoryType = category.getAttribute('data-category');
+      const iconElement = category.querySelector('.category-icon');
+      
+      if (iconElement) {
+        // 确保图标正确显示
+        const categoryIconPath = `assets/images/sounds/${categoryType}.svg`;
+        
+        // 使用内联SVG图标作为备份
+        let svgIcon = '';
+        
+        switch(categoryType) {
+          case 'nature':
+            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M14,8.5A1.5,1.5 0 0,0 12.5,10A1.5,1.5 0 0,0 14,11.5A1.5,1.5 0 0,0 15.5,10A1.5,1.5 0 0,0 14,8.5M14,12.5A1.5,1.5 0 0,0 12.5,14A1.5,1.5 0 0,0 14,15.5A1.5,1.5 0 0,0 15.5,14A1.5,1.5 0 0,0 14,12.5M10,17A1,1 0 0,0 9,18A1,1 0 0,0 10,19A1,1 0 0,0 11,18A1,1 0 0,0 10,17M10,8.5A1.5,1.5 0 0,0 8.5,10A1.5,1.5 0 0,0 10,11.5A1.5,1.5 0 0,0 11.5,10A1.5,1.5 0 0,0 10,8.5M14,20.5A0.5,0.5 0 0,0 13.5,21A0.5,0.5 0 0,0 14,21.5A0.5,0.5 0 0,0 14.5,21A0.5,0.5 0 0,0 14,20.5M14,17A1,1 0 0,0 13,18A1,1 0 0,0 14,19A1,1 0 0,0 15,18A1,1 0 0,0 14,17M21,13.5A0.5,0.5 0 0,0 20.5,14A0.5,0.5 0 0,0 21,14.5A0.5,0.5 0 0,0 21.5,14A0.5,0.5 0 0,0 21,13.5M18,5A1,1 0 0,0 17,6A1,1 0 0,0 18,7A1,1 0 0,0 19,6A1,1 0 0,0 18,5M18,9A1,1 0 0,0 17,10A1,1 0 0,0 18,11A1,1 0 0,0 19,10A1,1 0 0,0 18,9M18,17A1,1 0 0,0 17,18A1,1 0 0,0 18,19A1,1 0 0,0 19,18A1,1 0 0,0 18,17M18,13.5A0.5,0.5 0 0,0 17.5,14A0.5,0.5 0 0,0 18,14.5A0.5,0.5 0 0,0 18.5,14A0.5,0.5 0 0,0 18,13.5M6,5A1,1 0 0,0 5,6A1,1 0 0,0 6,7A1,1 0 0,0 7,6A1,1 0 0,0 6,5M6,9A1,1 0 0,0 5,10A1,1 0 0,0 6,11A1,1 0 0,0 7,10A1,1 0 0,0 6,9M6,17A1,1 0 0,0 5,18A1,1 0 0,0 6,19A1,1 0 0,0 7,18A1,1 0 0,0 6,17M6,13.5A0.5,0.5 0 0,0 5.5,14A0.5,0.5 0 0,0 6,14.5A0.5,0.5 0 0,0 6.5,14A0.5,0.5 0 0,0 6,13.5M10,12.5A1.5,1.5 0 0,0 8.5,14A1.5,1.5 0 0,0 10,15.5A1.5,1.5 0 0,0 11.5,14A1.5,1.5 0 0,0 10,12.5Z" /></svg>';
+            break;
+          case 'meditation':
+            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12,4C13.11,4 14,4.89 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6C10,4.89 10.89,4 12,4M12,10C13.1,10 14.17,10.29 15.07,10.81C14.44,11.15 13.5,11.83 13.5,13.05C13,12.95 12.5,12.9 12,12.9C8.69,12.9 6,14.25 6,16V17H13.5V18H6C4.93,18 4,17.07 4,16V15.5C4,13.12 7.5,10.9 12,10.9C12.37,10.9 12.73,10.93 13.08,11C13.57,10.8 14.06,10.56 14.5,10.26C13.82,10.09 12.92,10 12,10M18,13C20.21,13 22,14.79 22,17C22,19.21 20.21,21 18,21C16.62,21 15.4,20.34 14.7,19.3L15.76,18.5C16.25,19.22 17.08,19.7 18,19.7C19.5,19.7 20.7,18.5 20.7,17C20.7,15.5 19.5,14.3 18,14.3C17.08,14.3 16.25,14.78 15.76,15.5L14.7,14.7C15.4,13.66 16.62,13 18,13M18,17.5C18.28,17.5 18.5,17.28 18.5,17C18.5,16.72 18.28,16.5 18,16.5C17.72,16.5 17.5,16.72 17.5,17C17.5,17.28 17.72,17.5 18,17.5Z" /></svg>';
+            break;
+          case 'stories':
+            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M18,22A2,2 0 0,0 20,20V4C20,2.89 19.1,2 18,2H12V9L9.5,7.5L7,9V2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18Z" /></svg>';
+            break;
+          case 'music':
+            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M21,3V15.5A3.5,3.5 0 0,1 17.5,19A3.5,3.5 0 0,1 14,15.5A3.5,3.5 0 0,1 17.5,12C18.04,12 18.55,12.12 19,12.34V6.47L9,8.6V17.5A3.5,3.5 0 0,1 5.5,21A3.5,3.5 0 0,1 2,17.5A3.5,3.5 0 0,1 5.5,14C6.04,14 6.55,14.12 7,14.34V6L21,3Z" /></svg>';
+            break;
+          case 'whitenoise':
+            svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" /></svg>';
+            break;
+        }
+        
+        // 尝试从外部加载图标，如果失败则使用内联SVG
+        const iconImg = document.createElement('img');
+        iconImg.src = categoryIconPath;
+        iconImg.alt = categoryType;
+        iconImg.onerror = function() {
+          console.log('图标加载失败，使用内联SVG:', categoryType);
+          iconElement.innerHTML = svgIcon;
+        };
+        
+        iconElement.innerHTML = '';
+        iconElement.appendChild(iconImg);
+      }
+    });
+    
+    console.log('声音类别图标渲染完成');
+  }
+  
+  // 初始化时渲染声音类别图标
+  document.addEventListener('DOMContentLoaded', function() {
+    // 其他初始化代码...
+    
+    // 添加对这两个重要功能的调用
+    renderSoundCategories();
+    fixTabNavigation();
+    
+    // 显示通知，告知用户操作方式
+    setTimeout(() => {
+      showNotification('使用提示', '点击底部导航切换不同功能，点击声音卡片播放音频');
+    }, 2000);
+  });
   
   // 设置PWA相关事件
   window.addEventListener('beforeinstallprompt', (e) => {
