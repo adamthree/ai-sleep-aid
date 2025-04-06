@@ -13,8 +13,8 @@
   <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
   <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
   <style>
-    /* 恢复原始的手机应用演示样式 */
-    body {
+    /* 修复手机应用演示样式 - 确保不倾斜 */
+    html, body {
       margin: 0;
       padding: 0;
       background-color: #333; /* 衬底颜色 */
@@ -24,6 +24,7 @@
       height: 100vh;
       width: 100vw;
       overflow: hidden;
+      transform: none !important; /* 防止整体倾斜 */
     }
     
     .app-container {
@@ -34,6 +35,7 @@
       background-color: #14152e;
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
       border-radius: 32px;
+      transform: none !important; /* 防止容器倾斜 */
     }
     
     @media (max-width: 500px) {
@@ -53,6 +55,7 @@
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding: 0;
+      transform: none !important; /* 防止内容倾斜 */
     }
     
     .tab-bar {
@@ -69,6 +72,7 @@
       -webkit-backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 999;
+      transform: none !important; /* 防止标签栏倾斜 */
     }
     
     .tab-content {
@@ -80,7 +84,7 @@
       display: block;
     }
     
-    /* 确保音频播放器可见 */
+    /* 修复音频播放器 - 确保不倾斜且正确显示 */
     .audio-player {
       display: flex;
       align-items: center;
@@ -92,10 +96,23 @@
       position: fixed;
       bottom: 75px;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) !important; /* 仅使用水平居中变换 */
       width: calc(100% - 30px);
       max-width: 400px;
       z-index: 990;
+    }
+    
+    /* 修复播放器信息显示 */
+    .player-title, .player-artist {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
+    
+    /* 防止所有元素倾斜 */
+    * {
+      transform-style: flat;
     }
   </style>
 </head>
@@ -695,7 +712,7 @@
       <img src="assets/images/sounds/rain.svg" alt="音频图片" class="player-image">
       <div class="player-info">
         <div class="player-title">轻柔雨声</div>
-        <div class="player-artist">大自然</div>
+        <div class="player-artist">环境音效</div>
         <div class="player-progress">
           <div class="player-progress-current"></div>
         </div>

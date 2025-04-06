@@ -709,28 +709,29 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 更新播放器UI
   function updatePlayerUI(sound) {
-    // 更新播放器UI
-    document.querySelector('.player-title').textContent = sound.title;
-    document.querySelector('.player-artist').textContent = sound.artist || '大自然';
+    const audioPlayer = document.getElementById('audio-player');
+    const playerImage = audioPlayer.querySelector('.player-image');
+    const playerTitle = audioPlayer.querySelector('.player-title');
+    const playerArtist = audioPlayer.querySelector('.player-artist');
     
-    // 使用对应的图片
-    const playerImage = document.querySelector('.player-image');
-    const imgSrc = sound.image || `assets/images/sounds/${sound.category || 'nature'}.svg`;
-    playerImage.src = imgSrc;
-    playerImage.onerror = function() {
-      // 如果图片加载失败，使用默认图片
-      this.src = 'assets/images/app-icon.svg';
-    };
+    // 更新播放器UI
+    playerTitle.textContent = sound.title || '未知声音';
+    
+    // 修复: 使用更通用的标签来代替重复的"大自然"
+    const artistName = sound.artist || (sound.category === 'nature' ? '环境音效' : '音效库');
+    playerArtist.textContent = artistName;
+    
+    // 更新图片
+    if (sound.image) {
+      playerImage.src = sound.image;
+    } else {
+      // 根据声音分类选择默认图像
+      const category = sound.category || 'nature';
+      playerImage.src = `assets/images/sounds/${category}.svg`;
+    }
     
     // 显示播放器
-    const audioPlayer = document.getElementById('audio-player');
     audioPlayer.classList.add('active');
-    audioPlayer.style.display = 'flex';
-    audioPlayer.style.transform = 'translateY(0)';
-    
-    // 更新播放按钮状态
-    document.querySelector('.player-play i').className = 'fas fa-pause';
-    isPlaying = true;
   }
   
   // 更新混音器UI
