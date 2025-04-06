@@ -113,6 +113,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 添加新的音轨
     addSoundTrack(sound);
+    
+    // 确保显示"音频播放中"的通知，即使没有实际音频文件
+    showNotification('音频播放中', `正在播放: ${sound.title}`);
   }
   
   // 模拟进度条更新
@@ -271,8 +274,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // 清空输入框
     aiInput.value = '';
     
+    // 显示加载状态
+    showAiTypingIndicator();
+    
     // 分析用户消息并执行相应操作
     processUserVoiceCommand(message);
+  }
+  
+  // 显示AI正在输入的指示器
+  function showAiTypingIndicator() {
+    const typingIndicator = document.createElement('div');
+    typingIndicator.className = 'message message-ai typing';
+    typingIndicator.innerHTML = `
+      <div class="message-content">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    `;
+    aiChatMessages.appendChild(typingIndicator);
+    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    
+    return typingIndicator;
+  }
+  
+  // 隐藏AI输入指示器
+  function hideAiTypingIndicator() {
+    const typingIndicator = aiChatMessages.querySelector('.typing');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
   }
   
   // 处理用户语音指令
@@ -282,6 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 创建AI回复
     let aiResponse = '';
+    let responseDelay = 1000; // 默认延迟
     
     // 检查是否是场景请求
     if (lowerMessage.includes('热带雨林') || lowerMessage.includes('森林') || lowerMessage.includes('丛林')) {
@@ -344,6 +376,73 @@ document.addEventListener('DOMContentLoaded', function() {
         aiResponse = '请告诉我您想添加什么声音，例如"添加鸟鸣声"、"来点篝火声"等。';
       }
     }
+    // 混合多声音指令
+    else if (lowerMessage.includes('混合') || lowerMessage.includes('混音') || lowerMessage.includes('组合')) {
+      responseDelay = 2000; // 稍长的延迟
+      aiResponse = '正在为您创建声音组合...';
+      
+      // 分析请求中的声音关键词
+      const keywords = [];
+      const possibleSounds = ['雨', '雨声', '海', '海浪', '海洋', '森林', '鸟', '鸟鸣', '风', '风声', '篝火', '火堆'];
+      
+      possibleSounds.forEach(sound => {
+        if (lowerMessage.includes(sound)) {
+          keywords.push(sound);
+        }
+      });
+      
+      // 如果找到关键词，创建混合
+      if (keywords.length > 0) {
+        stopAllSounds();
+        
+        setTimeout(() => {
+          let mainSoundAdded = false;
+          keywords.forEach((keyword, index) => {
+            let soundKeyword = '';
+            
+            if (keyword.includes('雨')) soundKeyword = 'rain';
+            else if (keyword.includes('海')) soundKeyword = 'ocean';
+            else if (keyword.includes('森林')) soundKeyword = 'forest';
+            else if (keyword.includes('鸟')) soundKeyword = 'bird';
+            else if (keyword.includes('风')) soundKeyword = 'wind';
+            else if (keyword.includes('火')) soundKeyword = 'fire';
+            
+            const sound = findSoundByKeyword(soundKeyword);
+            if (sound) {
+              if (!mainSoundAdded) {
+                playSound(sound);
+                mainSoundAdded = true;
+              } else {
+                setTimeout(() => {
+                  addSoundTrack(sound);
+                }, 500 * index);
+              }
+            }
+          });
+          
+          // 更新AI回复
+          hideAiTypingIndicator();
+          addChatMessage('已为您创建声音组合，正在播放中。您可以说"AI优化混音"来优化音量平衡。', 'ai');
+        }, 2000);
+      } else {
+        aiResponse = '请告诉我您想混合哪些声音，例如"混合雨声和鸟鸣"或"组合海浪和风声"。';
+      }
+    }
+    // AI优化音轨指令
+    else if (lowerMessage.includes('优化') || lowerMessage.includes('平衡') || (lowerMessage.includes('ai') && lowerMessage.includes('混音'))) {
+      if (activeSoundTracks.length < 2) {
+        aiResponse = '需要至少两个声音才能优化混音。请先添加多个声音。';
+      } else {
+        responseDelay = 2000;
+        aiResponse = '正在使用AI优化您的混音...';
+        
+        setTimeout(() => {
+          optimizeMixWithAI();
+          hideAiTypingIndicator();
+          addChatMessage('已完成混音优化。各个声音轨道的音量已经过AI平衡处理，为您提供最佳的听觉体验。', 'ai');
+        }, 2000);
+      }
+    }
     // 调整音量
     else if (lowerMessage.includes('音量') || lowerMessage.includes('声音') || lowerMessage.includes('大声') || lowerMessage.includes('小声')) {
       if (lowerMessage.includes('大') || lowerMessage.includes('增大') || lowerMessage.includes('提高')) {
@@ -361,6 +460,11 @@ document.addEventListener('DOMContentLoaded', function() {
       stopAllSounds();
       aiResponse = '已为您停止所有声音播放。';
     }
+    // 睡眠提示和建议
+    else if (lowerMessage.includes('失眠') || lowerMessage.includes('睡不着') || lowerMessage.includes('睡眠问题')) {
+      responseDelay = 1500;
+      aiResponse = '对于失眠问题，我建议：\n1. 尝试规律的睡眠时间表\n2. 睡前30分钟避免电子设备\n3. 创建舒适的睡眠环境\n4. 使用我们的"深度睡眠"声音组合\n\n需要我为您播放深度睡眠组合吗？';
+    }
     // 模拟播放模式提示
     else if (lowerMessage.includes('无法播放') || lowerMessage.includes('播放失败') || lowerMessage.includes('没有声音')) {
       aiResponse = '当前使用模拟播放模式，由于浏览器安全限制，需要用户主动点击才能播放声音。请尝试点击任意声音图标启动播放，或者确保您的设备没有静音。';
@@ -372,8 +476,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 添加AI回复
     setTimeout(() => {
+      hideAiTypingIndicator();
       addChatMessage(aiResponse, 'ai');
-    }, 1000);
+    }, responseDelay);
   }
   
   // 根据关键词查找音频
@@ -467,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 更新播放器UI（无论音频是否加载成功，都更新UI）
     updatePlayerUI(sound);
     
-    // 使用完全模拟播放模式
+    // 使用完全模拟播放模式 - 不尝试加载可能不存在的音频文件
     const simulatedAudio = createSimulatedAudio();
     
     // 添加到活动音轨列表
@@ -482,6 +587,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 更新进度条
     updateProgressSimulated();
+    
+    // 设置播放状态
+    isPlaying = true;
   }
   
   // 创建模拟音频对象
@@ -688,16 +796,54 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 语音输入功能增强
   aiVoiceBtn.addEventListener('click', function() {
-    // 模拟语音识别中
+    // 显示语音识别正在进行的状态
     aiVoiceBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
     aiVoiceBtn.disabled = true;
     
-    // 是否支持语音识别API
+    // 添加通知告知用户
+    showNotification('语音识别中', '请对着麦克风说话...');
+    
+    // 检查浏览器是否支持语音识别
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      // 这里是本地模拟，真实应用中应该使用浏览器的语音识别API
-      simulateVoiceRecognition();
+      try {
+        // 创建语音识别对象
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        // 设置参数
+        recognition.lang = 'zh-CN'; // 使用中文识别
+        recognition.interimResults = false; // 只返回最终结果
+        recognition.maxAlternatives = 1; // 只返回最可能的结果
+        
+        // 开始录音
+        recognition.start();
+        
+        // 结果处理
+        recognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          aiInput.value = transcript;
+          sendAiMessage();
+        };
+        
+        // 错误处理
+        recognition.onerror = function(event) {
+          console.error('语音识别错误:', event.error);
+          // 回退到模拟识别
+          simulateVoiceRecognition();
+        };
+        
+        // 结束处理
+        recognition.onend = function() {
+          aiVoiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+          aiVoiceBtn.disabled = false;
+        };
+      } catch (e) {
+        console.error('语音识别初始化失败:', e);
+        // 回退到模拟识别
+        simulateVoiceRecognition();
+      }
     } else {
-      // 模拟识别过程
+      // 浏览器不支持，使用模拟识别
       simulateVoiceRecognition();
     }
   });
@@ -835,9 +981,15 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 修复底部导航
   function fixTabNavigation() {
+    const tabs = document.querySelectorAll('.tab-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
     tabs.forEach(tab => {
       tab.addEventListener('click', function(e) {
         e.preventDefault();
+        
+        // 移除当前控制台日志，查看点击事件是否被触发
+        console.log('Tab clicked:', this.getAttribute('data-tab'));
         
         // 获取目标tab ID
         const tabId = this.getAttribute('data-tab');
@@ -851,6 +1003,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const targetContent = document.getElementById(tabId);
         if (targetContent) {
           targetContent.classList.add('active');
+        } else {
+          console.error('Tab content not found:', tabId);
         }
       });
     });
@@ -913,4 +1067,634 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 初始化底部导航事件
   fixTabNavigation();
+  
+  // 地图功能实现
+  function initializeWorldMap() {
+    const interactiveMap = document.getElementById('interactive-map');
+    if (!interactiveMap) {
+      console.error('找不到地图容器元素');
+      return;
+    }
+    
+    // 检查是否加载了checkinData
+    if (typeof checkinData === 'undefined' || !checkinData.locations) {
+      console.error('找不到地图数据');
+      showNotification('数据加载失败', '无法加载地图数据，请刷新页面重试');
+      return;
+    }
+    
+    console.log('开始初始化地图...');
+    
+    // 添加地图位置标记
+    checkinData.locations.forEach(location => {
+      console.log('添加位置标记:', location.name);
+      const marker = document.createElement('div');
+      marker.className = 'map-location-marker';
+      marker.setAttribute('data-location', location.id);
+      marker.style.left = location.coordinates[0] + 'px';
+      marker.style.top = location.coordinates[1] + 'px';
+      
+      // 点击事件
+      marker.addEventListener('click', function() {
+        selectMapLocation(location.id);
+      });
+      
+      interactiveMap.appendChild(marker);
+    });
+    
+    // 初始状态 - 默认选中第一个位置
+    if (checkinData.locations.length > 0) {
+      selectMapLocation(checkinData.locations[0].id);
+    }
+    
+    // 热门位置列表点击
+    const locationItems = document.querySelectorAll('.location-item');
+    locationItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const locationId = this.getAttribute('data-location');
+        selectMapLocation(locationId);
+      });
+    });
+    
+    // 打卡分享按钮
+    const shareCheckinBtns = document.querySelectorAll('.share-checkin-btn');
+    shareCheckinBtns.forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const checkinItem = this.closest('.checkin-item');
+        const locationName = checkinItem.querySelector('.checkin-location').textContent;
+        
+        // 显示分享弹窗
+        if (shareModal) {
+          // 设置分享内容
+          const shareLink = document.querySelector('.share-link input');
+          if (shareLink) {
+            shareLink.value = `https://dreamguardian.app/checkin?location=${encodeURIComponent(locationName)}`;
+          }
+          
+          // 显示弹窗
+          shareModal.style.display = 'flex';
+        } else {
+          // 如果没有弹窗，使用浏览器原生分享
+          if (navigator.share) {
+            navigator.share({
+              title: '我的睡眠打卡',
+              text: `我在梦境守护者中完成了在${locationName}的助眠体验！`,
+              url: `https://dreamguardian.app/checkin`
+            });
+          }
+        }
+      });
+    });
+    
+    // 生成打卡按钮
+    const createCheckinBtn = document.querySelector('.create-checkin-btn');
+    if (createCheckinBtn) {
+      createCheckinBtn.addEventListener('click', generateNewCheckin);
+    }
+    
+    console.log('地图初始化完成');
+    
+    // 在页面加载10秒后，显示提示，引导用户使用地图功能
+    setTimeout(() => {
+      showNotification('探索世界声音', '点击底部"地图"选项卡，探索世界各地的自然声音');
+    }, 10000);
+  }
+  
+  // 选择地图位置
+  function selectMapLocation(locationId) {
+    // 清除所有激活状态
+    document.querySelectorAll('.map-location-marker').forEach(marker => {
+      marker.classList.remove('active');
+    });
+    document.querySelectorAll('.location-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    
+    // 设置新的激活状态
+    const marker = document.querySelector(`.map-location-marker[data-location="${locationId}"]`);
+    const locationItem = document.querySelector(`.location-item[data-location="${locationId}"]`);
+    
+    if (marker) marker.classList.add('active');
+    if (locationItem) locationItem.classList.add('active');
+    
+    // 查找位置数据
+    const location = checkinData.locations.find(loc => loc.id === locationId);
+    if (!location) return;
+    
+    // 这里可以添加更多的交互，例如显示位置详情、播放相关音频等
+    playLocationSounds(location);
+  }
+  
+  // 播放位置相关的声音
+  function playLocationSounds(location) {
+    // 停止所有当前音轨
+    stopAllSounds();
+    
+    // 找到主要声音
+    if (location.sounds && location.sounds.length > 0) {
+      // 添加主声音
+      const mainSoundId = location.sounds[0];
+      const mainSound = findSoundByKeyword(mainSoundId);
+      if (mainSound) {
+        playSound(mainSound);
+        
+        // 如果有多个声音，添加其他声音
+        if (location.sounds.length > 1) {
+          setTimeout(() => {
+            for (let i = 1; i < Math.min(location.sounds.length, 3); i++) {
+              const additionalSound = findSoundByKeyword(location.sounds[i]);
+              if (additionalSound) {
+                addSoundTrack(additionalSound);
+              }
+            }
+          }, 1000);
+        }
+      }
+    }
+    
+    // 显示位置相关信息
+    showNotification(location.name, location.description || location.type);
+  }
+  
+  // 生成新的睡眠打卡
+  function generateNewCheckin() {
+    const createCheckinBtn = document.querySelector('.create-checkin-btn');
+    
+    // 显示生成中状态
+    if (createCheckinBtn) {
+      const originalText = createCheckinBtn.innerHTML;
+      createCheckinBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在生成...';
+      createCheckinBtn.disabled = true;
+      
+      // 模拟生成过程
+      setTimeout(() => {
+        // 查找最近的睡眠数据
+        const lastNight = new Date();
+        lastNight.setDate(lastNight.getDate() - 1);
+        const month = (lastNight.getMonth() + 1).toString().padStart(2, '0');
+        const day = lastNight.getDate().toString().padStart(2, '0');
+        const dateStr = `${lastNight.getFullYear()}/${month}/${day}`;
+        
+        // 随机选择一个位置
+        const randomIndex = Math.floor(Math.random() * checkinData.locations.length);
+        const randomLocation = checkinData.locations[randomIndex];
+        
+        // 随机生成睡眠质量 (70-98)
+        const sleepQuality = Math.floor(Math.random() * 28) + 70;
+        
+        // 创建新的打卡元素
+        const newCheckin = document.createElement('div');
+        newCheckin.className = 'checkin-item';
+        newCheckin.innerHTML = `
+          <img src="assets/images/checkins/${randomLocation.id}-checkin.jpg" alt="${randomLocation.name}睡眠打卡" class="checkin-image">
+          <div class="checkin-info">
+            <div class="checkin-location">${randomLocation.name}</div>
+            <div class="checkin-date">${dateStr}</div>
+            <div class="checkin-quality">睡眠质量: ${sleepQuality}%</div>
+          </div>
+          <button class="share-checkin-btn"><i class="fas fa-share-alt"></i></button>
+        `;
+        
+        // 添加分享按钮事件
+        const shareBtn = newCheckin.querySelector('.share-checkin-btn');
+        shareBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const locationName = randomLocation.name;
+          
+          // 显示分享弹窗
+          if (shareModal) {
+            // 设置分享内容
+            const shareLink = document.querySelector('.share-link input');
+            if (shareLink) {
+              shareLink.value = `https://dreamguardian.app/checkin?location=${encodeURIComponent(locationName)}`;
+            }
+            
+            // 显示弹窗
+            shareModal.style.display = 'flex';
+          }
+        });
+        
+        // 插入到打卡列表的顶部
+        const checkinsList = document.querySelector('.sleep-checkins');
+        if (checkinsList) {
+          checkinsList.insertBefore(newCheckin, checkinsList.firstChild);
+        }
+        
+        // 重置按钮状态
+        createCheckinBtn.innerHTML = originalText;
+        createCheckinBtn.disabled = false;
+        
+        // 显示成功通知
+        showNotification('打卡生成成功', `您在${randomLocation.name}的睡眠打卡已生成`);
+      }, 2000);
+    }
+  }
+  
+  // 初始化调用
+  initializeWorldMap();
+  
+  // 增强混音功能实现
+  function initEnhancedMixer() {
+    // 获取相关元素
+    const addSoundBtn = document.querySelector('.add-sound-btn');
+    const aiOptimizeBtn = document.querySelector('.ai-optimize-btn');
+    const saveMixBtn = document.querySelector('.save-mix-btn');
+    const shareMixBtn = document.querySelector('.share-mix-btn');
+    const emotionScanBtn = document.querySelector('.emotion-scan-btn');
+    const recommendationItems = document.querySelectorAll('.recommendation-item');
+    
+    // 声音选择器相关元素
+    const soundSelectorModal = document.getElementById('sound-selector-modal');
+    const soundSelectorClose = document.querySelector('.sound-selector-close');
+    const soundSelectorCategories = document.querySelectorAll('.sound-selector-category');
+    const selectableSounds = document.querySelector('.selectable-sounds');
+    
+    // 情绪检测相关元素
+    const emotionDetectionModal = document.getElementById('emotion-detection-modal');
+    const emotionResult = document.querySelector('.emotion-result');
+    const emotionDetectionStatus = document.querySelector('.emotion-detection-status');
+    const applyRecBtn = document.querySelector('.apply-rec-btn');
+    
+    // 添加声音按钮事件
+    if (addSoundBtn) {
+      addSoundBtn.addEventListener('click', function() {
+        openSoundSelector();
+      });
+    }
+    
+    // AI优化按钮事件
+    if (aiOptimizeBtn) {
+      aiOptimizeBtn.addEventListener('click', function() {
+        optimizeMixWithAI();
+      });
+    }
+    
+    // 保存混音按钮事件
+    if (saveMixBtn) {
+      saveMixBtn.addEventListener('click', function() {
+        saveMixPreset();
+      });
+    }
+    
+    // 分享混音按钮事件
+    if (shareMixBtn) {
+      shareMixBtn.addEventListener('click', function() {
+        shareMixPreset();
+      });
+    }
+    
+    // 情绪检测按钮事件
+    if (emotionScanBtn) {
+      emotionScanBtn.addEventListener('click', function() {
+        startEmotionDetection();
+      });
+    }
+    
+    // 情感推荐应用按钮
+    if (applyRecBtn) {
+      applyRecBtn.addEventListener('click', function() {
+        applyEmotionRecommendation();
+      });
+    }
+    
+    // AI推荐混音项点击事件
+    recommendationItems.forEach(item => {
+      item.addEventListener('click', function() {
+        const mixId = this.getAttribute('data-mix');
+        applyRecommendedMix(mixId);
+      });
+    });
+    
+    // 声音选择器关闭按钮
+    if (soundSelectorClose) {
+      soundSelectorClose.addEventListener('click', function() {
+        soundSelectorModal.style.display = 'none';
+      });
+    }
+    
+    // 声音选择器类别切换
+    soundSelectorCategories.forEach(category => {
+      category.addEventListener('click', function() {
+        // 移除所有激活状态
+        soundSelectorCategories.forEach(cat => cat.classList.remove('active'));
+        
+        // 添加当前激活状态
+        this.classList.add('active');
+        
+        // 渲染对应类别的声音
+        const categoryId = this.getAttribute('data-category');
+        renderSelectableSounds(categoryId);
+      });
+    });
+    
+    // 关闭情绪检测弹窗
+    const emotionModalClose = emotionDetectionModal.querySelector('.share-close');
+    if (emotionModalClose) {
+      emotionModalClose.addEventListener('click', function() {
+        emotionDetectionModal.style.display = 'none';
+      });
+    }
+  }
+  
+  // 打开声音选择器
+  function openSoundSelector() {
+    const soundSelectorModal = document.getElementById('sound-selector-modal');
+    if (!soundSelectorModal) return;
+    
+    // 渲染默认类别的声音
+    renderSelectableSounds('nature');
+    
+    // 显示弹窗
+    soundSelectorModal.style.display = 'flex';
+  }
+  
+  // 渲染可选择的声音
+  function renderSelectableSounds(category) {
+    const selectableSounds = document.querySelector('.selectable-sounds');
+    if (!selectableSounds) return;
+    
+    // 清空现有内容
+    selectableSounds.innerHTML = '';
+    
+    // 获取指定类别的声音
+    let sounds = [];
+    if (category === 'nature') {
+      sounds = soundData.nature;
+    } else if (category === 'meditation') {
+      sounds = soundData.meditation;
+    } else if (category === 'whitenoise') {
+      sounds = soundData.whitenoise;
+    } else if (category === 'music') {
+      sounds = soundData.music;
+    } else if (category === 'stories') {
+      sounds = soundData.stories;
+    }
+    
+    // 创建声音项
+    sounds.forEach(sound => {
+      const soundItem = document.createElement('div');
+      soundItem.className = 'selectable-sound-item';
+      soundItem.setAttribute('data-sound-id', sound.id);
+      
+      // 使用图片
+      const imgSrc = sound.image || `assets/images/sounds/${category}.svg`;
+      
+      soundItem.innerHTML = `
+        <div class="selectable-sound-image">
+          <img src="${imgSrc}" alt="${sound.title}">
+        </div>
+        <div class="selectable-sound-title">${sound.title}</div>
+        <div class="selectable-sound-artist">${sound.artist}</div>
+      `;
+      
+      // 添加点击事件
+      soundItem.addEventListener('click', function() {
+        // 添加选中的声音到混音器
+        const soundId = this.getAttribute('data-sound-id');
+        const selectedSound = findSoundById(soundId);
+        
+        if (selectedSound) {
+          // 关闭弹窗
+          document.getElementById('sound-selector-modal').style.display = 'none';
+          
+          // 添加声音
+          addSoundTrack(selectedSound);
+          
+          // 显示通知
+          showNotification('已添加声音', `已将"${selectedSound.title}"添加到混音中`);
+        }
+      });
+      
+      // 添加到容器
+      selectableSounds.appendChild(soundItem);
+    });
+  }
+  
+  // 根据ID查找声音
+  function findSoundById(soundId) {
+    // 合并所有类别的声音
+    const allSounds = [
+      ...soundData.nature,
+      ...soundData.meditation,
+      ...soundData.whitenoise,
+      ...soundData.music,
+      ...soundData.stories
+    ];
+    
+    // 查找匹配的声音
+    return allSounds.find(sound => sound.id === soundId);
+  }
+  
+  // AI优化混音
+  function optimizeMixWithAI() {
+    // 检查是否有活动音轨
+    if (activeSoundTracks.length === 0) {
+      showNotification('无法优化', '请先添加至少一个声音到混音器');
+      return;
+    }
+    
+    // 显示优化中通知
+    showNotification('AI优化中', '正在为您优化多音轨平衡...');
+    
+    // 模拟AI优化过程
+    setTimeout(() => {
+      // 对各个声音轨道进行"优化"调整
+      let totalTracks = activeSoundTracks.length;
+      
+      // 计算基础音量 - 轨道越多，单个轨道音量越小
+      const baseVolume = Math.min(0.8, 1.0 / totalTracks + 0.2);
+      
+      // "AI"优化 - 设置主声音更大一些，其他声音平衡调整
+      activeSoundTracks.forEach((track, index) => {
+        // 假设第一个轨道是主声音
+        if (index === 0) {
+          // 主声音音量稍高
+          track.volume = Math.min(baseVolume + 0.15, 1.0);
+        } else {
+          // 给每个音轨一个稍微随机的音量，创造"AI优化"的效果
+          const randomFactor = Math.random() * 0.1;
+          track.volume = Math.max(0.1, Math.min(baseVolume - 0.1 + randomFactor, 0.8));
+        }
+        
+        // 更新音频对象的音量
+        if (track.audio) {
+          track.audio.volume = track.volume;
+        }
+      });
+      
+      // 更新混音器UI
+      updateMixerUI();
+      
+      // 显示优化完成通知
+      showNotification('优化完成', '多声音轨道已经过AI平衡优化');
+    }, 1500);
+  }
+  
+  // 保存混音预设
+  function saveMixPreset() {
+    // 检查是否有活动音轨
+    if (activeSoundTracks.length === 0) {
+      showNotification('无法保存', '请先添加至少一个声音到混音器');
+      return;
+    }
+    
+    // 创建混音预设
+    const mixPreset = {
+      id: 'mix-' + Date.now(),
+      name: '我的混音 ' + new Date().toLocaleDateString(),
+      tracks: activeSoundTracks.map(track => ({
+        soundId: track.sound.id,
+        volume: track.volume
+      }))
+    };
+    
+    // 这里应该保存到本地存储或服务器
+    // 模拟保存过程
+    showNotification('已保存', '您的混音已保存，可在"我的"页面查看');
+  }
+  
+  // 分享混音预设
+  function shareMixPreset() {
+    // 检查是否有活动音轨
+    if (activeSoundTracks.length === 0) {
+      showNotification('无法分享', '请先添加至少一个声音到混音器');
+      return;
+    }
+    
+    // 获取当前混音的声音名称
+    const soundNames = activeSoundTracks.map(track => track.sound.title).join(' + ');
+    
+    // 打开分享弹窗
+    const shareModal = document.getElementById('share-modal');
+    if (shareModal) {
+      // 设置分享链接
+      const shareLink = shareModal.querySelector('.share-link input');
+      if (shareLink) {
+        shareLink.value = `https://dreamguardian.app/mix?sounds=${encodeURIComponent(soundNames)}`;
+      }
+      
+      // 显示弹窗
+      shareModal.style.display = 'flex';
+    } else {
+      // 如果没有弹窗，使用浏览器原生分享
+      if (navigator.share) {
+        navigator.share({
+          title: '我的助眠声音组合',
+          text: `我在梦境守护者中创建了一个声音组合: ${soundNames}`,
+          url: 'https://dreamguardian.app/mix'
+        });
+      }
+    }
+  }
+  
+  // 应用推荐混音
+  function applyRecommendedMix(mixId) {
+    // 停止当前所有声音
+    stopAllSounds();
+    
+    let sounds = [];
+    
+    // 根据混音ID获取对应的声音组合
+    if (mixId === 'focus') {
+      // 专注工作 - 雨声 + 咖啡馆 + 轻音乐
+      sounds = [
+        findSoundByKeyword('rain'),
+        findSoundById('white-noise'), // 模拟咖啡馆声音
+        findSoundById('piano-sleep')
+      ];
+    } else if (mixId === 'deep-sleep') {
+      // 深度睡眠 - 白噪音 + 风扇声 + 心跳
+      sounds = [
+        findSoundById('pink-noise'),
+        findSoundById('fan-noise'),
+        findSoundByKeyword('meditation') // 模拟舒缓的"心跳"
+      ];
+    } else if (mixId === 'relax') {
+      // 放松减压 - 海浪 + 鸟鸣 + 轻风
+      sounds = [
+        findSoundById('ocean'),
+        findSoundByKeyword('birds'),
+        findSoundByKeyword('wind')
+      ];
+    }
+    
+    // 依次添加声音
+    sounds.forEach((sound, index) => {
+      if (sound) {
+        if (index === 0) {
+          // 第一个声音使用playSound来初始化播放器
+          playSound(sound);
+        } else {
+          // 后续声音添加为额外音轨
+          setTimeout(() => {
+            addSoundTrack(sound);
+          }, 500 * index); // 依次添加，有间隔时间
+        }
+      }
+    });
+    
+    // 显示应用通知
+    showNotification('已应用推荐混音', `已为您应用"${getRecommendationName(mixId)}"声音组合`);
+  }
+  
+  // 获取推荐混音名称
+  function getRecommendationName(mixId) {
+    if (mixId === 'focus') return '专注工作';
+    if (mixId === 'deep-sleep') return '深度睡眠';
+    if (mixId === 'relax') return '放松减压';
+    return '推荐组合';
+  }
+  
+  // 启动情绪检测
+  function startEmotionDetection() {
+    const emotionDetectionModal = document.getElementById('emotion-detection-modal');
+    const emotionResult = emotionDetectionModal.querySelector('.emotion-result');
+    const emotionDetectionStatus = emotionDetectionModal.querySelector('.emotion-detection-status');
+    
+    // 重置状态
+    emotionResult.style.display = 'none';
+    emotionDetectionStatus.style.display = 'block';
+    
+    // 显示弹窗
+    emotionDetectionModal.style.display = 'flex';
+    
+    // 模拟情绪检测过程
+    setTimeout(() => {
+      // 隐藏检测状态，显示结果
+      emotionDetectionStatus.style.display = 'none';
+      emotionResult.style.display = 'block';
+    }, 3000);
+  }
+  
+  // 应用情绪推荐
+  function applyEmotionRecommendation() {
+    // 关闭弹窗
+    document.getElementById('emotion-detection-modal').style.display = 'none';
+    
+    // 停止当前声音
+    stopAllSounds();
+    
+    // 应用推荐 - 疲惫状态推荐"轻雨声 + 低频白噪音"
+    const rainSound = findSoundByKeyword('rain');
+    const noiseSound = findSoundById('pink-noise');
+    
+    // 添加声音
+    if (rainSound) {
+      playSound(rainSound);
+      
+      // 延迟添加第二个声音
+      if (noiseSound) {
+        setTimeout(() => {
+          addSoundTrack(noiseSound);
+        }, 500);
+      }
+    }
+    
+    // 显示通知
+    showNotification('已应用情绪推荐', '已为您应用匹配"疲惫"情绪的声音组合');
+  }
+  
+  // 初始化增强混音功能
+  initEnhancedMixer();
 }); 

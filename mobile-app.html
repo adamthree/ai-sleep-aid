@@ -12,6 +12,70 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
   <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
+  <style>
+    /* 改进布局样式 */
+    .app-container {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    .card {
+      margin-bottom: 15px; /* 减少卡片间距 */
+    }
+    
+    .hero-section {
+      padding: 20px 15px; /* 减小hero区域的内边距 */
+    }
+    
+    .sleep-stats {
+      flex-wrap: wrap; /* 让统计卡片自动折行 */
+    }
+    
+    .stat-card {
+      min-width: 70px; /* 减小统计卡片的最小宽度 */
+      margin: 5px; /* 减小统计卡片间距 */
+    }
+    
+    .sound-categories {
+      justify-content: space-between; /* 均匀分布类别项 */
+    }
+    
+    .category-item {
+      padding: 5px; /* 减少类别项内边距 */
+    }
+    
+    .tab-content {
+      padding-bottom: 70px; /* 增加底部内边距，避免被底部导航遮挡 */
+    }
+    
+    /* 提高主要内容区域的可见性 */
+    .main-content {
+      padding-top: 60px; /* 减小顶部内边距 */
+    }
+    
+    /* 减小底部导航的高度 */
+    .tab-bar {
+      height: 55px; /* 减小底部导航的高度 */
+    }
+    
+    /* 添加滚动指示器 */
+    .card.scrollable {
+      max-height: 250px;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .card.scrollable::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(transparent, rgba(20, 21, 46, 0.7));
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -37,29 +101,6 @@
           <h1 class="hero-title">改善睡眠质量</h1>
           <p class="hero-description">使用科学声音和AI技术，帮助你获得更好的睡眠体验</p>
           <button class="hero-cta" data-action="start-sleep">开始助眠</button>
-        </div>
-
-        <!-- Sleep Stats -->
-        <div class="card">
-          <h2 class="card-title"><i class="fas fa-chart-line"></i> 睡眠数据</h2>
-          <div class="sleep-stats">
-            <div class="stat-card">
-              <div class="stat-value">6h 48m</div>
-              <div class="stat-label">平均睡眠时长</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">82%</div>
-              <div class="stat-label">睡眠质量</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">23:30</div>
-              <div class="stat-label">平均入睡时间</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-value">5</div>
-              <div class="stat-label">连续使用天数</div>
-            </div>
-          </div>
         </div>
 
         <!-- Sound Categories -->
@@ -89,8 +130,31 @@
           </div>
 
           <!-- Sound List -->
-          <div class="sound-list" id="sound-list">
+          <div class="sound-list scrollable" id="sound-list">
             <!-- 由JavaScript动态填充 -->
+          </div>
+        </div>
+
+        <!-- Sleep Stats -->
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-chart-line"></i> 睡眠数据</h2>
+          <div class="sleep-stats">
+            <div class="stat-card">
+              <div class="stat-value">6h 48m</div>
+              <div class="stat-label">平均睡眠时长</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">82%</div>
+              <div class="stat-label">睡眠质量</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">23:30</div>
+              <div class="stat-label">平均入睡时间</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">5</div>
+              <div class="stat-label">连续使用天数</div>
+            </div>
           </div>
         </div>
 
@@ -115,31 +179,68 @@
         <div class="card">
           <h2 class="card-title"><i class="fas fa-sliders-h"></i> 声音调节</h2>
           
-          <!-- Mixer -->
+          <!-- 增强版混音器 -->
           <div class="sound-mixer mt-2">
             <div class="mixer-channels">
-              <div class="mixer-channel">
-                <div class="channel-label">雨声</div>
-                <input type="range" min="0" max="100" value="70" class="channel-volume">
-                <div class="channel-value">70%</div>
-              </div>
-              <div class="mixer-channel">
-                <div class="channel-label">风声</div>
-                <input type="range" min="0" max="100" value="40" class="channel-volume">
-                <div class="channel-value">40%</div>
-              </div>
-              <div class="mixer-channel">
-                <div class="channel-label">鸟鸣</div>
-                <input type="range" min="0" max="100" value="25" class="channel-volume">
-                <div class="channel-value">25%</div>
-              </div>
-              <div class="mixer-channel">
-                <div class="channel-label">火炉</div>
-                <input type="range" min="0" max="100" value="50" class="channel-volume">
-                <div class="channel-value">50%</div>
+              <!-- 动态填充音轨 -->
+            </div>
+            
+            <!-- 增强的混音功能 -->
+            <div class="enhanced-mixer-controls">
+              <button class="ai-optimize-btn">
+                <i class="fas fa-magic"></i> AI优化混音
+              </button>
+              <button class="add-sound-btn">
+                <i class="fas fa-plus"></i> 添加声音
+              </button>
+              <button class="save-mix-btn">
+                <i class="fas fa-save"></i> 保存混音
+              </button>
+              <button class="share-mix-btn">
+                <i class="fas fa-share-alt"></i> 分享混音
+              </button>
+            </div>
+            
+            <!-- 语音控制提示 -->
+            <div class="voice-control-tip">
+              <i class="fas fa-microphone"></i>
+              <p>说"添加鸟鸣声"或"添加篝火声"来通过语音添加更多声音</p>
+            </div>
+            
+            <!-- AI推荐混音 -->
+            <div class="ai-recommendations">
+              <h3>AI推荐混音</h3>
+              <div class="recommendation-list">
+                <div class="recommendation-item" data-mix="focus">
+                  <div class="rec-icon"><i class="fas fa-brain"></i></div>
+                  <div class="rec-info">
+                    <div class="rec-name">专注工作</div>
+                    <div class="rec-sound">雨声 + 咖啡馆 + 轻音乐</div>
+                  </div>
+                </div>
+                <div class="recommendation-item" data-mix="deep-sleep">
+                  <div class="rec-icon"><i class="fas fa-moon"></i></div>
+                  <div class="rec-info">
+                    <div class="rec-name">深度睡眠</div>
+                    <div class="rec-sound">白噪音 + 风扇声 + 心跳</div>
+                  </div>
+                </div>
+                <div class="recommendation-item" data-mix="relax">
+                  <div class="rec-icon"><i class="fas fa-spa"></i></div>
+                  <div class="rec-info">
+                    <div class="rec-name">放松减压</div>
+                    <div class="rec-sound">海浪 + 鸟鸣 + 轻风</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <button class="hero-cta mt-2">保存我的混音</button>
+            
+            <!-- 情绪匹配功能 -->
+            <div class="emotion-detection">
+              <h3>情绪感知助眠</h3>
+              <p>允许系统感知您的情绪，为您推荐最适合的助眠音效</p>
+              <button class="emotion-scan-btn"><i class="fas fa-heart-pulse"></i> 检测情绪</button>
+            </div>
           </div>
         </div>
         
@@ -423,6 +524,160 @@
           </div>
         </div>
       </div>
+
+      <!-- Setting Tab Content -->
+      <div id="settings-tab" class="tab-content">
+        <!-- 用户资料 -->
+        <div class="user-profile card">
+          <img src="assets/images/user-avatar.svg" class="user-avatar" alt="用户头像">
+          <h2 class="profile-name">梦想家</h2>
+          <p class="profile-info">加入时间：2023年10月</p>
+          
+          <div class="user-stats">
+            <div class="stat-item">
+              <div class="stat-value">28</div>
+              <div class="stat-label">助眠次数</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">12</div>
+              <div class="stat-label">收藏音频</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">5</div>
+              <div class="stat-label">分享次数</div>
+            </div>
+          </div>
+          
+          <div class="membership-info">
+            <h3>会员状态</h3>
+            <p>免费试用期</p>
+            <div class="days-left">剩余天数：7天</div>
+            
+            <div class="membership-features">
+              <div class="feature-item"><i class="fas fa-check"></i> 无限制声音播放</div>
+              <div class="feature-item"><i class="fas fa-check"></i> 基础AI助眠建议</div>
+              <div class="feature-item"><i class="fas fa-check"></i> 5个保存的混音</div>
+            </div>
+            
+            <button class="membership-btn">升级至专业版</button>
+          </div>
+        </div>
+        
+        <!-- 设置项目 -->
+        <div class="settings-list card">
+          <div class="settings-item" data-action="profile">
+            <div class="settings-icon"><i class="fas fa-user"></i></div>
+            <div class="settings-name">个人资料</div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+          </div>
+          <div class="settings-item" data-action="notifications">
+            <div class="settings-icon"><i class="fas fa-bell"></i></div>
+            <div class="settings-name">通知设置</div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+          </div>
+          <div class="settings-item" data-action="downloads">
+            <div class="settings-icon"><i class="fas fa-download"></i></div>
+            <div class="settings-name">已下载音频</div>
+            <div class="settings-value">8个</div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+          </div>
+          <div class="settings-item" data-action="share">
+            <div class="settings-icon"><i class="fas fa-share-alt"></i></div>
+            <div class="settings-name">分享应用</div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+          </div>
+          <div class="settings-item" data-action="help">
+            <div class="settings-icon"><i class="fas fa-question-circle"></i></div>
+            <div class="settings-name">帮助与支持</div>
+            <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 新增: 世界地图签到标签内容 -->
+      <div id="map-tab" class="tab-content">
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-globe-asia"></i> 全球声音之旅</h2>
+          <p class="section-description">探索世界各地的自然声音，每晚在不同地点入眠</p>
+          
+          <!-- 互动地图区域 -->
+          <div class="world-map-container">
+            <div id="interactive-map">
+              <!-- 地图将通过JavaScript加载 -->
+              <img src="assets/images/world-map.svg" alt="世界地图" class="placeholder-map">
+            </div>
+          </div>
+          
+          <!-- 热门声音地点 -->
+          <div class="popular-locations">
+            <h3>热门声音地点</h3>
+            <div class="location-list">
+              <div class="location-item" data-location="rainforest">
+                <div class="location-icon"><i class="fas fa-tree"></i></div>
+                <div class="location-info">
+                  <div class="location-name">亚马逊雨林</div>
+                  <div class="location-type">热带雨林声音</div>
+                </div>
+              </div>
+              <div class="location-item" data-location="ocean">
+                <div class="location-icon"><i class="fas fa-water"></i></div>
+                <div class="location-info">
+                  <div class="location-name">巴厘岛海滩</div>
+                  <div class="location-type">海浪声</div>
+                </div>
+              </div>
+              <div class="location-item" data-location="mountain">
+                <div class="location-icon"><i class="fas fa-mountain"></i></div>
+                <div class="location-info">
+                  <div class="location-name">瑞士阿尔卑斯山</div>
+                  <div class="location-type">高山风声</div>
+                </div>
+              </div>
+              <div class="location-item" data-location="nordic">
+                <div class="location-icon"><i class="fas fa-snowflake"></i></div>
+                <div class="location-info">
+                  <div class="location-name">北欧森林</div>
+                  <div class="location-type">宁静冬季声音</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 睡眠打卡 -->
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-map-marker-alt"></i> 我的睡眠打卡</h2>
+          
+          <div class="sleep-checkins">
+            <div class="checkin-item">
+              <img src="assets/images/checkins/rainforest-checkin.jpg" alt="雨林睡眠打卡" class="checkin-image">
+              <div class="checkin-info">
+                <div class="checkin-location">亚马逊雨林</div>
+                <div class="checkin-date">2025/02/15</div>
+                <div class="checkin-quality">睡眠质量: 94%</div>
+              </div>
+              <button class="share-checkin-btn"><i class="fas fa-share-alt"></i></button>
+            </div>
+            
+            <div class="checkin-item">
+              <img src="assets/images/checkins/ocean-checkin.jpg" alt="海滩睡眠打卡" class="checkin-image">
+              <div class="checkin-info">
+                <div class="checkin-location">巴厘岛海滩</div>
+                <div class="checkin-date">2025/02/14</div>
+                <div class="checkin-quality">睡眠质量: 87%</div>
+              </div>
+              <button class="share-checkin-btn"><i class="fas fa-share-alt"></i></button>
+            </div>
+          </div>
+          
+          <!-- 生成新打卡 -->
+          <div class="create-checkin">
+            <h3>生成今日打卡</h3>
+            <p>AI将根据您昨晚的睡眠环境生成精美的打卡图片</p>
+            <button class="create-checkin-btn"><i class="fas fa-magic"></i> 生成打卡</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Audio Player -->
@@ -443,62 +698,137 @@
       </div>
     </div>
 
-    <!-- Share Modal -->
-    <div class="share-modal" id="share-modal">
+    <!-- 模态弹窗 -->
+    <div id="share-modal" class="share-modal">
       <div class="share-content">
-        <h3 class="share-title">分享睡眠内容</h3>
-        <button class="share-close"><i class="fas fa-times"></i></button>
-        <div class="share-link">
-          <input type="text" value="https://adamthree.github.io/ai-sleep-aid/mobile-app.html" readonly>
-          <button id="copy-link-btn"><i class="fas fa-copy"></i></button>
+        <div class="share-header">
+          <h2>分享应用</h2>
+          <button class="share-close">&times;</button>
         </div>
-        <div class="share-platforms">
-          <div class="share-platform"><i class="fab fa-weixin"></i></div>
-          <div class="share-platform"><i class="fab fa-weibo"></i></div>
-          <div class="share-platform"><i class="fab fa-qq"></i></div>
-          <div class="share-platform"><i class="fas fa-envelope"></i></div>
+        
+        <div class="share-body">
+          <p>分享梦境守护者给您的朋友，一起体验更好的睡眠</p>
+          
+          <div class="share-link">
+            <input type="text" value="https://dreamguardian.app" readonly>
+            <button id="copy-link-btn"><i class="fas fa-copy"></i></button>
+          </div>
+          
+          <div class="share-social">
+            <button class="social-btn wechat"><i class="fab fa-weixin"></i></button>
+            <button class="social-btn weibo"><i class="fab fa-weibo"></i></button>
+            <button class="social-btn qq"><i class="fab fa-qq"></i></button>
+            <button class="social-btn more"><i class="fas fa-ellipsis-h"></i></button>
+          </div>
         </div>
-        <button class="hero-cta">生成分享图片</button>
       </div>
     </div>
     
-    <!-- Audio Sources Modal -->
-    <div class="share-modal" id="audio-sources-modal">
+    <!-- 音频来源弹窗 -->
+    <div id="audio-sources-modal" class="share-modal">
       <div class="share-content">
-        <h3 class="share-title">音频来源</h3>
-        <button class="share-close"><i class="fas fa-times"></i></button>
-        <div class="audio-sources-list">
-          <!-- 由JavaScript动态填充 -->
+        <div class="share-header">
+          <h2>音频来源</h2>
+          <button class="share-close">&times;</button>
+        </div>
+        
+        <div class="share-body">
+          <p>本应用使用以下开源音频资源</p>
+          
+          <div class="audio-sources-list">
+            <!-- 将由JavaScript动态填充 -->
+          </div>
+          
+          <a href="https://freesound.org" target="_blank" class="hero-cta mt-3">
+            访问Freesound
+          </a>
         </div>
       </div>
     </div>
 
-    <!-- Tab Bar -->
+    <!-- 声音选择器弹窗 -->
+    <div id="sound-selector-modal" class="sound-selector-modal">
+      <div class="sound-selector-header">
+        <h2>添加声音</h2>
+        <button class="sound-selector-close">&times;</button>
+      </div>
+      
+      <div class="sound-selector-categories">
+        <button class="sound-selector-category active" data-category="nature">自然</button>
+        <button class="sound-selector-category" data-category="whitenoise">白噪音</button>
+        <button class="sound-selector-category" data-category="meditation">冥想</button>
+        <button class="sound-selector-category" data-category="music">音乐</button>
+        <button class="sound-selector-category" data-category="stories">故事</button>
+      </div>
+      
+      <div class="selectable-sounds">
+        <!-- 将由JavaScript动态填充 -->
+      </div>
+    </div>
+    
+    <!-- 情绪检测弹窗 -->
+    <div id="emotion-detection-modal" class="share-modal">
+      <div class="share-content">
+        <div class="share-header">
+          <h2>情绪检测</h2>
+          <button class="share-close">&times;</button>
+        </div>
+        
+        <div class="share-body">
+          <div class="emotion-detection-content">
+            <div class="emotion-detection-status">
+              <i class="fas fa-microphone-alt pulse"></i>
+              <p>请对着麦克风说几句话，系统将分析您的情绪状态...</p>
+            </div>
+            
+            <div class="emotion-result" style="display: none;">
+              <div class="detected-emotion">
+                <div class="emotion-icon"><i class="fas fa-tired"></i></div>
+                <div class="emotion-name">疲惫</div>
+              </div>
+              
+              <div class="emotion-description">
+                <p>检测到您当前的情绪状态为<strong>疲惫</strong>。我们推荐以下声音组合来帮助您放松并入睡：</p>
+              </div>
+              
+              <div class="emotion-recommendation">
+                <div class="rec-title">推荐组合</div>
+                <div class="rec-sounds">轻雨声 + 低频白噪音</div>
+                <button class="apply-rec-btn">应用推荐</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Tab Bar -->
     <div class="tab-bar">
-      <a href="#home" class="tab-item active" data-tab="home-tab">
+      <div class="tab-item active" data-tab="home-tab">
         <i class="fas fa-home"></i>
         <span>首页</span>
-      </a>
-      <a href="#sounds" class="tab-item" data-tab="sounds-tab">
+      </div>
+      <div class="tab-item" data-tab="sounds-tab">
         <i class="fas fa-music"></i>
         <span>声音</span>
-      </a>
-      <a href="#ai" class="tab-item" data-tab="ai-tab">
+      </div>
+      <div class="tab-item" data-tab="map-tab">
+        <i class="fas fa-globe"></i>
+        <span>地图</span>
+      </div>
+      <div class="tab-item" data-tab="ai-tab">
         <i class="fas fa-robot"></i>
         <span>AI助手</span>
-      </a>
-      <a href="#timer" class="tab-item" data-tab="timer-tab">
-        <i class="fas fa-clock"></i>
-        <span>定时</span>
-      </a>
-      <a href="#profile" class="tab-item" data-tab="profile-tab">
+      </div>
+      <div class="tab-item" data-tab="settings-tab">
         <i class="fas fa-user"></i>
         <span>我的</span>
-      </a>
+      </div>
     </div>
   </div>
 
   <script src="assets/js/sound-data.js"></script>
+  <script src="assets/js/checkin-data.js"></script>
   <script src="assets/js/mobile-app.js"></script>
 </body>
 </html> 

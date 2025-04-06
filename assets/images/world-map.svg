@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="400" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#14152e"/>
+  
+  <!-- 简化的世界地图轮廓 - 使用柔和的颜色 -->
+  <!-- 北美 -->
+  <path d="M150 80 L220 70 L280 120 L240 170 L190 210 L170 190 L140 170 L120 130 Z" fill="#2E3267" stroke="#3D4491" stroke-width="1"/>
+  
+  <!-- 南美 -->
+  <path d="M220 220 L250 250 L230 320 L190 340 L170 310 L190 240 Z" fill="#2E3267" stroke="#3D4491" stroke-width="1"/>
+  
+  <!-- 欧洲 -->
+  <path d="M380 70 L450 60 L470 100 L430 130 L380 120 Z" fill="#2E3267" stroke="#3D4491" stroke-width="1"/>
+  
+  <!-- 非洲 -->
+  <path d="M380 140 L450 130 L490 220 L450 290 L400 270 L380 230 L360 180 Z" fill="#2E3267" stroke="#3D4491" stroke-width="1"/>
+  
+  <!-- 亚洲 -->
+  <path d="M480 60 L650 70 L670 140 L630 200 L580 230 L530 200 L480 190 L470 120 Z" fill="#2E3267" stroke="#3D4491" stroke-width="1"/>
+  
+  <!-- 澳大利亚 -->
+  <path d="M650 250 L700 260 L690 310 L640 320 Z" fill="#2E3267" stroke="#3D4491" stroke-width="1"/>
+  
+  <!-- 格点 -->
+  <g stroke="#3D4491" stroke-width="0.5" opacity="0.3">
+    <!-- 水平线 -->
+    <line x1="0" y1="100" x2="800" y2="100"/>
+    <line x1="0" y1="200" x2="800" y2="200"/>
+    <line x1="0" y1="300" x2="800" y2="300"/>
+    
+    <!-- 垂直线 -->
+    <line x1="200" y1="0" x2="200" y2="400"/>
+    <line x1="400" y1="0" x2="400" y2="400"/>
+    <line x1="600" y1="0" x2="600" y2="400"/>
+  </g>
+  
+  <!-- 地点标记点 -->
+  <!-- 亚马逊雨林 -->
+  <circle cx="230" cy="270" r="5" fill="#8C52FF"/>
+  
+  <!-- 巴厘岛海滩 -->
+  <circle cx="640" cy="250" r="5" fill="#8C52FF"/>
+  
+  <!-- 瑞士阿尔卑斯山 -->
+  <circle cx="410" cy="110" r="5" fill="#8C52FF"/>
+  
+  <!-- 北欧森林 -->
+  <circle cx="420" cy="70" r="5" fill="#8C52FF"/>
+  
+  <!-- 装饰元素 -->
+  <g opacity="0.5">
+    <circle cx="100" cy="50" r="2" fill="#FFFFFF"/>
+    <circle cx="300" cy="30" r="1" fill="#FFFFFF"/>
+    <circle cx="500" cy="40" r="2" fill="#FFFFFF"/>
+    <circle cx="700" cy="60" r="1" fill="#FFFFFF"/>
+    <circle cx="150" cy="350" r="2" fill="#FFFFFF"/>
+    <circle cx="450" cy="370" r="1" fill="#FFFFFF"/>
+    <circle cx="650" cy="380" r="2" fill="#FFFFFF"/>
+  </g>
+</svg> 
