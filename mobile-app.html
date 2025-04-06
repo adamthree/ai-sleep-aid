@@ -10,14 +10,15 @@
   <link rel="stylesheet" href="assets/css/mobile-app.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="assets/images/app-icon.png">
+  <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
+  <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
 </head>
 <body>
   <div class="app-container">
     <!-- Header -->
     <header class="app-header">
       <div class="app-logo">
-        <img src="assets/images/ai-avatar.svg" alt="Logo">
+        <img src="assets/images/app-icon.svg" alt="Logo">
         <span>梦境守护者</span>
       </div>
       <div class="app-nav">
@@ -35,7 +36,7 @@
         <div class="hero-section">
           <h1 class="hero-title">改善睡眠质量</h1>
           <p class="hero-description">使用科学声音和AI技术，帮助你获得更好的睡眠体验</p>
-          <button class="hero-cta">开始助眠</button>
+          <button class="hero-cta" data-action="start-sleep">开始助眠</button>
         </div>
 
         <!-- Sleep Stats -->
@@ -65,70 +66,31 @@
         <div class="card">
           <h2 class="card-title"><i class="fas fa-music"></i> 助眠声音</h2>
           <div class="sound-categories">
-            <div class="category-item active">
+            <div class="category-item active" data-category="nature">
               <div class="category-icon"><i class="fas fa-leaf"></i></div>
               <div class="category-name">自然</div>
             </div>
-            <div class="category-item">
+            <div class="category-item" data-category="meditation">
               <div class="category-icon"><i class="fas fa-om"></i></div>
               <div class="category-name">冥想</div>
             </div>
-            <div class="category-item">
+            <div class="category-item" data-category="stories">
               <div class="category-icon"><i class="fas fa-book"></i></div>
               <div class="category-name">故事</div>
             </div>
-            <div class="category-item">
+            <div class="category-item" data-category="music">
               <div class="category-icon"><i class="fas fa-guitar"></i></div>
               <div class="category-name">音乐</div>
             </div>
-            <div class="category-item">
+            <div class="category-item" data-category="whitenoise">
               <div class="category-icon"><i class="fas fa-wind"></i></div>
               <div class="category-name">白噪音</div>
             </div>
           </div>
 
           <!-- Sound List -->
-          <div class="sound-list">
-            <div class="sound-item" data-sound="rain">
-              <img src="https://source.unsplash.com/featured/?rain" alt="雨声" class="sound-item-image">
-              <div class="sound-item-overlay">
-                <div class="sound-item-title">轻柔雨声</div>
-                <div class="sound-item-artist">大自然</div>
-              </div>
-              <div class="sound-item-play">
-                <i class="fas fa-play"></i>
-              </div>
-            </div>
-            <div class="sound-item" data-sound="forest">
-              <img src="https://source.unsplash.com/featured/?forest" alt="森林" class="sound-item-image">
-              <div class="sound-item-overlay">
-                <div class="sound-item-title">森林夜晚</div>
-                <div class="sound-item-artist">大自然</div>
-              </div>
-              <div class="sound-item-play">
-                <i class="fas fa-play"></i>
-              </div>
-            </div>
-            <div class="sound-item" data-sound="ocean">
-              <img src="https://source.unsplash.com/featured/?ocean" alt="海洋" class="sound-item-image">
-              <div class="sound-item-overlay">
-                <div class="sound-item-title">海浪声</div>
-                <div class="sound-item-artist">大自然</div>
-              </div>
-              <div class="sound-item-play">
-                <i class="fas fa-play"></i>
-              </div>
-            </div>
-            <div class="sound-item" data-sound="thunderstorm">
-              <img src="https://source.unsplash.com/featured/?thunderstorm" alt="雷雨" class="sound-item-image">
-              <div class="sound-item-overlay">
-                <div class="sound-item-title">远处雷雨</div>
-                <div class="sound-item-artist">大自然</div>
-              </div>
-              <div class="sound-item-play">
-                <i class="fas fa-play"></i>
-              </div>
-            </div>
+          <div class="sound-list" id="sound-list">
+            <!-- 由JavaScript动态填充 -->
           </div>
         </div>
 
@@ -186,7 +148,7 @@
           <h2 class="card-title"><i class="fas fa-star"></i> 精选合集</h2>
           <div class="sound-list">
             <div class="sound-item" data-sound="deep-sleep">
-              <img src="https://source.unsplash.com/featured/?night" alt="深度睡眠" class="sound-item-image">
+              <img src="assets/images/sounds/white-noise.svg" alt="深度睡眠" class="sound-item-image">
               <div class="sound-item-overlay">
                 <div class="sound-item-title">深度睡眠</div>
                 <div class="sound-item-artist">专业配乐</div>
@@ -196,7 +158,7 @@
               </div>
             </div>
             <div class="sound-item" data-sound="lucid-dreams">
-              <img src="https://source.unsplash.com/featured/?dream" alt="清醒梦" class="sound-item-image">
+              <img src="assets/images/sounds/forest.svg" alt="清醒梦" class="sound-item-image">
               <div class="sound-item-overlay">
                 <div class="sound-item-title">清醒梦境</div>
                 <div class="sound-item-artist">深度冥想</div>
@@ -206,7 +168,7 @@
               </div>
             </div>
             <div class="sound-item" data-sound="stress-relief">
-              <img src="https://source.unsplash.com/featured/?calm" alt="减压" class="sound-item-image">
+              <img src="assets/images/sounds/ocean.svg" alt="减压" class="sound-item-image">
               <div class="sound-item-overlay">
                 <div class="sound-item-title">压力释放</div>
                 <div class="sound-item-artist">冥想引导</div>
@@ -216,7 +178,7 @@
               </div>
             </div>
             <div class="sound-item" data-sound="delta-waves">
-              <img src="https://source.unsplash.com/featured/?wave" alt="脑电波" class="sound-item-image">
+              <img src="assets/images/sounds/rain.svg" alt="脑电波" class="sound-item-image">
               <div class="sound-item-overlay">
                 <div class="sound-item-title">Delta脑波</div>
                 <div class="sound-item-artist">科学助眠</div>
@@ -225,6 +187,20 @@
                 <i class="fas fa-play"></i>
               </div>
             </div>
+          </div>
+        </div>
+        
+        <!-- Audio Source Instructions -->
+        <div class="card">
+          <h2 class="card-title"><i class="fas fa-info-circle"></i> 音频资源</h2>
+          <div class="info-content">
+            <p>本应用使用以下开源音频资源：</p>
+            <ul>
+              <li><a href="https://freesound.org" target="_blank">Freesound.org</a> - 开源音效库</li>
+              <li><a href="https://freemusicarchive.org" target="_blank">Free Music Archive</a> - 免费音乐资源</li>
+            </ul>
+            <p class="mt-2">您可以点击下方按钮访问音频下载页面:</p>
+            <button class="hero-cta mt-1" id="show-audio-sources">查看音频来源</button>
           </div>
         </div>
       </div>
@@ -427,7 +403,7 @@
               8个
             </div>
           </div>
-          <div class="settings-item">
+          <div class="settings-item" data-action="share">
             <div class="settings-left">
               <i class="fas fa-share-alt"></i>
               <div class="settings-label">分享应用</div>
@@ -452,7 +428,7 @@
     <!-- Audio Player -->
     <div class="audio-player" id="audio-player">
       <div class="player-toggle"></div>
-      <img src="https://source.unsplash.com/featured/?nature" alt="音频图片" class="player-image">
+      <img src="assets/images/sounds/rain.svg" alt="音频图片" class="player-image">
       <div class="player-info">
         <div class="player-title">轻柔雨声</div>
         <div class="player-artist">大自然</div>
@@ -473,7 +449,7 @@
         <h3 class="share-title">分享睡眠内容</h3>
         <button class="share-close"><i class="fas fa-times"></i></button>
         <div class="share-link">
-          <input type="text" value="https://adamthree.github.io/ai-sleep-aid/" readonly>
+          <input type="text" value="https://adamthree.github.io/ai-sleep-aid/mobile-app.html" readonly>
           <button id="copy-link-btn"><i class="fas fa-copy"></i></button>
         </div>
         <div class="share-platforms">
@@ -483,6 +459,17 @@
           <div class="share-platform"><i class="fas fa-envelope"></i></div>
         </div>
         <button class="hero-cta">生成分享图片</button>
+      </div>
+    </div>
+    
+    <!-- Audio Sources Modal -->
+    <div class="share-modal" id="audio-sources-modal">
+      <div class="share-content">
+        <h3 class="share-title">音频来源</h3>
+        <button class="share-close"><i class="fas fa-times"></i></button>
+        <div class="audio-sources-list">
+          <!-- 由JavaScript动态填充 -->
+        </div>
       </div>
     </div>
 
@@ -511,6 +498,7 @@
     </div>
   </div>
 
+  <script src="assets/js/sound-data.js"></script>
   <script src="assets/js/mobile-app.js"></script>
 </body>
 </html> 

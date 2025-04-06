@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 背景 -->
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1b46" />
+      <stop offset="100%" stop-color="#3b3e8c" />
+    </linearGradient>
+    <radialGradient id="moon-glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" stop-color="#e1e1ff" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#8093f1" stop-opacity="0.1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- 主背景 -->
+  <rect width="512" height="512" rx="128" fill="url(#bg-gradient)" />
+  
+  <!-- 月亮光晕 -->
+  <circle cx="256" cy="200" r="180" fill="url(#moon-glow)" />
+  
+  <!-- 装饰星星 -->
+  <g fill="#ffffff" opacity="0.8">
+    <circle cx="120" cy="140" r="3" />
+    <circle cx="420" cy="160" r="2" />
+    <circle cx="380" cy="90" r="2.5" />
+    <circle cx="150" cy="80" r="2" />
+    <circle cx="90" cy="200" r="1.5" />
+    <circle cx="180" cy="120" r="2" />
+    <circle cx="320" cy="140" r="2.5" />
+    <circle cx="400" cy="220" r="2" />
+    <circle cx="150" cy="220" r="1.5" />
+    <circle cx="250" cy="100" r="3" />
+  </g>
+  
+  <!-- 月亮 -->
+  <circle cx="256" cy="200" r="80" fill="#e1e1ff" />
+  <circle cx="220" cy="170" r="15" fill="#1a1b46" />
+  
+  <!-- 睡眠Z字符 -->
+  <g fill="#6264b7">
+    <path d="M300,260 L340,260 L300,320 L340,320" stroke="#8093f1" stroke-width="8" fill="none" />
+    <path d="M330,290 L370,290 L330,350 L370,350" stroke="#8093f1" stroke-width="6" fill="none" />
+    <path d="M360,320 L400,320 L360,380 L400,380" stroke="#8093f1" stroke-width="4" fill="none" />
+  </g>
+  
+  <!-- 音波波纹 -->
+  <g stroke="#6264b7" fill="none">
+    <path d="M130,300 Q256,280 380,300" stroke-width="4" />
+    <path d="M150,340 Q256,320 360,340" stroke-width="3" />
+    <path d="M170,380 Q256,360 340,380" stroke-width="2" />
+    <path d="M190,420 Q256,400 320,420" stroke-width="1" />
+  </g>
+</svg> 

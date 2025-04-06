@@ -1,341 +1,403 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // 初始化页面
-  initTabNavigation();
-  initSoundPlayers();
-  initAIChat();
-  initAudioPlayer();
-  initShareFeatures();
-  initMixer();
-  initTimerControls();
-  
-  // 模拟已加载的内容，显示音频播放器
-  setTimeout(function() {
-    document.getElementById('audio-player').classList.add('active');
-  }, 2000);
-});
-
-// 标签页导航
-function initTabNavigation() {
-  const tabItems = document.querySelectorAll('.tab-item');
+  // 获取DOM元素
+  const tabs = document.querySelectorAll('.tab-item');
   const tabContents = document.querySelectorAll('.tab-content');
-  
-  tabItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      const targetId = this.getAttribute('data-tab');
-      
-      // 移除所有活动类
-      tabItems.forEach(tab => tab.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-      
-      // 添加活动类到当前标签
-      this.classList.add('active');
-      document.getElementById(targetId).classList.add('active');
-    });
-  });
-}
-
-// 声音播放器初始化
-function initSoundPlayers() {
-  const soundItems = document.querySelectorAll('.sound-item');
+  const categoryItems = document.querySelectorAll('.category-item');
+  const soundList = document.getElementById('sound-list');
   const audioPlayer = document.getElementById('audio-player');
-  const playerTitle = audioPlayer.querySelector('.player-title');
-  const playerArtist = audioPlayer.querySelector('.player-artist');
-  const playerImage = audioPlayer.querySelector('.player-image');
-  const playerPlayButton = audioPlayer.querySelector('.player-play i');
-  
-  soundItems.forEach(item => {
-    item.addEventListener('click', function() {
-      const soundName = this.getAttribute('data-sound');
-      const title = this.querySelector('.sound-item-title').textContent;
-      const artist = this.querySelector('.sound-item-artist').textContent;
-      const imageUrl = this.querySelector('.sound-item-image').src;
-      
-      // 更新播放器信息
-      playerTitle.textContent = title;
-      playerArtist.textContent = artist;
-      playerImage.src = imageUrl;
-      playerPlayButton.className = 'fas fa-pause';
-      
-      // 显示音频播放器
-      audioPlayer.classList.add('active');
-      
-      // 如果有实际的音频，可以在这里播放
-      console.log(`播放声音: ${soundName}`);
-    });
-  });
-  
-  // 播放器切换按钮
-  const playerToggle = audioPlayer.querySelector('.player-toggle');
-  playerToggle.addEventListener('click', function() {
-    audioPlayer.classList.toggle('active');
-  });
-  
-  // 播放/暂停按钮
-  const playPauseBtn = audioPlayer.querySelector('.player-play');
-  playPauseBtn.addEventListener('click', function() {
-    const icon = this.querySelector('i');
-    if (icon.classList.contains('fa-pause')) {
-      icon.className = 'fas fa-play';
-      console.log('暂停播放');
-    } else {
-      icon.className = 'fas fa-pause';
-      console.log('开始播放');
-    }
-  });
-  
-  // 进度更新（模拟）
-  let progress = 30;
-  setInterval(function() {
-    if (playerPlayButton.classList.contains('fa-pause')) {
-      progress = (progress + 1) % 100;
-      audioPlayer.querySelector('.player-progress-current').style.width = `${progress}%`;
-    }
-  }, 1000);
-}
-
-// AI聊天功能
-function initAIChat() {
+  const audioToggle = document.querySelector('.player-toggle');
   const aiInput = document.getElementById('ai-input-field');
   const aiSendBtn = document.getElementById('ai-send-btn');
   const aiVoiceBtn = document.getElementById('ai-voice-btn');
   const aiChatMessages = document.getElementById('ai-chat-messages');
+  const shareModal = document.getElementById('share-modal');
+  const audioSourcesModal = document.getElementById('audio-sources-modal');
+  const audioSourcesList = document.querySelector('.audio-sources-list');
+  const showAudioSourcesBtn = document.getElementById('show-audio-sources');
+  const shareCloseButtons = document.querySelectorAll('.share-close');
+  const copyLinkBtn = document.getElementById('copy-link-btn');
+  const settingsShareBtn = document.querySelector('.settings-item[data-action="share"]');
+  const startSleepBtn = document.querySelector('.hero-cta[data-action="start-sleep"]');
   
-  // 预设的AI回复
-  const aiResponses = {
-    '默认': '我可以帮您改善睡眠质量，请告诉我您遇到了什么问题？',
-    '失眠': '失眠是很常见的睡眠问题。我建议您尝试以下方法：1. 保持规律的睡眠时间；2. 睡前减少屏幕使用；3. 尝试我们的"深度放松"音频助眠。',
-    '无法入睡': '我理解您的困扰。尝试这些方法：1. 睡前一小时避免蓝光设备；2. 建立固定的睡前仪式；3. 尝试我们的"深度放松"音频冥想，它专为入睡困难设计。',
-    '早醒': '早醒可能与多种因素有关。建议您：1. 保持卧室安静昏暗；2. 晚上减少液体摄入；3. 尝试我们的"深度睡眠"音频，它能帮助您保持睡眠状态。',
-    '做噩梦': '频繁做噩梦会影响睡眠质量。您可以尝试：1. 睡前放松心情；2. 进行意识清晰梦训练；3. 使用我们的"平静梦境"引导冥想。',
-    '打呼噜': '打呼噜可能影响睡眠质量。建议：1. 尝试侧睡；2. 保持健康体重；3. 使用专用枕头；4. 严重情况请咨询医生。',
-    '睡觉时间': '成年人理想的睡眠时间为7-9小时。您可以设置睡眠计划，我们会在适当时间提醒您入睡和起床。',
-    '冥想': '我们提供多种冥想音频，包括引导式冥想、专注冥想和睡前放松冥想。您可以在"声音"选项卡中找到它们。',
-    '白噪音': '白噪音能有效掩盖环境噪音，帮助入睡。我们提供多种白噪音，包括风扇声、雨声和海浪声。',
-    '助眠音乐': '音乐能帮助放松身心，我们提供专门设计的助眠音乐，包括轻柔钢琴曲、自然声音和环境音乐。',
-    '购买会员': '升级到专业会员可以享受更多功能，包括无限制音频访问、高级AI睡眠分析和个性化睡眠计划。您可以在"我的"页面中购买会员。'
-  };
+  // 当前播放的音频元素
+  let currentAudio = null;
+  let isPlaying = false;
   
-  // 发送消息
-  function sendMessage() {
-    const messageText = aiInput.value.trim();
-    if (messageText === '') return;
+  // 标签切换
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // 移除所有激活状态
+      tabs.forEach(item => item.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      // 添加当前激活状态
+      this.classList.add('active');
+      const tabId = this.getAttribute('data-tab');
+      document.getElementById(tabId).classList.add('active');
+    });
+  });
+  
+  // 声音类别切换
+  categoryItems.forEach(item => {
+    item.addEventListener('click', function() {
+      // 移除所有激活状态
+      categoryItems.forEach(catItem => catItem.classList.remove('active'));
+      
+      // 添加当前激活状态
+      this.classList.add('active');
+      
+      // 获取选中的类别
+      const category = this.getAttribute('data-category');
+      
+      // 根据类别渲染声音列表
+      renderSoundsByCategory(category);
+    });
+  });
+  
+  // 根据类别渲染声音列表
+  function renderSoundsByCategory(category) {
+    // 清空声音列表
+    soundList.innerHTML = '';
     
-    // 添加用户消息
-    addMessage(messageText, 'user');
-    aiInput.value = '';
+    // 获取指定类别的声音数据
+    let sounds = [];
     
-    // 处理响应（简单匹配关键词）
-    setTimeout(function() {
-      let response = aiResponses['默认'];
-      Object.keys(aiResponses).forEach(key => {
-        if (messageText.includes(key)) {
-          response = aiResponses[key];
-        }
+    if (category === 'nature') {
+      sounds = soundData.nature;
+    } else if (category === 'meditation') {
+      sounds = soundData.meditation;
+    } else if (category === 'whitenoise') {
+      sounds = soundData.whitenoise;
+    } else if (category === 'music') {
+      sounds = soundData.music;
+    } else if (category === 'stories') {
+      sounds = soundData.stories;
+    }
+    
+    // 为每个声音创建元素
+    sounds.forEach(sound => {
+      const soundItem = document.createElement('div');
+      soundItem.className = 'sound-item';
+      soundItem.setAttribute('data-sound', sound.id);
+      
+      // 使用SVG图标或默认图片
+      const imgSrc = sound.image || `assets/images/sounds/${category}.svg`;
+      
+      soundItem.innerHTML = `
+        <img src="${imgSrc}" alt="${sound.title}" class="sound-item-image">
+        <div class="sound-item-overlay">
+          <div class="sound-item-title">${sound.title}</div>
+          <div class="sound-item-artist">${sound.artist}</div>
+        </div>
+        <div class="sound-item-play">
+          <i class="fas fa-play"></i>
+        </div>
+      `;
+      
+      // 添加点击事件
+      soundItem.addEventListener('click', function() {
+        playSound(sound);
       });
-      addMessage(response, 'ai');
+      
+      // 添加到声音列表
+      soundList.appendChild(soundItem);
+    });
+  }
+  
+  // 播放声音
+  function playSound(sound) {
+    // 如果有正在播放的音频，先停止
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    
+    // 创建新的音频元素
+    const audio = new Audio();
+    
+    // 设置音频源
+    if (sound.audio) {
+      audio.src = sound.audio;
+    } else {
+      // 模拟音频源，实际项目中应该使用真实的音频文件
+      audio.src = 'assets/sounds/' + sound.id + '.mp3';
+    }
+    
+    // 更新播放器UI
+    document.querySelector('.player-title').textContent = sound.title;
+    document.querySelector('.player-artist').textContent = sound.artist;
+    
+    // 使用对应的图片
+    const playerImage = document.querySelector('.player-image');
+    playerImage.src = sound.image || `assets/images/sounds/${sound.category || 'nature'}.svg`;
+    
+    // 显示播放器
+    audioPlayer.classList.add('active');
+    
+    // 播放错误处理
+    audio.addEventListener('error', function() {
+      alert('音频文件加载失败，请稍后再试');
+      audioPlayer.classList.remove('active');
+    });
+    
+    // 播放音频
+    audio.play()
+      .then(() => {
+        isPlaying = true;
+        document.querySelector('.player-play i').className = 'fas fa-pause';
+      })
+      .catch(error => {
+        console.error('播放失败:', error);
+        alert('音频播放失败，请检查您的设备是否允许自动播放');
+      });
+    
+    // 保存当前音频
+    currentAudio = audio;
+    
+    // 更新进度条
+    updateProgress(audio);
+  }
+  
+  // 更新进度条
+  function updateProgress(audio) {
+    setInterval(() => {
+      if (isPlaying && !audio.paused) {
+        const progress = (audio.currentTime / audio.duration) * 100;
+        document.querySelector('.player-progress-current').style.width = progress + '%';
+      }
     }, 1000);
   }
   
-  // 添加消息到聊天框
-  function addMessage(text, sender) {
+  // 播放/暂停切换
+  document.querySelector('.player-play').addEventListener('click', function() {
+    if (!currentAudio) return;
+    
+    if (isPlaying) {
+      currentAudio.pause();
+      this.querySelector('i').className = 'fas fa-play';
+    } else {
+      currentAudio.play();
+      this.querySelector('i').className = 'fas fa-pause';
+    }
+    
+    isPlaying = !isPlaying;
+  });
+  
+  // 播放器切换显示
+  audioToggle.addEventListener('click', function() {
+    audioPlayer.classList.toggle('expanded');
+  });
+  
+  // 开始助眠按钮 - 跳转到声音页面
+  if (startSleepBtn) {
+    startSleepBtn.addEventListener('click', function() {
+      // 切换到声音标签
+      tabs.forEach(item => item.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      const soundsTab = document.querySelector('.tab-item[data-tab="sounds-tab"]');
+      soundsTab.classList.add('active');
+      document.getElementById('sounds-tab').classList.add('active');
+    });
+  }
+  
+  // AI聊天功能
+  function sendAiMessage() {
+    const message = aiInput.value.trim();
+    if (!message) return;
+    
+    // 添加用户消息
+    addChatMessage(message, 'user');
+    
+    // 清空输入框
+    aiInput.value = '';
+    
+    // 模拟AI回复
+    setTimeout(() => {
+      const aiResponse = getAiResponse(message);
+      addChatMessage(aiResponse, 'ai');
+    }, 1000);
+  }
+  
+  // 添加聊天消息
+  function addChatMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message message-${sender}`;
     
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'message-content';
-    contentDiv.textContent = text;
+    const now = new Date();
+    const timeStr = now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
     
-    const timeDiv = document.createElement('div');
-    timeDiv.className = 'message-time';
-    timeDiv.textContent = '刚刚';
-    
-    messageDiv.appendChild(contentDiv);
-    messageDiv.appendChild(timeDiv);
+    messageDiv.innerHTML = `
+      <div class="message-content">${text}</div>
+      <div class="message-time">${timeStr}</div>
+    `;
     
     aiChatMessages.appendChild(messageDiv);
+    
+    // 滚动到底部
     aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
   }
   
-  // 事件监听
-  aiSendBtn.addEventListener('click', sendMessage);
+  // 获取AI回复 (简单模拟)
+  function getAiResponse(message) {
+    message = message.toLowerCase();
+    
+    if (message.includes('失眠') || message.includes('睡不着') || message.includes('难以入睡')) {
+      return '失眠是很常见的问题。您可以尝试：1. 保持规律的作息时间；2. 睡前一小时不使用电子设备；3. 尝试我们的"深度放松"冥想音频；4. 睡前热水澡可以帮助放松身体。您想现在尝试哪个音频放松吗？';
+    } else if (message.includes('噩梦') || message.includes('梦魇')) {
+      return '频繁的噩梦可能与日常压力有关。您可以尝试睡前写日记，记录并释放白天的焦虑。我们的"平静心灵"冥想对减少噩梦也很有帮助。';
+    } else if (message.includes('推荐') || message.includes('建议')) {
+      return '根据当前时间，我推荐您尝试"深度睡眠"音频，它结合了轻柔的雨声和7.8Hz的共振频率，有助于进入深度睡眠状态。您想现在开始播放吗？';
+    } else if (message.includes('白噪音') || message.includes('噪音')) {
+      return '白噪音是掩盖环境干扰的好方法。我们提供多种噪音类型：白噪音、粉红噪音和棕噪音。粉红噪音对大多数人效果最佳，它模拟轻柔的雨声或瀑布声。';
+    } else if (message.includes('感谢') || message.includes('谢谢')) {
+      return '不客气，很高兴能帮到您。祝您今晚睡个好觉！如果还有其他问题，随时可以问我。';
+    } else if (message.includes('音乐') || message.includes('歌')) {
+      return '我们的睡眠音乐选择了特定的节奏和频率，能帮助大脑进入睡眠状态。最受欢迎的是"睡眠钢琴曲"和"Delta脑波音乐"，它们都经过精心设计，促进深度放松。';
+    } else {
+      return '感谢您的信息。我可以帮您解答关于睡眠、放松技巧或推荐适合您的助眠音频。您可以告诉我您当前的睡眠困扰，或者想要什么类型的声音来帮助入睡。';
+    }
+  }
+  
+  // 发送按钮点击
+  aiSendBtn.addEventListener('click', sendAiMessage);
+  
+  // 输入框回车发送
   aiInput.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
-      sendMessage();
+      sendAiMessage();
     }
   });
   
   // 语音输入模拟
   aiVoiceBtn.addEventListener('click', function() {
-    this.classList.add('recording');
+    // 模拟语音识别中
+    aiVoiceBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+    aiVoiceBtn.disabled = true;
     
-    // 模拟录音中
+    // 模拟识别过程
     setTimeout(() => {
-      this.classList.remove('recording');
-      aiInput.value = '我最近睡眠质量不好，经常失眠';
-      aiInput.focus();
+      aiVoiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+      aiVoiceBtn.disabled = false;
+      
+      // 模拟语音输入结果
+      aiInput.value = '我最近总是睡不好，有什么建议吗？';
+      sendAiMessage();
     }, 2000);
   });
-}
-
-// 音频播放器功能
-function initAudioPlayer() {
-  // 模拟进度变化
-  const progressBar = document.querySelector('.player-progress-current');
-  let width = 0;
   
-  setInterval(() => {
-    const playerButton = document.querySelector('.player-play i');
-    if (playerButton.classList.contains('fa-pause')) {
-      width = (width + 0.5) % 100;
-      progressBar.style.width = width + '%';
-    }
-  }, 1000);
-}
-
-// 分享功能
-function initShareFeatures() {
-  const shareModal = document.getElementById('share-modal');
-  const shareLinks = document.querySelectorAll('[data-action="share"]');
-  const closeButton = shareModal.querySelector('.share-close');
-  const copyButton = document.getElementById('copy-link-btn');
-  const shareLink = shareModal.querySelector('.share-link input');
-  const sharePlatforms = shareModal.querySelectorAll('.share-platform');
-  
-  // 打开分享弹窗
-  function openShareModal() {
-    shareModal.classList.add('active');
+  // 分享弹窗
+  if (settingsShareBtn) {
+    settingsShareBtn.addEventListener('click', function() {
+      shareModal.style.display = 'flex';
+    });
   }
   
-  // 关闭分享弹窗
-  function closeShareModal() {
-    shareModal.classList.remove('active');
+  // 显示音频来源
+  if (showAudioSourcesBtn) {
+    showAudioSourcesBtn.addEventListener('click', function() {
+      // 填充音频来源列表
+      renderAudioSources();
+      audioSourcesModal.style.display = 'flex';
+    });
   }
+  
+  // 渲染音频来源列表
+  function renderAudioSources() {
+    if (!audioSourcesList) return;
+    
+    audioSourcesList.innerHTML = '';
+    
+    // 合并所有分类的声音
+    const allSounds = [
+      ...soundData.nature, 
+      ...soundData.meditation, 
+      ...soundData.whitenoise, 
+      ...soundData.music, 
+      ...soundData.stories
+    ];
+    
+    allSounds.forEach(sound => {
+      if (sound.source || sound.downloadUrl) {
+        const sourceItem = document.createElement('div');
+        sourceItem.className = 'audio-source-item';
+        
+        sourceItem.innerHTML = `
+          <div class="source-info">
+            <h4>${sound.title}</h4>
+            <p>作者: ${sound.artist}</p>
+            ${sound.source ? `<p class="source-link">来源: <a href="${sound.source}" target="_blank">${sound.source}</a></p>` : ''}
+          </div>
+          ${sound.downloadUrl ? `<a href="${sound.downloadUrl}" target="_blank" class="download-btn"><i class="fas fa-download"></i></a>` : ''}
+        `;
+        
+        audioSourcesList.appendChild(sourceItem);
+      }
+    });
+  }
+  
+  // 关闭弹窗
+  shareCloseButtons.forEach(btn => {
+    btn.addEventListener('click', function() {
+      // 找到最近的modal父元素
+      const modal = this.closest('.share-modal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
   
   // 复制链接
-  function copyLink() {
-    shareLink.select();
-    document.execCommand('copy');
-    
-    // 显示复制成功提示
-    copyButton.innerHTML = '<i class="fas fa-check"></i>';
-    setTimeout(() => {
-      copyButton.innerHTML = '<i class="fas fa-copy"></i>';
-    }, 2000);
-  }
-  
-  // 添加事件监听
-  if (shareLinks.length > 0) {
-    shareLinks.forEach(link => {
-      link.addEventListener('click', openShareModal);
-    });
-  }
-  
-  closeButton.addEventListener('click', closeShareModal);
-  copyButton.addEventListener('click', copyLink);
-  
-  // 分享平台点击
-  sharePlatforms.forEach(platform => {
-    platform.addEventListener('click', function() {
-      const platformName = this.querySelector('i').className.split('-')[1];
-      console.log(`分享到平台: ${platformName}`);
+  if (copyLinkBtn) {
+    copyLinkBtn.addEventListener('click', function() {
+      const linkInput = document.querySelector('.share-link input');
+      linkInput.select();
+      document.execCommand('copy');
       
-      // 这里可以添加实际的分享功能
-      // 模拟分享成功
-      this.classList.add('shared');
+      // 显示复制成功提示
+      const originalHTML = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-check"></i>';
+      
       setTimeout(() => {
-        this.classList.remove('shared');
-      }, 1000);
+        this.innerHTML = originalHTML;
+      }, 2000);
     });
-  });
-  
-  // 为设置中的分享按钮添加事件
-  const profileShareBtn = document.querySelector('.settings-item .settings-left i.fa-share-alt');
-  if (profileShareBtn) {
-    profileShareBtn.parentElement.parentElement.addEventListener('click', openShareModal);
-  }
-}
-
-// 声音混合器功能
-function initMixer() {
-  const sliders = document.querySelectorAll('.channel-volume');
-  
-  sliders.forEach(slider => {
-    slider.addEventListener('input', function() {
-      const value = this.value;
-      const valueDisplay = this.nextElementSibling;
-      if (valueDisplay) {
-        valueDisplay.textContent = value + '%';
-      }
-      
-      // 如果有实际的音频混合功能，可以在这里实现
-      console.log(`音量调整: ${this.previousElementSibling.textContent} = ${value}%`);
-    });
-  });
-}
-
-// 定时器控制
-function initTimerControls() {
-  const timerDisplay = document.querySelector('.timer-display');
-  const timerButtons = document.querySelectorAll('.timer-btn');
-  let timerInterval;
-  let remainingTime = 30 * 60; // 30分钟，以秒为单位
-  
-  // 更新定时器显示
-  function updateTimerDisplay() {
-    const minutes = Math.floor(remainingTime / 60);
-    const seconds = remainingTime % 60;
-    timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
   
-  // 开始定时器
-  function startTimer() {
-    clearInterval(timerInterval);
-    timerInterval = setInterval(function() {
-      if (remainingTime > 0) {
-        remainingTime--;
-        updateTimerDisplay();
-      } else {
-        clearInterval(timerInterval);
-        console.log('定时器结束');
-        // 这里可以添加定时结束后的行为，如停止播放音频
-      }
-    }, 1000);
-  }
+  // 初始化 - 默认渲染自然声音
+  renderSoundsByCategory('nature');
   
-  // 设置时间
-  function setTime(minutes) {
-    remainingTime = minutes * 60;
-    updateTimerDisplay();
-    startTimer();
-  }
-  
-  // 为按钮添加事件
-  timerButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const text = this.textContent.trim();
-      
-      // 移除所有活动状态
-      timerButtons.forEach(btn => btn.classList.remove('primary'));
-      this.classList.add('primary');
-      
-      if (text.includes('15')) {
-        setTime(15);
-      } else if (text.includes('30')) {
-        setTime(30);
-      } else if (text.includes('60')) {
-        setTime(60);
-      } else if (text.includes('自定义')) {
-        // 打开自定义时间设置
-        const customTime = prompt('请输入定时时间（分钟）：', '45');
-        if (customTime && !isNaN(customTime)) {
-          setTime(parseInt(customTime));
-        }
+  // 设置PWA相关事件
+  window.addEventListener('beforeinstallprompt', (e) => {
+    // 防止Chrome 67及更早版本自动显示安装提示
+    e.preventDefault();
+    // 将事件存储起来，以便稍后触发
+    const deferredPrompt = e;
+    
+    // 可以在适当的时候触发安装提示
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.membership-btn')) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('用户接受了安装');
+          } else {
+            console.log('用户拒绝了安装');
+          }
+        });
       }
     });
   });
   
-  // 初始更新
-  updateTimerDisplay();
-} 
+  // 响应式调整
+  function handleResize() {
+    if (window.innerWidth > 768) {
+      // 在大屏幕上自动展开侧栏等操作
+    }
+  }
+  
+  window.addEventListener('resize', handleResize);
+  handleResize(); // 初始化调用
+}); 
