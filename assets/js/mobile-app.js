@@ -113,108 +113,139 @@ document.addEventListener('DOMContentLoaded', function() {
     // 停止所有当前音轨
     stopAllSounds();
     
-    // 添加新的音轨
-    addSoundTrack(sound);
-    
-    // 使用实际在线音频源，确保能直接播放
     try {
-      // 使用Pixabay的免费音频API - 这些链接是稳定的公共CDN
-      let audioSrc = '';
+      // 立即显示播放界面和通知
+      updatePlayerUI(sound);
+      showNotification('开始播放', `${sound.title} 正在加载...`);
       
-      // 根据声音类型选择合适的音频
-      if (sound.id === 'rain' || sound.title.includes('雨')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/09/audio_652da3df75.mp3'; // 雨声
-      } else if (sound.id === 'ocean' || sound.title.includes('海')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_d005e8ab3a.mp3'; // 海浪声
-      } else if (sound.id === 'forest' || sound.title.includes('森林')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_c9a4a1d834.mp3'; // 森林声
-      } else if (sound.id === 'fire' || sound.title.includes('篝火')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_b04af54271.mp3'; // 篝火声
-      } else if (sound.id === 'meditation' || sound.title.includes('冥想')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/01/27/audio_1d00a9f223.mp3'; // 冥想音乐
-      } else if (sound.id === 'whitenoise' || sound.title.includes('白噪音')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/12/13/audio_fb2335127e.mp3'; // 白噪音
-      } else if (sound.id === 'piano' || sound.title.includes('钢琴')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/11/17/audio_637264939d.mp3'; // 钢琴音乐
-      } else if (sound.id === 'creek' || sound.title.includes('溪')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/08/20/audio_1920d56025.mp3'; // 溪流声
-      } else if (sound.id === 'bird' || sound.title.includes('鸟')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/07/24/audio_5673ea7d4b.mp3'; // 鸟声
-      } else if (sound.id === 'wind' || sound.title.includes('风')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_88290afa00.mp3'; // 风声
-      } else if (sound.id === 'deep-sleep' || sound.title.includes('深度睡眠')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/10/17/audio_7e129d2376.mp3'; // 深度睡眠
-      } else if (sound.id === 'lucid-dreams' || sound.title.includes('清醒梦境')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/03/18/audio_1c24d6f7cc.mp3'; // 清醒梦境
-      } else if (sound.id === 'stress-relief' || sound.title.includes('压力')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2021/07/27/audio_62b41fcbdc.mp3'; // 压力释放
-      } else if (sound.id === 'delta-waves' || sound.title.includes('Delta')) {
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/08/27/audio_5214abadba.mp3'; // Delta脑波
-      } else {
-        // 默认轻松音乐
-        audioSrc = 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_c33418dc23.mp3';
+      // 使用这些直接可用的公共音频URL - 不需要服务器
+      const audioSources = {
+        rain: 'https://freesound.org/data/previews/516/516902_11255645-lq.mp3', // 雨声
+        ocean: 'https://freesound.org/data/previews/468/468407_9558033-lq.mp3', // 海浪声
+        forest: 'https://freesound.org/data/previews/610/610232_13074022-lq.mp3', // 森林声
+        fire: 'https://freesound.org/data/previews/495/495808_10302037-lq.mp3', // 篝火声
+        meditation: 'https://freesound.org/data/previews/472/472764_6142149-lq.mp3', // 冥想音乐
+        whitenoise: 'https://freesound.org/data/previews/482/482477_9408500-lq.mp3', // 白噪音
+        birds: 'https://freesound.org/data/previews/405/405563_7553421-lq.mp3', // 鸟声
+        river: 'https://freesound.org/data/previews/528/528771_11861866-lq.mp3', // 溪流
+        thunder: 'https://freesound.org/data/previews/459/459521_318450-lq.mp3', // 雷声
+        night: 'https://freesound.org/data/previews/557/557259_9438354-lq.mp3', // 夜晚
+        wind: 'https://freesound.org/data/previews/523/523117_7456994-lq.mp3', // 风声
+        piano: 'https://freesound.org/data/previews/468/468407_9558033-lq.mp3', // 钢琴音乐
+        default: 'https://freesound.org/data/previews/499/499938_7084354-lq.mp3' // 默认轻音乐
+      };
+      
+      // 根据声音ID或名称选择适合的音频源
+      let audioSrc = audioSources.default;
+      const soundId = sound.id ? sound.id.toLowerCase() : '';
+      const soundTitle = sound.title ? sound.title.toLowerCase() : '';
+      
+      // 检查特定类型
+      if (soundId.includes('rain') || soundTitle.includes('雨')) {
+        audioSrc = audioSources.rain;
+      } else if (soundId.includes('ocean') || soundTitle.includes('海')) {
+        audioSrc = audioSources.ocean;
+      } else if (soundId.includes('forest') || soundTitle.includes('森林')) {
+        audioSrc = audioSources.forest;
+      } else if (soundId.includes('fire') || soundTitle.includes('火') || soundTitle.includes('篝火')) {
+        audioSrc = audioSources.fire;
+      } else if (soundId.includes('meditation') || soundTitle.includes('冥想')) {
+        audioSrc = audioSources.meditation;
+      } else if (soundId.includes('white') || soundTitle.includes('白噪音') || soundTitle.includes('噪声')) {
+        audioSrc = audioSources.whitenoise;
+      } else if (soundId.includes('bird') || soundTitle.includes('鸟')) {
+        audioSrc = audioSources.birds;
+      } else if (soundId.includes('river') || soundTitle.includes('溪') || soundTitle.includes('河')) {
+        audioSrc = audioSources.river;
+      } else if (soundId.includes('thunder') || soundTitle.includes('雷')) {
+        audioSrc = audioSources.thunder;
+      } else if (soundId.includes('night') || soundTitle.includes('夜')) {
+        audioSrc = audioSources.night;
+      } else if (soundId.includes('wind') || soundTitle.includes('风')) {
+        audioSrc = audioSources.wind;
+      } else if (soundId.includes('piano') || soundTitle.includes('钢琴')) {
+        audioSrc = audioSources.piano;
       }
       
       console.log("使用音频源:", audioSrc);
       
-      // 创建实际音频元素
+      // 预先创建一个Audio元素并设置好事件监听
       const audio = new Audio();
       
-      // 先设置音频事件
-      audio.oncanplay = function() {
-        console.log("音频已准备好播放");
-        // 显示通知告知用户
-        showNotification('声音已准备好', `现在播放: ${sound.title}`);
+      // 添加音频事件
+      audio.oncanplaythrough = function() {
+        console.log("音频加载完成，开始播放");
+        
+        // 尝试播放
+        const playPromise = this.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            console.log("音频播放成功");
+            isPlaying = true;
+            document.querySelector('.player-play i').className = 'fas fa-pause';
+            showNotification('播放中', `${sound.title} 正在播放`);
+            
+            // 更新激活的音轨
+            const trackIndex = activeSoundTracks.findIndex(track => track.sound.id === sound.id);
+            if (trackIndex !== -1) {
+              activeSoundTracks[trackIndex].audio = audio;
+            }
+          }).catch(err => {
+            console.error("自动播放失败:", err);
+            handlePlaybackError();
+          });
+        }
       };
       
-      audio.onplaying = function() {
-        console.log("音频开始播放");
-        isPlaying = true;
-        document.querySelector('.player-play i').className = 'fas fa-pause';
+      audio.onerror = function(e) {
+        console.error("音频加载错误:", e);
+        handlePlaybackError();
       };
       
-      audio.onerror = function() {
-        console.error("音频加载失败", this.error);
-        showNotification('播放提示', '音频加载失败，请检查网络连接');
-      };
-      
-      // 设置音频属性
+      // 设置其他属性
       audio.src = audioSrc;
       audio.loop = true;
       audio.volume = masterVolume;
+      audio.crossOrigin = "anonymous"; // 确保可以跨域加载
       
-      // 强制开始播放
-      const playPromise = audio.play();
+      // 开始加载
+      audio.load();
       
-      if (playPromise !== undefined) {
-        playPromise.then(() => {
-          console.log("成功开始播放");
-          
-          // 更新激活的音轨
-          const trackIndex = activeSoundTracks.findIndex(track => track.sound.id === sound.id);
-          if (trackIndex !== -1) {
-            activeSoundTracks[trackIndex].audio = audio;
-          }
-          
-        }).catch(err => {
-          console.error("自动播放失败:", err);
-          // 显示通知提示用户手动交互
-          showNotification('需要交互', '请点击屏幕以允许播放声音');
-          
-          // 添加一次性点击事件处理器来启动音频
-          document.body.addEventListener('click', function startAudioOnce() {
-            audio.play().catch(e => console.error("尝试播放失败:", e));
-            document.body.removeEventListener('click', startAudioOnce);
-          });
-        });
-      }
+      // 添加到激活的音轨列表
+      activeSoundTracks.push({
+        sound: sound,
+        audio: audio,
+        volume: masterVolume
+      });
       
-      // 更新当前播放器UI
-      updatePlayerUI(sound);
+      // 更新混音器UI
+      updateMixerUI();
       
     } catch (e) {
-      console.error("音频播放错误:", e);
-      showNotification('播放失败', '无法播放音频，请稍后重试');
+      console.error("音频系统错误:", e);
+      handlePlaybackError();
+    }
+    
+    // 错误处理函数
+    function handlePlaybackError() {
+      showNotification('音频提示', '点击屏幕开始播放，或检查您的浏览器设置');
+      
+      // 添加一次性点击事件以启动音频
+      document.body.addEventListener('click', function playOnce() {
+        const audioElems = activeSoundTracks.map(track => track.audio);
+        
+        audioElems.forEach(audio => {
+          if (audio && audio.paused) {
+            audio.play().catch(e => console.error("尝试播放失败:", e));
+          }
+        });
+        
+        document.body.removeEventListener('click', playOnce);
+      });
+      
+      // 尝试使用模拟音频
+      updateProgressSimulated();
     }
   }
   
