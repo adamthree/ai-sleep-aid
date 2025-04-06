@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
   <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
   <style>
-    /* 修复手机应用演示样式 */
+    /* 修复手机应用演示样式 - 确保居中 */
     html, body {
       margin: 0;
       padding: 0;
@@ -38,8 +38,7 @@
       box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
       border-radius: 32px;
       transform: none !important; /* 防止任何变形 */
-      display: flex;
-      flex-direction: column;
+      margin: 0 auto; /* 确保水平居中 */
     }
     
     @media (max-width: 500px) {
@@ -103,10 +102,10 @@
       z-index: 990;
     }
     
-    /* 防止内部元素变形 */
-    * {
+    /* 移除可能导致问题的全局样式 */
+    /* * {
       transform-style: flat;
-    }
+    } */
   </style>
 </head>
 <body>
