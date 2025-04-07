@@ -1,133 +1,135 @@
 // 声音数据
 const soundData = {
-  // 自然声音分类
-  nature: [
+  // 自然声音
+  'nature': [
     {
       id: 'rain',
       title: '雨声',
+      image: 'https://cdn-icons-png.flaticon.com/512/1779/1779891.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/4150/4150992.png',
-      type: 'natural',
-      duration: '10:00',
-      description: '舒缓的雨声，帮助您放松并进入梦乡'
+      duration: '10:00'
     },
     {
       id: 'forest',
       title: '森林',
+      image: 'https://cdn-icons-png.flaticon.com/512/620/620995.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/2927/2927856.png',
-      type: 'natural',
-      duration: '10:00',
-      description: '宁静的森林环境音，包含鸟鸣和微风'
+      duration: '10:00'
     },
     {
       id: 'ocean',
       title: '海浪',
+      image: 'https://cdn-icons-png.flaticon.com/512/2784/2784399.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/3516/3516306.png',
-      type: 'natural',
-      duration: '10:00',
-      description: '平静的海浪声，让您仿佛置身于海边'
+      duration: '10:00'
     },
     {
       id: 'river',
-      title: '溪流',
+      title: '河流',
+      image: 'https://cdn-icons-png.flaticon.com/512/2080/2080056.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/4723/4723396.png',
-      type: 'natural',
-      duration: '10:00',
-      description: '流水的声音，有助于清除杂念'
+      duration: '10:00'
     }
   ],
   
-  // 冥想声音分类
-  meditation: [
+  // 冥想声音
+  'meditation': [
     {
       id: 'tibetan-bowl',
-      title: '藏音碗',
+      title: '西藏碗',
+      image: 'https://cdn-icons-png.flaticon.com/512/2829/2829661.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/6284/6284392.png',
-      type: 'meditation',
-      duration: '10:00',
-      description: '传统藏音碗的共鸣声，帮助冥想和放松'
+      duration: '10:00'
     },
     {
       id: 'om-chanting',
       title: 'Om吟唱',
+      image: 'https://cdn-icons-png.flaticon.com/512/1468/1468160.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/8089/8089324.png',
-      type: 'meditation',
-      duration: '10:00',
-      description: '古老的梵语吟唱，平静心灵'
+      duration: '10:00'
     }
   ],
   
-  // 白噪音分类
-  whitenoise: [
+  // 白噪音
+  'noise': [
     {
       id: 'white-noise',
       title: '白噪音',
+      image: 'https://cdn-icons-png.flaticon.com/512/3280/3280026.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/3596/3596149.png',
-      type: 'noise',
-      duration: '10:00',
-      description: '纯白噪音，屏蔽环境干扰'
+      duration: '10:00'
     },
     {
       id: 'pink-noise',
-      title: '粉红噪音',
+      title: '粉噪音',
+      image: 'https://cdn-icons-png.flaticon.com/512/2065/2065061.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/6012/6012631.png',
-      type: 'noise',
-      duration: '10:00',
-      description: '比白噪音更柔和的频谱，更适合睡眠'
+      duration: '10:00'
     }
   ],
   
-  // 音乐分类
-  music: [
+  // 音乐
+  'music': [
     {
       id: 'piano-sleep',
-      title: '睡眠钢琴曲',
+      title: '钢琴安眠曲',
+      image: 'https://cdn-icons-png.flaticon.com/512/2829/2829076.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/3101/3101003.png',
-      type: 'music',
-      duration: '10:00',
-      description: '舒缓的钢琴曲，低沉的音调有助于入眠'
+      duration: '10:00'
     },
     {
       id: 'ambient-sleep',
-      title: '环境氛围音',
+      title: '环境音乐',
+      image: 'https://cdn-icons-png.flaticon.com/512/5274/5274728.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/4472/4472616.png',
-      type: 'music',
-      duration: '10:00',
-      description: '环境音乐，营造放松氛围'
+      duration: '10:00'
     }
   ],
   
-  // 故事分类
-  stories: [
+  // 故事
+  'story': [
     {
-      id: 'forest-walk',
-      title: '森林漫步',
+      id: 'nature-story',
+      title: '大自然的故事',
+      image: 'https://cdn-icons-png.flaticon.com/512/806/806292.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/620/620967.png',
-      type: 'story',
-      duration: '10:00',
-      description: '一段关于森林漫步的引导式冥想故事'
+      duration: '10:00'
     },
     {
-      id: 'starry-night',
-      title: '星空之旅',
+      id: 'meditation-guide',
+      title: '引导冥想',
+      image: 'https://cdn-icons-png.flaticon.com/512/3048/3048319.png',
       artist: 'Nature Sleep',
-      image: 'https://cdn-icons-png.flaticon.com/512/3094/3094818.png',
-      type: 'story',
-      duration: '10:00',
-      description: '一段关于宇宙和星空的引导式冥想故事'
+      duration: '10:00'
     }
   ]
 };
+
+// 预设混音列表
+const mixData = [
+  {
+    id: 'mix-ocean-ambient',
+    title: '海洋环境',
+    image: 'https://cdn-icons-png.flaticon.com/512/2784/2784399.png',
+    artist: 'Nature Sleep',
+    description: '海洋与环境音乐的完美结合',
+    sounds: [
+      {id: 'ocean', volume: 0.6},
+      {id: 'ambient-sleep', volume: 0.4}
+    ]
+  },
+  {
+    id: 'mix-rain-piano',
+    title: '雨声钢琴',
+    image: 'https://cdn-icons-png.flaticon.com/512/1779/1779891.png',
+    artist: 'Nature Sleep',
+    description: '雨声与钢琴的浪漫组合',
+    sounds: [
+      {id: 'rain', volume: 0.7},
+      {id: 'piano-sleep', volume: 0.5}
+    ]
+  }
+];
 
 // 地点声音
 const locationSounds = [

@@ -100,10 +100,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 切换声音播放状态
   function toggleSound(sound) {
+    console.log("点击声音:", sound.id); // 添加调试日志
+    
     // 检查声音是否已经在活动列表中
     const existingIndex = activeSounds.findIndex(s => s.id === sound.id);
     
     if (existingIndex >= 0) {
+      console.log("移除已存在的声音");
       // 移除声音
       const removedSound = activeSounds.splice(existingIndex, 1)[0];
       if (removedSound.audio) {
@@ -125,112 +128,105 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMixerChannels();
       }
     } else {
-      // 直接播放声音，不显示弹窗
+      console.log("添加新声音");
+      // 直接播放声音，使用短音频确保播放
       const audio = new Audio();
       
-      // 使用本地测试音频确保播放成功
-      const localSoundMap = {
-        'rain': 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav',
-        'forest': 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav',
-        'ocean': 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav',
-        'river': 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav',
-        'tibetan-bowl': 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav',
-        'om-chanting': 'https://www2.cs.uic.edu/~i101/SoundFiles/Fanfare60.wav',
-        'white-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav',
-        'pink-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/spacemusic.wav',
-        'piano-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg10.wav',
-        'ambient-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg.wav'
-      };
-      
-      const soundUrl = localSoundMap[sound.id];
+      // 始终使用这些可靠的音频URL
+      const soundUrl = `https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav`;
+      console.log("使用音频URL:", soundUrl);
       
       // 设置音频参数
       audio.src = soundUrl;
       audio.loop = true;
       audio.volume = masterVolume;
       
-      // 尝试播放
-      audio.play().then(() => {
-        // 播放成功
-        isPlaying = true;
-        playIcon.className = 'fas fa-pause';
-        
-        // 添加到活动声音列表
-        activeSounds.push({
-          id: sound.id,
-          title: sound.title,
-          image: sound.image,
-          audio: audio
-        });
-        
-        // 更新UI
-        updateSoundCardState(sound.id, true);
-        updatePlayerInfo(sound);
-        playerContainer.classList.add('active');
-        
-        // 显示混音器（如果有多个声音）
-        if (activeSounds.length > 1) {
-          mixerContainer.style.display = 'block';
-        }
-        
-        // 更新混音器
-        updateMixerChannels();
-      }).catch(error => {
-        console.error('播放失败，但不显示提示:', error);
-        // 直接使用最简单的音频尝试播放
-        const simpleAudio = new Audio('https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav');
-        simpleAudio.loop = true;
-        simpleAudio.volume = masterVolume;
-        
-        simpleAudio.play().then(() => {
-          // 播放成功
-          isPlaying = true;
-          playIcon.className = 'fas fa-pause';
-          
-          // 添加到活动声音列表
-          activeSounds.push({
-            id: sound.id,
-            title: sound.title,
-            image: sound.image,
-            audio: simpleAudio
-          });
-          
-          // 更新UI
-          updateSoundCardState(sound.id, true);
-          updatePlayerInfo(sound);
-          playerContainer.classList.add('active');
-          
-          if (activeSounds.length > 1) {
-            mixerContainer.style.display = 'block';
-          }
-          
-          updateMixerChannels();
-        }).catch(e => {
-          console.error('最终播放尝试失败，但不显示提示:', e);
-        });
+      // 尝试播放前先显示播放器，确保UI更新
+      activeSounds.push({
+        id: sound.id,
+        title: sound.title,
+        image: sound.image,
+        audio: audio
       });
+      
+      // 预先更新UI，不等待播放成功
+      updateSoundCardState(sound.id, true);
+      updatePlayerInfo(sound);
+      playerContainer.classList.add('active');
+      
+      // 显示混音器（如果有多个声音）
+      if (activeSounds.length > 1) {
+        mixerContainer.style.display = 'block';
+      }
+      
+      // 更新混音器
+      updateMixerChannels();
+      
+      // 尝试播放
+      try {
+        console.log("尝试播放音频");
+        const playPromise = audio.play();
+        
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            console.log("播放成功");
+            isPlaying = true;
+            playIcon.className = 'fas fa-pause';
+          }).catch(error => {
+            console.error('播放失败:', error);
+            
+            // 尝试用户交互
+            document.addEventListener('click', function playHandler() {
+              audio.play().catch(e => console.error("点击尝试播放失败:", e));
+              document.removeEventListener('click', playHandler);
+            }, { once: true });
+          });
+        }
+      } catch (error) {
+        console.error("播放时出错:", error);
+      }
     }
   }
   
   // 更新声音卡片状态
   function updateSoundCardState(soundId, isActive) {
+    console.log("更新声音卡片状态:", soundId, isActive);
     const soundCard = document.querySelector(`.sound-card[data-sound-id="${soundId}"]`);
     if (soundCard) {
       if (isActive) {
         soundCard.classList.add('active');
-        soundCard.querySelector('.sound-play-btn i').className = 'fas fa-pause';
+        const playIcon = soundCard.querySelector('.sound-play-btn i');
+        if (playIcon) {
+          playIcon.className = 'fas fa-pause';
+        }
       } else {
         soundCard.classList.remove('active');
-        soundCard.querySelector('.sound-play-btn i').className = 'fas fa-play';
+        const playIcon = soundCard.querySelector('.sound-play-btn i');
+        if (playIcon) {
+          playIcon.className = 'fas fa-play';
+        }
       }
+    } else {
+      console.warn("找不到声音卡片:", soundId);
     }
   }
   
   // 更新播放器信息
   function updatePlayerInfo(sound) {
-    playerThumbnail.src = sound.image;
-    playerTitle.textContent = sound.title;
+    console.log("更新播放器信息:", sound);
+    if (!sound) {
+      console.warn("没有声音信息可更新");
+      return;
+    }
+    
+    playerThumbnail.src = sound.image || '';
+    playerTitle.textContent = sound.title || '未知声音';
     playerSubtitle.textContent = '';
+    
+    // 确保播放器可见
+    if (!playerContainer.classList.contains('active')) {
+      playerContainer.classList.add('active');
+    }
   }
   
   // 更新混音器通道

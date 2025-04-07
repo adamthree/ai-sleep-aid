@@ -117,24 +117,60 @@
       box-shadow: 0 6px 20px rgba(91, 77, 255, 0.4);
     }
     
-    /* 修改声音卡片样式 */
-    .sound-card {
-      border-radius: 16px;
-      overflow: hidden;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* 确保播放器容器正确显示 */
+    #player-container {
+      position: fixed;
+      bottom: 60px;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      background-color: rgba(26, 26, 46, 0.95);
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      transform: translateY(100%);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      z-index: 50;
     }
     
-    .sound-card:active {
-      transform: scale(0.95);
+    #player-container.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    /* 确保混音器容器正确显示 */
+    #mixer-container {
+      display: none;
+      position: fixed;
+      bottom: 120px;
+      left: 0;
+      right: 0;
+      background-color: rgba(26, 26, 46, 0.95);
+      padding: 12px 16px;
+      max-height: 40vh;
+      overflow-y: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 45;
+    }
+    
+    /* 调整声音卡片样式 */
+    .sound-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 1/1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 15px;
     }
     
     .sound-card.active {
-      box-shadow: 0 0 0 2px #7F5CFF, 0 4px 15px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 0 0 2px #7F5CFF, 0 4px 12px rgba(0, 0, 0, 0.4);
     }
   </style>
 </head>
 <body>
-  <div class="app-container">
+  <div id="app-container">
     <!-- 顶部导航栏 -->
     <div class="top-nav">
       <div class="logo">
@@ -174,224 +210,60 @@
       </div>
     </div>
     
-    <!-- 主内容区 -->
-    <div class="main-content">
-      <!-- 声音标签页 -->
-      <div id="sounds-tab" class="tab-content active">
-        <!-- 声音分类导航 -->
-        <div class="category-nav">
-          <div class="category-item active" data-category="nature">
-            <i class="fas fa-leaf"></i>
-            <span>自然</span>
-          </div>
-          <div class="category-item" data-category="meditation">
-            <i class="fas fa-om"></i>
-            <span>冥想</span>
-          </div>
-          <div class="category-item" data-category="whitenoise">
-            <i class="fas fa-wave-square"></i>
-            <span>白噪音</span>
-          </div>
-          <div class="category-item" data-category="music">
-            <i class="fas fa-music"></i>
-            <span>音乐</span>
-          </div>
-          <div class="category-item" data-category="stories">
-            <i class="fas fa-book"></i>
-            <span>故事</span>
-          </div>
+    <!-- 主内容区域 -->
+    <div id="main-content">
+      <!-- 声音列表 -->
+      <div id="sound-grid" class="tab-content active">
+        <!-- 分类导航 -->
+        <div class="sound-categories">
+          <div class="category-item active" data-category="nature">大自然</div>
+          <div class="category-item" data-category="meditation">冥想</div>
+          <div class="category-item" data-category="noise">白噪音</div>
+          <div class="category-item" data-category="music">音乐</div>
+          <div class="category-item" data-category="story">故事</div>
         </div>
         
         <!-- 声音网格 -->
-        <div id="sound-grid" class="sound-grid">
-          <!-- 声音卡片将通过JavaScript动态生成 -->
-        </div>
-        
-        <!-- 混音器 -->
-        <div id="mixer-container" class="mixer-container" style="display: none;">
-          <div class="mixer-header">
-            <h3>混音器</h3>
-            <div class="mixer-actions">
-              <button id="clear-mix-btn" class="mixer-btn">清空</button>
-              <button id="save-mix-btn" class="mixer-btn primary">保存</button>
-            </div>
-          </div>
-          <div id="mixer-channels" class="mixer-channels">
-            <!-- 混音通道将通过JavaScript动态生成 -->
-          </div>
+        <div class="sounds-grid-container">
+          <!-- 声音卡片将通过JS动态生成 -->
         </div>
       </div>
-      
-      <!-- AI助手标签页 -->
-      <div id="ai-tab" class="tab-content">
-        <div class="ai-container">
-          <div id="ai-messages" class="ai-messages">
-            <div class="message message-ai">
-              <div class="message-content">你好！我是你的睡眠助手。你可以告诉我你想听的声音，或者询问我睡眠相关的建议。</div>
-              <div class="message-time">现在</div>
-            </div>
-          </div>
-          <div class="ai-input">
-            <input type="text" id="ai-input-field" placeholder="输入消息..." />
-            <button id="ai-voice-btn" class="ai-btn"><i class="fas fa-microphone"></i></button>
-            <button id="ai-send-btn" class="ai-btn"><i class="fas fa-paper-plane"></i></button>
-          </div>
+    </div>
+    
+    <!-- 播放器容器，确保样式使其显示 -->
+    <div id="player-container">
+      <div class="player-content">
+        <div class="player-thumbnail">
+          <img id="player-thumbnail" src="" alt="当前播放">
         </div>
-      </div>
-      
-      <!-- 探索地图标签页 -->
-      <div id="map-tab" class="tab-content">
-        <div class="map-container">
-          <div class="map-header">
-            <h3>声音探索</h3>
-            <p>探索世界各地流行的声音地点</p>
-          </div>
-          <div class="map-content">
-            <div class="location-card">
-              <img src="assets/images/locations/kyoto.jpg" alt="京都竹林" class="location-image">
-              <div class="location-info">
-                <h4>京都竹林</h4>
-                <p>日本传统竹林的沙沙声</p>
-                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
-              </div>
-            </div>
-            <div class="location-card">
-              <img src="assets/images/locations/hawaii.jpg" alt="夏威夷海滩" class="location-image">
-              <div class="location-info">
-                <h4>夏威夷海滩</h4>
-                <p>热带海滩的波浪声</p>
-                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
-              </div>
-            </div>
-            <div class="location-card">
-              <img src="assets/images/locations/amazon.jpg" alt="亚马逊雨林" class="location-image">
-              <div class="location-info">
-                <h4>亚马逊雨林</h4>
-                <p>雨林丰富的生态系统声音</p>
-                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
-              </div>
-            </div>
-            <div class="location-card">
-              <img src="assets/images/locations/iceland.jpg" alt="冰岛瀑布" class="location-image">
-              <div class="location-info">
-                <h4>冰岛瀑布</h4>
-                <p>壮观瀑布的轰鸣声</p>
-                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
-              </div>
-            </div>
-            <div class="location-card">
-              <img src="assets/images/locations/tibet.jpg" alt="喜马拉雅寺庙" class="location-image">
-              <div class="location-info">
-                <h4>喜马拉雅寺庙</h4>
-                <p>高山僧侣的平静颂歌</p>
-                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
-              </div>
-            </div>
-          </div>
+        <div class="player-info">
+          <div id="player-title">未选择声音</div>
+          <div id="player-subtitle"></div>
         </div>
-      </div>
-      
-      <!-- 个人资料标签页 -->
-      <div id="profile-tab" class="tab-content">
-        <div class="profile-container">
-          <div class="profile-header">
-            <div class="profile-avatar">
-              <i class="fas fa-user"></i>
-            </div>
-            <h3>我的资料</h3>
+        <div class="player-controls">
+          <div id="play-all-btn" class="control-btn">
+            <i id="play-icon" class="fas fa-play"></i>
           </div>
-          <div class="stats-container">
-            <div class="stat-card">
-              <div class="stat-icon"><i class="fas fa-moon"></i></div>
-              <div class="stat-value">24</div>
-              <div class="stat-label">睡眠次数</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon"><i class="fas fa-clock"></i></div>
-              <div class="stat-value">48h</div>
-              <div class="stat-label">总时长</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon"><i class="fas fa-star"></i></div>
-              <div class="stat-value">6</div>
-              <div class="stat-label">收藏声音</div>
-            </div>
+          <div id="clear-all-btn" class="control-btn">
+            <i class="fas fa-times"></i>
           </div>
-          <div class="saved-mixes">
-            <h4>保存的混音</h4>
-            <div class="mix-list">
-              <div class="mix-card">
-                <div class="mix-icon"><i class="fas fa-sliders-h"></i></div>
-                <div class="mix-info">
-                  <div class="mix-title">雨夜放松</div>
-                  <div class="mix-date">2023-10-15</div>
-                </div>
-                <button class="mix-play-btn"><i class="fas fa-play"></i></button>
-              </div>
-              <div class="mix-card">
-                <div class="mix-icon"><i class="fas fa-sliders-h"></i></div>
-                <div class="mix-info">
-                  <div class="mix-title">森林冥想</div>
-                  <div class="mix-date">2023-10-10</div>
-                </div>
-                <button class="mix-play-btn"><i class="fas fa-play"></i></button>
-              </div>
-              <div class="mix-card">
-                <div class="mix-icon"><i class="fas fa-sliders-h"></i></div>
-                <div class="mix-info">
-                  <div class="mix-title">海边工作</div>
-                  <div class="mix-date">2023-10-05</div>
-                </div>
-                <button class="mix-play-btn"><i class="fas fa-play"></i></button>
-              </div>
-            </div>
-          </div>
-          <div class="settings-section">
-            <h4>设置</h4>
-            <div class="setting-item">
-              <span>深色模式</span>
-              <label class="switch">
-                <input type="checkbox" checked>
-                <span class="slider round"></span>
-              </label>
-            </div>
-            <div class="setting-item">
-              <span>自动关闭计时</span>
-              <select class="setting-select">
-                <option>无</option>
-                <option>30分钟</option>
-                <option>1小时</option>
-                <option>2小时</option>
-              </select>
-            </div>
-            <div class="setting-item">
-              <span>音质设置</span>
-              <select class="setting-select">
-                <option>标准</option>
-                <option>高质量</option>
-              </select>
-            </div>
+          <div id="save-mix-btn" class="control-btn">
+            <i class="fas fa-save"></i>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- 播放器容器 -->
-    <div id="player-container" class="player-container">
-      <div class="player-info">
-        <img id="player-thumbnail" src="assets/images/sounds/rain.jpg" alt="雨声" class="player-thumbnail">
-        <div class="player-text">
-          <div id="player-title" class="player-title">雨声</div>
-          <div id="player-subtitle" class="player-subtitle">自然</div>
+    <!-- 混音器容器，确保样式使其正确显示 -->
+    <div id="mixer-container" style="display: none;">
+      <div class="mixer-header">
+        <h3>混音器</h3>
+        <div class="mixer-toggle">
+          <i class="fas fa-chevron-down"></i>
         </div>
       </div>
-      <div class="player-progress">
-        <div id="player-progress-bar" class="player-progress-bar" style="width: 0%;"></div>
-      </div>
-      <div class="player-controls">
-        <button class="player-control-btn"><i class="fas fa-backward"></i></button>
-        <button id="player-play-btn" class="player-control-btn play-btn"><i id="play-icon" class="fas fa-play"></i></button>
-        <button class="player-control-btn"><i class="fas fa-forward"></i></button>
+      <div class="mixer-channels">
+        <!-- 通道将通过JS动态生成 -->
       </div>
     </div>
     
@@ -415,18 +287,58 @@
       </div>
     </div>
     
-    <!-- 通知 -->
+    <!-- 通知区域 -->
     <div id="notification" class="notification">
-      <i class="fas fa-check-circle notification-icon"></i>
+      <i class="fas fa-info-circle notification-icon"></i>
       <div class="notification-content">
-        <div class="notification-title">成功</div>
-        <div class="notification-message">操作已完成</div>
+        <div class="notification-title">通知标题</div>
+        <div class="notification-message">通知内容</div>
+      </div>
+    </div>
+    
+    <!-- 标签内容区域 -->
+    <div id="sounds-tab" class="tab-content active">
+      <!-- 声音内容已在主内容区域 -->
+    </div>
+    
+    <div id="ai-tab" class="tab-content">
+      <div class="ai-chat">
+        <div id="ai-messages" class="ai-messages">
+          <div class="message message-ai">
+            <div class="message-content">
+              欢迎使用Nature Sleep智能助手。您可以问我有关助眠声音、失眠问题或直接告诉我您想听的声音，例如"播放雨声"、"我要听海浪声"等。
+            </div>
+            <div class="message-time">现在</div>
+          </div>
+        </div>
+        <div class="ai-input">
+          <input id="ai-input-field" type="text" placeholder="输入您的问题或指令...">
+          <button id="ai-voice-btn"><i class="fas fa-microphone"></i></button>
+          <button id="ai-send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="map-tab" class="tab-content">
+      <div class="map-container">
+        <h2>声音地图探索</h2>
+        <p>探索世界各地的特色声音</p>
+        <!-- 地图内容 -->
+      </div>
+    </div>
+    
+    <div id="profile-tab" class="tab-content">
+      <div class="profile-container">
+        <h2>个人中心</h2>
+        <p>查看您的睡眠数据和收藏</p>
+        <!-- 个人中心内容 -->
       </div>
     </div>
   </div>
   
-  <!-- 脚本 -->
+  <!-- 声音数据 -->
   <script src="assets/js/sound-data.js"></script>
+  <!-- 应用脚本 -->
   <script src="assets/js/new-app.js"></script>
 </body>
 </html> 
