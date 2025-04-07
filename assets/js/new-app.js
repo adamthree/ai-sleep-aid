@@ -29,12 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用多种可靠音源组合
+    // 使用更可靠的音源组合
     const soundUrls = {
       'rain': 'https://actions.google.com/sounds/v1/weather/rain_on_roof.ogg',
-      'forest': 'https://storage.googleapis.com/files.freesound.org/previews/617/617730_1648170-hq.mp3',
+      'forest': 'https://media.freesound.org/previews/629/629130_12652634-hq.mp3',
       'ocean': 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
-      'river': 'https://storage.googleapis.com/files.freesound.org/previews/44/44255_337984-hq.mp3',
+      'river': 'https://media.freesound.org/previews/162/162361_2796536-hq.mp3',
       'tibetan-bowl': 'https://actions.google.com/sounds/v1/household/metallic_bowl_struck.ogg',
       'om-chanting': 'https://actions.google.com/sounds/v1/human_voices/male_humming.ogg',
       'white-noise': 'https://actions.google.com/sounds/v1/ambiences/air_conditioner.ogg',
@@ -134,16 +134,16 @@ document.addEventListener('DOMContentLoaded', function() {
       // 错误处理
       audio.onerror = function() {
         console.error('音频加载失败:', sound.id);
-        showNotification('播放失败', '无法加载音频资源，请稍后再试', 'error');
+        tryAlternativeSource(sound);
       };
       
-      // 设置超时，避免长时间等待
+      // 设置超时，减少等待时间，更快切换到备用源
       setTimeout(function() {
         if (audio.readyState < 3) { // HAVE_FUTURE_DATA
           audio.oncanplaythrough = null;
           tryAlternativeSource(sound);
         }
-      }, 5000);
+      }, 3000); // 从5000减少到3000
     }
   }
   

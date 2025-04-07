@@ -13,35 +13,52 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/images/app-icon.png">
   <style>
-    /* 修复logo样式，确保不会遮挡内容 */
+    /* 进一步优化顶部导航和logo，防止遮挡 */
     .top-nav {
-      height: 50px;
+      height: 40px !important;
       background-color: rgba(18, 18, 24, 0.95);
       position: relative;
       z-index: 10;
+      padding: 0 15px !important;
     }
     
     .logo-icon {
-      width: 24px;
-      height: 24px;
-      margin-right: 8px;
+      width: 20px !important;
+      height: 20px !important;
+      margin-right: 6px !important;
     }
     
     .logo-text {
-      font-size: 16px;
+      font-size: 14px !important;
       font-weight: bold;
     }
     
     .main-content {
-      padding-top: 12px;
-      margin-top: 0;
+      padding-top: 5px !important;
+      margin-top: 0 !important;
     }
     
-    /* 修复通知样式使其不会占用太多空间 */
+    /* 修复通知位置 */
     .notification {
-      top: 60px;
-      max-width: 90%;
-      padding: 10px;
+      top: 45px !important;
+      padding: 8px !important;
+      font-size: 14px !important;
+    }
+    
+    /* 确保底部导航不会消失 */
+    .bottom-nav {
+      display: flex !important;
+    }
+    
+    /* 缩小搜索和设置按钮 */
+    .top-action-btn {
+      width: 28px !important;
+      height: 28px !important;
+    }
+    
+    /* 确保按钮图标居中 */
+    .top-action-btn i {
+      font-size: 14px !important;
     }
   </style>
 </head>
