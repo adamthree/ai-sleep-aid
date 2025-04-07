@@ -35,50 +35,90 @@ document.addEventListener('DOMContentLoaded', function() {
   let isAiResponding = false;
   let shouldResumeVoiceAfterResponse = false;
 
-  // 根据分类渲染声音列表
-  function renderSoundsByCategory(category) {
-    if (!soundList) return;
+  // 音频元素
+  let currentAudio = null;
+  const playerEl = document.getElementById('audio-player');
+  const playerTitle = document.querySelector('.player-title');
+  const playerArtist = document.querySelector('.player-artist');
+  const playerProgress = document.querySelector('.player-progress-current');
+  const playerPlayBtn = document.querySelector('.player-play');
+  const playerCloseBtn = document.getElementById('player-close');
+
+  // 声音播放功能
+  function playSound(soundId, title, artist, image) {
+    // 停止当前正在播放的音频
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
     
-    soundList.innerHTML = '';
+    // 获取音频URL
+    const audioSrc = getSoundUrl(soundId);
     
-    // 获取对应分类的声音
-    const sounds = soundData[category] || [];
+    // 创建新的音频元素
+    currentAudio = new Audio(audioSrc);
+    currentAudio.loop = true;
     
-    sounds.forEach(sound => {
-      // 确保声音有有效的ID
-      sound.id = sound.id || `sound-${category}-${Math.random().toString(36).substring(2, 9)}`;
-      
-      // 设定分类
-      sound.category = category;
-      
-      // 创建声音项UI
-      const soundItem = document.createElement('div');
-      soundItem.className = 'sound-item';
-      soundItem.setAttribute('data-sound-id', sound.id);
-      
-      // 确保图片路径正确
-      const imagePath = sound.image || `assets/images/sounds/${category}.svg`;
-      
-      soundItem.innerHTML = `
-        <img src="${imagePath}" alt="${sound.title}" class="sound-item-image">
-        <div class="sound-item-overlay">
-          <div class="sound-item-title">${sound.title}</div>
-          <div class="sound-item-artist">${sound.artist || getCategoryDisplayName(category)}</div>
-        </div>
-        <div class="sound-item-play">
-          <i class="fas fa-play"></i>
-        </div>
-      `;
-      
-      // 添加点击播放事件
-      soundItem.addEventListener('click', function() {
-        playSound(sound);
-      });
-      
-      soundList.appendChild(soundItem);
+    // 加载和播放
+    currentAudio.addEventListener('canplaythrough', function() {
+      currentAudio.play()
+        .then(() => {
+          isPlaying = true;
+          playerPlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
+          showNotification('开始播放', `正在播放: ${title}`);
+        })
+        .catch(error => {
+          console.error('播放失败:', error);
+          showNotification('播放失败', '无法播放所选音频，请尝试其他音频。');
+        });
     });
+    
+    currentAudio.addEventListener('error', function() {
+      console.error('音频加载错误');
+      showNotification('加载失败', '无法加载所选音频，请检查网络连接或尝试其他音频。');
+    });
+    
+    // 更新播放器UI
+    playerImage.src = image;
+    playerTitle.textContent = title;
+    playerArtist.textContent = artist;
+    playerEl.style.display = 'flex';
+    
+    // 显示播放器
+    setTimeout(() => {
+      playerEl.classList.add('active');
+    }, 10);
+    
+    // 更新进度条
+    if (currentAudio) {
+      setInterval(() => {
+        if (isPlaying && currentAudio.duration) {
+          const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+          playerProgress.style.width = `${progress}%`;
+        }
+      }, 1000);
+    }
   }
   
+  // 获取音频URL
+  function getSoundUrl(soundId) {
+    // 稳定的音频源
+    const soundUrls = {
+      'rain': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0f6c318b4.mp3',
+      'ocean': 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_d6f899a183.mp3',
+      'forest': 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_dca145d650.mp3',
+      'fire': 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_5c4d07a6a6.mp3',
+      'birds': 'https://cdn.pixabay.com/download/audio/2022/07/04/audio_fcc2b3e25f.mp3',
+      'wind': 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_4f66bee6c5.mp3',
+      'thunder': 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_9788d2a482.mp3',
+      'white-noise': 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8b8a21bc5.mp3',
+      'tibetan-bowl': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_f9eb8b8420.mp3',
+      'piano-sleep': 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_b5e66836e0.mp3'
+    };
+    
+    return soundUrls[soundId] || `assets/sounds/${soundId}.mp3`;
+  }
+
   // 获取分类的显示名称
   function getCategoryDisplayName(category) {
     const displayNames = {
@@ -92,442 +132,79 @@ document.addEventListener('DOMContentLoaded', function() {
     return displayNames[category] || '音效';
   }
 
-  // 播放声音功能 - 使用稳定的音频源
-  function playSound(sound) {
-    console.log("播放声音:", sound.title);
-    
-    // 停止所有当前音轨
-    stopAllSounds();
-    
-    try {
-      // 立即显示播放界面和通知
-      updatePlayerUI(sound);
-      showNotification('开始播放', `${sound.title} 正在加载...`);
-      
-      // 使用稳定且免费的音频API
-      const audioSources = {
-        rain: 'https://orangefreesounds.com/wp-content/uploads/2021/07/Rain-sounds-looped.mp3',
-        ocean: 'https://soundbible.com/mp3/Ocean_Waves-Mike_Koenig-980635527.mp3',
-        forest: 'https://soundbible.com/mp3/forest_ambience-6941.mp3',
-        fire: 'https://soundbible.com/mp3/fire_crackling-Mike_Koenig-1921201712.mp3',
-        birds: 'https://soundbible.com/mp3/birds-singing-01.mp3',
-        wind: 'https://soundbible.com/mp3/wind-1-juan_merie_venter-978564486.mp3',
-        thunder: 'https://soundbible.com/mp3/Thunder-Mike_Koenig-1661717865.mp3',
-        whitenoise: 'https://soundbible.com/mp3/Elevator_Ding-KevanGC-1377446482.mp3',
-        meditation: 'https://orangefreesounds.com/wp-content/uploads/2016/12/Meditation-music-no-bells-1-hour.mp3',
-        piano: 'https://orangefreesounds.com/wp-content/uploads/2020/09/Peaceful-relaxing-piano-music.mp3',
-        default: 'https://orangefreesounds.com/wp-content/uploads/2021/07/Rain-sounds-looped.mp3'
-      };
-      
-      // 本地备用音频 - 当在线音频加载失败时使用
-      const localAudioSources = {
-        rain: 'assets/sounds/rain.mp3',
-        ocean: 'assets/sounds/ocean.mp3',
-        forest: 'assets/sounds/forest.mp3',
-        fire: 'assets/sounds/fire.mp3',
-        birds: 'assets/sounds/birds.mp3',
-        wind: 'assets/sounds/wind.mp3',
-        thunder: 'assets/sounds/thunder.mp3',
-        whitenoise: 'assets/sounds/whitenoise.mp3',
-        meditation: 'assets/sounds/meditation.mp3',
-        piano: 'assets/sounds/piano.mp3',
-        default: 'assets/sounds/rain.mp3'
-      };
-      
-      // 根据声音ID或名称选择适合的音频源
-      let audioSrc = audioSources.default;
-      let localFallbackSrc = localAudioSources.default;
-      const soundId = (sound.id || '').toLowerCase();
-      const soundTitle = (sound.title || '').toLowerCase();
-      
-      // 检查特定类型
-      if (soundId.includes('rain') || soundTitle.includes('雨')) {
-        audioSrc = audioSources.rain;
-        localFallbackSrc = localAudioSources.rain;
-      } else if (soundId.includes('ocean') || soundId.includes('sea') || soundTitle.includes('海')) {
-        audioSrc = audioSources.ocean;
-        localFallbackSrc = localAudioSources.ocean;
-      } else if (soundId.includes('forest') || soundTitle.includes('森林')) {
-        audioSrc = audioSources.forest;
-        localFallbackSrc = localAudioSources.forest;
-      } else if (soundId.includes('fire') || soundTitle.includes('火') || soundTitle.includes('篝火')) {
-        audioSrc = audioSources.fire;
-        localFallbackSrc = localAudioSources.fire;
-      } else if (soundId.includes('bird') || soundTitle.includes('鸟')) {
-        audioSrc = audioSources.birds;
-        localFallbackSrc = localAudioSources.birds;
-      } else if (soundId.includes('meditation') || soundTitle.includes('冥想')) {
-        audioSrc = audioSources.meditation;
-        localFallbackSrc = localAudioSources.meditation;
-      } else if (soundId.includes('wind') || soundTitle.includes('风')) {
-        audioSrc = audioSources.wind;
-        localFallbackSrc = localAudioSources.wind;
-      } else if (soundId.includes('piano') || soundTitle.includes('钢琴')) {
-        audioSrc = audioSources.piano;
-        localFallbackSrc = localAudioSources.piano;
-      } else if (soundId.includes('thunder') || soundTitle.includes('雷')) {
-        audioSrc = audioSources.thunder;
-        localFallbackSrc = localAudioSources.thunder;
-      } else if (soundId.includes('white') || soundTitle.includes('白噪')) {
-        audioSrc = audioSources.whitenoise;
-        localFallbackSrc = localAudioSources.whitenoise;
-      }
-      
-      console.log("尝试使用音频源:", audioSrc);
-      
-      // 创建新的Audio元素
-      const audio = new Audio();
-      
-      // 添加事件处理
-      audio.oncanplaythrough = function() {
-        console.log("音频加载完成，开始播放");
-        
-        // 开始播放
-        audio.play().then(() => {
-          console.log("音频播放成功");
-          showNotification('播放中', `${sound.title} 正在播放`);
-          
-          // 更新播放按钮
-          const playBtn = document.querySelector('.player-play i');
-          if (playBtn) playBtn.className = 'fas fa-pause';
-          
-          // 更新播放状态
-          isPlaying = true;
-        }).catch(err => {
-          console.error("自动播放失败:", err);
-          showNotification('需要交互', '请点击播放按钮启动播放');
-          
-          // 添加一次性点击事件到播放按钮
-          const playerPlayBtn = document.querySelector('.player-play');
-          if (playerPlayBtn) {
-            const startPlayOnce = function() {
-              audio.play().catch(e => console.error("播放失败:", e));
-              playerPlayBtn.removeEventListener('click', startPlayOnce);
-            };
-            playerPlayBtn.addEventListener('click', startPlayOnce);
-          }
-        });
-      };
-      
-      // 错误处理 - 尝试使用本地备用音频
-      audio.onerror = function(e) {
-        console.error("在线音频加载错误, 尝试本地备用:", e);
-        showNotification('正在切换音源', '在线音频加载失败，尝试使用本地音频...');
-        
-        // 尝试使用本地备用音频
-        audio.src = localFallbackSrc;
-        audio.load();
-        
-        // 为本地备用音频添加错误处理
-        audio.onerror = function(e2) {
-          console.error("本地音频也加载失败:", e2);
-          showNotification('加载错误', '无法加载音频，请尝试其他音频或刷新页面');
-          
-          // 尝试创建一个简单的音调作为最后手段
-          try {
-            console.log("尝试生成基本音调作为替代");
-            createBasicTone();
-          } catch (toneError) {
-            console.error("无法创建基本音调:", toneError);
-          }
-        };
-      };
-      
-      // 设置音频属性
-      audio.src = audioSrc;
-      audio.loop = true;
-      audio.volume = 0.7;
-      audio.preload = "auto";
-      
-      // 开始加载
-      audio.load();
-      
-      // 存储到活动音轨列表
-      activeSoundTracks.push({
-        sound: sound,
-        audio: audio,
-        volume: 0.7
-      });
-      
-      // 显示播放器
-      if (audioPlayer) {
-        audioPlayer.style.display = 'flex';
-        audioPlayer.classList.add('active');
-      }
-      
-      // 定期更新进度条
-      updateProgress(audio);
-      
-    } catch (e) {
-      console.error("音频播放错误:", e);
-      showNotification('播放错误', '无法播放音频，请刷新页面重试');
-    }
-  }
-
-  // 创建基本音调作为最后手段
-  function createBasicTone() {
-    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-      // 创建音频上下文
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      const audioContext = new AudioCtx();
-      
-      // 创建振荡器
-      const oscillator = audioContext.createOscillator();
-      oscillator.type = 'sine'; // 正弦波
-      oscillator.frequency.setValueAtTime(432, audioContext.currentTime); // 设置频率
-      
-      // 创建增益节点用于控制音量
-      const gainNode = audioContext.createGain();
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // 设置音量较低
-      
-      // 连接节点
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // 开始播放
-      oscillator.start();
-      
-      // 存储到活动音轨列表
-      const basicToneTrack = {
-        sound: { title: "基本音调", artist: "系统生成" },
-        oscillator: oscillator,
-        audioContext: audioContext,
-        gainNode: gainNode,
-        volume: 0.1,
-        // 模拟音频对象的方法
-        audio: {
-          paused: false,
-          pause: function() {
-            try {
-              oscillator.stop();
-              this.paused = true;
-            } catch (e) {
-              console.error("停止音调失败:", e);
-            }
-          }
-        }
-      };
-      
-      activeSoundTracks.push(basicToneTrack);
-      isPlaying = true;
-      
-      // 更新播放按钮
-      const playBtn = document.querySelector('.player-play i');
-      if (playBtn) playBtn.className = 'fas fa-pause';
-      
-      showNotification('基本音调', '使用基本音调作为替代，您可以尝试其他声音');
-    } else {
-      throw new Error("浏览器不支持AudioContext");
-    }
-  }
-
-  // 更新进度条函数
-  function updateProgress(audio) {
-    if (!audio) return;
-    
-    // 清除之前的计时器
-    if (window.progressInterval) {
-      clearInterval(window.progressInterval);
-    }
-    
-    // 创建新的计时器
-    window.progressInterval = setInterval(() => {
-      if (isPlaying && audio.duration) {
-        try {
-          const progress = (audio.currentTime / audio.duration) * 100;
-          const progressBar = document.querySelector('.player-progress-current');
-          if (progressBar) {
-            progressBar.style.width = progress + '%';
-          }
-        } catch (error) {
-          console.log('更新进度条失败:', error);
-        }
-      }
-    }, 1000);
-  }
-
-  // 更新播放器UI
-  function updatePlayerUI(sound) {
-    if (!audioPlayer) return;
-    
-    const playerTitle = audioPlayer.querySelector('.player-title');
-    const playerArtist = audioPlayer.querySelector('.player-artist');
-    
-    // 更新播放器UI
-    if (playerTitle) playerTitle.textContent = sound.title || '未知声音';
-    
-    // 修复: 使用更通用的标签来代替重复的标签
-    const artistName = sound.artist || getCategoryDisplayName(sound.category || 'nature');
-    if (playerArtist) playerArtist.textContent = artistName;
-    
-    // 更新图片
-    if (playerImage) {
-      if (sound.image) {
-        playerImage.src = sound.image;
-      } else {
-        // 根据声音分类选择默认图像
-        const category = sound.category || 'nature';
-        playerImage.src = `assets/images/sounds/${category}.svg`;
-      }
-    }
-    
-    // 显示播放器
-    audioPlayer.classList.add('active');
-    audioPlayer.style.display = 'flex';
-  }
-
-  // 停止所有声音
-  function stopAllSounds() {
-    // 停止所有音轨
-    activeSoundTracks.forEach(track => {
-      if (track.audio) {
-        track.audio.pause();
-        if (typeof track.audio.currentTime !== 'undefined') {
-          track.audio.currentTime = 0;
-        }
-      }
-    });
-    
-    // 清空音轨列表
-    activeSoundTracks.length = 0;
-    
-    // 重置播放状态
-    isPlaying = false;
-    const playBtn = document.querySelector('.player-play i');
-    if (playBtn) playBtn.className = 'fas fa-play';
-    
-    // 隐藏播放器
-    if (audioPlayer) {
-      audioPlayer.classList.remove('active');
-    }
-  }
-
-  // 添加播放器关闭按钮事件
-  if (playerClose) {
-    playerClose.addEventListener('click', function(e) {
-      e.stopPropagation(); // 阻止事件冒泡
-      stopAllSounds();
-      audioPlayer.style.display = 'none';
-    });
-  }
-
-  // 添加播放器点击事件
-  if (audioPlayer) {
-    audioPlayer.addEventListener('click', function(e) {
-      // 阻止点击关闭按钮时触发
-      if (e.target.closest('.player-close') || e.target.closest('.player-btn')) {
-        return;
-      }
-      
-      // 播放/暂停当前音轨
-      if (activeSoundTracks.length > 0 && activeSoundTracks[0].audio) {
-        const audio = activeSoundTracks[0].audio;
-        const playBtn = document.querySelector('.player-play i');
-        
-        if (audio.paused) {
-          audio.play();
-          isPlaying = true;
-          if (playBtn) playBtn.className = 'fas fa-pause';
-        } else {
-          audio.pause();
-          isPlaying = false;
-          if (playBtn) playBtn.className = 'fas fa-play';
-        }
-      }
-    });
-  }
-
-  // 播放按钮点击事件
-  const playBtn = document.querySelector('.player-play');
-  if (playBtn) {
-    playBtn.addEventListener('click', function(e) {
-      e.stopPropagation(); // 阻止事件冒泡
-      
-      if (activeSoundTracks.length > 0 && activeSoundTracks[0].audio) {
-        const audio = activeSoundTracks[0].audio;
-        const icon = this.querySelector('i');
-        
-        if (audio.paused) {
-          audio.play();
-          isPlaying = true;
-          if (icon) icon.className = 'fas fa-pause';
-        } else {
-          audio.pause();
-          isPlaying = false;
-          if (icon) icon.className = 'fas fa-play';
-        }
-      }
-    });
-  }
-
   // 显示通知
   function showNotification(title, message) {
-    // 创建通知元素
     const notification = document.createElement('div');
     notification.className = 'notification';
-    
     notification.innerHTML = `
       <div class="notification-title">${title}</div>
       <div class="notification-message">${message}</div>
     `;
-    
-    // 添加到页面
     document.body.appendChild(notification);
     
-    // 淡入动画
     setTimeout(() => {
       notification.classList.add('active');
     }, 10);
     
-    // 自动移除
     setTimeout(() => {
       notification.classList.remove('active');
       setTimeout(() => {
-        document.body.removeChild(notification);
+        notification.remove();
       }, 300);
     }, 3000);
   }
 
-  // 分类点击事件
-  soundCategories.forEach(categoryItem => {
-    categoryItem.addEventListener('click', function() {
-      // 更新分类样式
-      soundCategories.forEach(item => item.classList.remove('active'));
-      this.classList.add('active');
+  // 渲染声音列表
+  function renderSoundList(category = 'nature') {
+    soundList.innerHTML = '';
+    
+    const sounds = soundData[category] || [];
+    sounds.forEach(sound => {
+      const soundItem = document.createElement('div');
+      soundItem.className = 'sound-item';
+      soundItem.innerHTML = `
+        <img src="${sound.image}" alt="${sound.title}" class="sound-item-image">
+        <div class="sound-item-overlay">
+          <div class="sound-item-title">${sound.title}</div>
+          <div class="sound-item-artist">${sound.artist}</div>
+        </div>
+        <div class="sound-item-play">
+          <i class="fas fa-play"></i>
+        </div>
+      `;
       
-      // 获取分类值
-      currentCategory = this.getAttribute('data-category');
+      soundItem.addEventListener('click', () => {
+        playSound(sound.id, sound.title, sound.artist, sound.image);
+      });
+      
+      soundList.appendChild(soundItem);
+    });
+  }
+
+  // 切换声音分类
+  soundCategories.forEach(item => {
+    item.addEventListener('click', () => {
+      const category = item.getAttribute('data-category');
+      
+      // 更新活跃状态
+      soundCategories.forEach(cat => cat.classList.remove('active'));
+      item.classList.add('active');
       
       // 渲染对应分类的声音列表
-      renderSoundsByCategory(currentCategory);
+      renderSoundList(category);
     });
   });
 
-  // 在DOMContentLoaded时自动播放第一个声音
-  setTimeout(() => {
-    if (soundData && soundData.nature && soundData.nature.length > 0) {
-      console.log("自动播放第一个声音");
-      playSound(soundData.nature[0]);
-      
-      // 显示播放提示
-      showNotification('自动播放', '正在播放自然声音，为您创造宁静环境');
-    }
-  }, 1000);
-
-  // 初始渲染声音列表
-  renderSoundsByCategory(currentCategory);
-  
-  // 添加标签切换功能
+  // 切换标签页
   tabItems.forEach(item => {
-    item.addEventListener('click', function() {
-      // 更新标签样式
+    item.addEventListener('click', () => {
+      const tabId = item.getAttribute('data-tab');
+      
+      // 更新活跃状态
       tabItems.forEach(tab => tab.classList.remove('active'));
-      this.classList.add('active');
+      item.classList.add('active');
       
-      // 获取对应内容ID
-      const tabId = this.getAttribute('data-tab');
-      
-      // 显示对应内容
+      // 显示对应的标签内容
       tabContents.forEach(content => {
         content.classList.remove('active');
         if (content.id === tabId) {
@@ -537,6 +214,190 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // 初始化页面其他功能
-  // ... existing code ...
+  // 播放/暂停按钮事件
+  playerPlayBtn.addEventListener('click', () => {
+    if (!currentAudio) return;
+    
+    if (isPlaying) {
+      currentAudio.pause();
+      playerPlayBtn.innerHTML = '<i class="fas fa-play"></i>';
+      isPlaying = false;
+    } else {
+      currentAudio.play();
+      playerPlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      isPlaying = true;
+    }
+  });
+
+  // 关闭播放器按钮事件
+  playerCloseBtn.addEventListener('click', () => {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    
+    playerEl.classList.remove('active');
+    setTimeout(() => {
+      playerEl.style.display = 'none';
+    }, 300);
+    
+    isPlaying = false;
+  });
+
+  // AI聊天功能
+  const aiChatMessages = document.getElementById('ai-chat-messages');
+  
+  // 发送AI消息
+  function sendAiMessage(message) {
+    if (!message.trim()) return;
+    
+    // 添加用户消息
+    const userMessageEl = document.createElement('div');
+    userMessageEl.className = 'message message-user';
+    userMessageEl.innerHTML = `
+      <div class="message-content">${message}</div>
+      <div class="message-time">${getCurrentTime()}</div>
+    `;
+    aiChatMessages.appendChild(userMessageEl);
+    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    
+    // 清空输入框
+    aiInputField.value = '';
+    
+    // 处理消息内容
+    processAiMessage(message);
+  }
+  
+  // 处理AI消息
+  function processAiMessage(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    // 简单的响应逻辑
+    let response = '';
+    
+    if (lowerMessage.includes('你好') || lowerMessage.includes('嗨') || lowerMessage.includes('hi')) {
+      response = '你好！我是梦境守护者AI助手，有什么可以帮到你的？';
+    } else if (lowerMessage.includes('播放') || lowerMessage.includes('听')) {
+      if (lowerMessage.includes('雨') || lowerMessage.includes('雨声')) {
+        playSound('rain', '轻柔雨声', '大自然', 'assets/images/sounds/rain.svg');
+        response = '正在为你播放轻柔的雨声，希望能帮助你放松入睡。';
+      } else if (lowerMessage.includes('海') || lowerMessage.includes('海浪')) {
+        playSound('ocean', '海浪声', '大自然', 'assets/images/sounds/ocean.svg');
+        response = '正在为你播放平静的海浪声，闭上眼睛想象自己躺在海边的沙滩上吧。';
+      } else if (lowerMessage.includes('森林') || lowerMessage.includes('鸟')) {
+        playSound('forest', '森林声音', '大自然', 'assets/images/sounds/forest.svg');
+        response = '正在为你播放森林的环境声，包含鸟鸣和自然风声。';
+      } else {
+        response = '抱歉，我没有找到你想听的声音。你可以尝试"雨声"，"海浪声"或"森林声音"。';
+      }
+    } else if (lowerMessage.includes('失眠')) {
+      response = '失眠是常见的睡眠问题。我建议你可以：<br>1. 尝试规律作息，每天同一时间上床<br>2. 睡前避免咖啡因和蓝光设备<br>3. 尝试深呼吸或冥想<br>4. 听一些放松的自然声音';
+    } else if (lowerMessage.includes('谢谢') || lowerMessage.includes('感谢')) {
+      response = '不客气！如果还有其他问题，随时可以问我。祝你有个美好的梦境！';
+    } else {
+      response = '我还在学习中，暂时理解不了这个问题。你可以问我关于睡眠的建议，或者让我播放一些助眠声音。';
+    }
+    
+    // 显示AI回复
+    setTimeout(() => {
+      const aiMessageEl = document.createElement('div');
+      aiMessageEl.className = 'message message-ai';
+      aiMessageEl.innerHTML = `
+        <div class="message-content">${response}</div>
+        <div class="message-time">${getCurrentTime()}</div>
+      `;
+      aiChatMessages.appendChild(aiMessageEl);
+      aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+    }, 1000);
+  }
+  
+  // 获取当前时间
+  function getCurrentTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  
+  // AI发送按钮事件
+  aiSendBtn.addEventListener('click', () => {
+    sendAiMessage(aiInputField.value);
+  });
+  
+  // AI输入框回车事件
+  aiInputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendAiMessage(aiInputField.value);
+    }
+  });
+
+  // 初始加载默认分类的声音列表
+  renderSoundList('nature');
+
+  // 添加音轨
+  function addSoundTrack(sound) {
+    // 检查音轨是否已存在
+    const existingTrack = activeSoundTracks.find(track => track.sound.id === sound.id);
+    if (existingTrack) {
+      // 如果音轨已存在，将其音量恢复到较高水平
+      existingTrack.volume = masterVolume;
+      if (existingTrack.audio) {
+        existingTrack.audio.volume = masterVolume;
+      }
+      return;
+    }
+    
+    // 更新播放器UI（无论音频是否加载成功，都更新UI）
+    updatePlayerUI(sound);
+    
+    // 创建新的音频元素
+    const audio = new Audio();
+    
+    // 尝试设置音频源
+    const audioUrl = getSoundUrl(sound.id);
+    audio.src = audioUrl;
+    
+    // 设置循环播放
+    audio.loop = true;
+    
+    // 设置音量
+    audio.volume = masterVolume;
+    
+    // 错误处理
+    audio.addEventListener('error', function() {
+      console.log('音频加载失败，使用模拟播放模式');
+      showNotification('播放提示', '正在使用模拟播放模式');
+    });
+    
+    // 添加到活动音轨列表
+    activeSoundTracks.push({
+      sound: sound,
+      audio: audio,
+      volume: masterVolume
+    });
+    
+    // 尝试播放
+    audio.play().then(() => {
+      showNotification('开始播放', `正在播放: ${sound.title}`);
+    }).catch(error => {
+      console.log('浏览器阻止了自动播放:', error);
+      showNotification('播放提示', '请点击屏幕任意位置启动播放');
+      
+      // 添加一次性点击事件启动播放
+      document.body.addEventListener('click', function playOnClick() {
+        audio.play().then(() => {
+          showNotification('开始播放', `正在播放: ${sound.title}`);
+        }).catch(() => {
+          showNotification('播放失败', '请检查您的浏览器设置，允许音频播放');
+        });
+        document.body.removeEventListener('click', playOnClick);
+      }, { once: true });
+    });
+    
+    // 更新音轨混合器UI
+    updateMixerUI();
+    
+    // 更新进度条
+    updateProgress(audio);
+  }
 }); 
