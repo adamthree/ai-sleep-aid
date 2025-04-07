@@ -29,18 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用FreeSound.org和其他开源音频资源
+    // 使用Google Actions的开源音频作为主要来源
     const soundUrls = {
-      'rain': 'https://cdn.freesound.org/previews/346/346642_5121236-lq.mp3',
-      'forest': 'https://cdn.freesound.org/previews/617/617730_1648170-lq.mp3',
-      'ocean': 'https://cdn.freesound.org/previews/531/531947_77006-lq.mp3',
-      'river': 'https://cdn.freesound.org/previews/412/412017_7867797-lq.mp3',
-      'tibetan-bowl': 'https://cdn.freesound.org/previews/122/122647_2022494-lq.mp3',
-      'om-chanting': 'https://cdn.freesound.org/previews/207/207206_5686-lq.mp3',
-      'white-noise': 'https://cdn.freesound.org/previews/205/205966_230132-lq.mp3',
-      'pink-noise': 'https://cdn.freesound.org/previews/212/212039_5688-lq.mp3',
-      'piano-sleep': 'https://cdn.freesound.org/previews/376/376532_7037-lq.mp3',
-      'ambient-sleep': 'https://cdn.freesound.org/previews/397/397311_4921277-lq.mp3'
+      'rain': 'https://actions.google.com/sounds/v1/weather/rain_on_roof.ogg',
+      'forest': 'https://actions.google.com/sounds/v1/ambiences/forest_ambience.ogg',
+      'ocean': 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
+      'river': 'https://actions.google.com/sounds/v1/water/stream_running_in_forest.ogg',
+      'tibetan-bowl': 'https://actions.google.com/sounds/v1/household/metallic_bowl_struck.ogg',
+      'om-chanting': 'https://actions.google.com/sounds/v1/human_voices/male_humming.ogg',
+      'white-noise': 'https://actions.google.com/sounds/v1/ambiences/air_conditioner.ogg',
+      'pink-noise': 'https://actions.google.com/sounds/v1/ambiences/keyboard_typing.ogg',
+      'piano-sleep': 'https://actions.google.com/sounds/v1/musical_instruments/piano_music.ogg',
+      'ambient-sleep': 'https://actions.google.com/sounds/v1/ambiences/relaxed_atmosphere_hum.ogg'
     };
     
     return soundUrls[soundId] || null;
@@ -149,14 +149,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 尝试使用替代音源
   function tryAlternativeSource(sound) {
-    // 替代音源URL（可以添加更多备用URL）
+    // 使用另一个可信源作为备选
     const alternativeSources = {
-      'rain': 'https://actions.google.com/sounds/v1/water/rain_on_roof.ogg',
-      'forest': 'https://actions.google.com/sounds/v1/ambiences/forest_ambience.ogg',
-      'ocean': 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
-      'river': 'https://actions.google.com/sounds/v1/water/stream_running_in_forest.ogg',
-      'white-noise': 'https://actions.google.com/sounds/v1/ambiences/keyboard_typing.ogg',
-      'piano-sleep': 'https://actions.google.com/sounds/v1/musical_instruments/piano_music.ogg'
+      'rain': 'https://freesound.org/data/previews/169/169301_2975501-lq.mp3',
+      'forest': 'https://freesound.org/data/previews/342/342512_1329071-lq.mp3',
+      'ocean': 'https://freesound.org/data/previews/520/520173_6956517-lq.mp3',
+      'river': 'https://freesound.org/data/previews/44/44255_337984-lq.mp3',
+      'tibetan-bowl': 'https://freesound.org/data/previews/399/399934_7573596-lq.mp3',
+      'om-chanting': 'https://freesound.org/data/previews/381/381220_6275449-lq.mp3',
+      'white-noise': 'https://freesound.org/data/previews/194/194837_3272349-lq.mp3',
+      'pink-noise': 'https://freesound.org/data/previews/386/386551_7255534-lq.mp3',
+      'piano-sleep': 'https://freesound.org/data/previews/515/515544_11235851-lq.mp3',
+      'ambient-sleep': 'https://freesound.org/data/previews/436/436530_9022657-lq.mp3'
     };
     
     const altUrl = alternativeSources[sound.id];
