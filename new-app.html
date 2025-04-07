@@ -117,7 +117,7 @@
       box-shadow: 0 6px 20px rgba(91, 77, 255, 0.4);
     }
     
-    /* 确保播放器容器正确显示 */
+    /* 调整播放器容器样式，确保尺寸合适 */
     #player-container {
       position: fixed;
       bottom: 60px;
@@ -126,17 +126,89 @@
       display: flex;
       align-items: center;
       background-color: rgba(26, 26, 46, 0.95);
-      padding: 12px 16px;
+      padding: 8px 12px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       transform: translateY(100%);
       opacity: 0;
       transition: transform 0.3s ease, opacity 0.3s ease;
       z-index: 50;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      height: auto;
+      min-height: 60px;
     }
     
     #player-container.active {
       transform: translateY(0);
       opacity: 1;
+    }
+    
+    /* 调整播放器内容区域 */
+    .player-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .player-thumbnail {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    
+    .player-thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .player-info {
+      flex-grow: 1;
+      overflow: hidden;
+      margin-right: 10px;
+    }
+    
+    #player-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    #player-subtitle {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .player-controls {
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    
+    .control-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-size: 14px;
     }
     
     /* 确保混音器容器正确显示 */
@@ -148,10 +220,13 @@
       right: 0;
       background-color: rgba(26, 26, 46, 0.95);
       padding: 12px 16px;
-      max-height: 40vh;
+      max-height: 30vh;
       overflow-y: auto;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 45;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
     
     /* 调整声音卡片样式 */
@@ -174,7 +249,8 @@
     <!-- 顶部导航栏 -->
     <div class="top-nav">
       <div class="logo">
-        <div class="logo-icon">
+        <div class="logo-icon" id="dynamic-logo">
+          <!-- 默认为月亮标识，将根据选择的声音动态变化 -->
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
             <!-- 夜空背景 -->
             <circle cx="50" cy="50" r="50" fill="#1a1a2e"/>
@@ -189,17 +265,6 @@
             <circle cx="85" cy="25" r="2" fill="#ffffff"/>
             <circle cx="65" cy="75" r="1.5" fill="#ffffff"/>
             <circle cx="15" cy="60" r="1" fill="#ffffff"/>
-            
-            <!-- 闪光效果 -->
-            <circle cx="25" cy="30" r="4" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.5">
-              <animate attributeName="r" values="2;4;2" dur="3s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" repeatCount="indefinite"/>
-            </circle>
-            
-            <circle cx="85" cy="25" r="4" fill="none" stroke="#ffffff" stroke-width="0.5" opacity="0.5">
-              <animate attributeName="r" values="2;4;2" dur="5s" repeatCount="indefinite"/>
-              <animate attributeName="opacity" values="0.5;0.1;0.5" dur="5s" repeatCount="indefinite"/>
-            </circle>
           </svg>
         </div>
         <span class="logo-text">Nature Sleep</span>
@@ -340,5 +405,141 @@
   <script src="assets/js/sound-data.js"></script>
   <!-- 应用脚本 -->
   <script src="assets/js/new-app.js"></script>
+  
+  <!-- 添加声音类型对应的SVG图标模板 -->
+  <div style="display: none;">
+    <!-- 雨声图标 -->
+    <svg id="rain-icon-template" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="#1a1a2e"/>
+      <path d="M30,40 Q50,30 70,40 Q80,45 80,55 Q80,65 70,70 Q60,75 40,70 Q30,65 30,55 Q30,45 30,40" fill="#7B88C7" opacity="0.8"/>
+      <!-- 雨滴 -->
+      <line x1="40" y1="75" x2="35" y2="85" stroke="#BBCBF4" stroke-width="2" stroke-linecap="round"/>
+      <line x1="50" y1="75" x2="45" y2="85" stroke="#BBCBF4" stroke-width="2" stroke-linecap="round"/>
+      <line x1="60" y1="75" x2="55" y2="85" stroke="#BBCBF4" stroke-width="2" stroke-linecap="round"/>
+      <line x1="45" y1="70" x2="40" y2="80" stroke="#BBCBF4" stroke-width="2" stroke-linecap="round"/>
+      <line x1="55" y1="70" x2="50" y2="80" stroke="#BBCBF4" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    
+    <!-- 海浪图标 -->
+    <svg id="ocean-icon-template" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="#1a1a2e"/>
+      <path d="M20,60 Q35,50 50,60 Q65,70 80,60 L80,80 L20,80 Z" fill="#5B9BD5" opacity="0.8"/>
+      <path d="M20,50 Q35,40 50,50 Q65,60 80,50 L80,55 Q65,65 50,55 Q35,45 20,55 Z" fill="#8BC0E7" opacity="0.7"/>
+    </svg>
+    
+    <!-- 森林图标 -->
+    <svg id="forest-icon-template" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="#1a1a2e"/>
+      <path d="M35,70 L45,70 L40,30 Z" fill="#4F8A4F" opacity="0.8"/>
+      <path d="M55,70 L65,70 L60,35 Z" fill="#4F8A4F" opacity="0.8"/>
+      <path d="M45,75 L55,75 L50,40 Z" fill="#5CA05C" opacity="0.9"/>
+    </svg>
+    
+    <!-- 河流图标 -->
+    <svg id="river-icon-template" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="50" fill="#1a1a2e"/>
+      <path d="M20,40 Q35,30 50,40 Q65,50 80,40 L80,60 Q65,70 50,60 Q35,50 20,60 Z" fill="#5B9BD5" opacity="0.8"/>
+    </svg>
+  </div>
+  
+  <!-- 添加音频播放相关js -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 动态更新logo
+      function updateLogoForSound(soundId) {
+        console.log("更新logo为:", soundId);
+        const logoContainer = document.getElementById('dynamic-logo');
+        if (!logoContainer) {
+          console.error("未找到logo容器元素");
+          return;
+        }
+        
+        let template;
+        
+        if (soundId === 'rain') {
+          template = document.getElementById('rain-icon-template');
+        } else if (soundId === 'ocean') {
+          template = document.getElementById('ocean-icon-template');
+        } else if (soundId === 'forest') {
+          template = document.getElementById('forest-icon-template');
+        } else if (soundId === 'river') {
+          template = document.getElementById('river-icon-template');
+        } else {
+          // 默认月亮图标，不做更改
+          console.log("使用默认logo");
+          return;
+        }
+        
+        if (template) {
+          console.log("找到模板:", soundId);
+          logoContainer.innerHTML = template.innerHTML;
+          const svg = logoContainer.querySelector('svg');
+          if (svg) {
+            svg.removeAttribute('id');
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            console.log("Logo更新成功");
+          } else {
+            console.error("SVG元素未找到");
+          }
+        } else {
+          console.error("未找到模板:", soundId);
+        }
+      }
+      
+      // 监听自定义事件来更新logo
+      document.addEventListener('soundActivated', function(e) {
+        console.log("收到soundActivated事件:", e.detail);
+        if (e.detail && e.detail.soundId) {
+          updateLogoForSound(e.detail.soundId);
+        }
+      });
+      
+      // 确保全局toggleSound事件能够触发logo更新
+      window.addEventListener('load', function() {
+        console.log("页面加载完成，准备覆盖toggleSound函数");
+        
+        // 必须延迟执行，确保new-app.js中的toggleSound已加载
+        setTimeout(function() {
+          const originalToggleSound = window.toggleSound;
+          if (typeof originalToggleSound === 'function') {
+            console.log("找到原始toggleSound函数，进行覆盖");
+            window.toggleSound = function(sound) {
+              console.log("自定义toggleSound被调用:", sound?.id);
+              const result = originalToggleSound(sound);
+              
+              // 发送自定义事件
+              if (sound && sound.id) {
+                document.dispatchEvent(new CustomEvent('soundActivated', {
+                  detail: { soundId: sound.id }
+                }));
+              }
+              
+              return result;
+            };
+          } else {
+            console.error("未找到toggleSound函数，无法覆盖");
+          }
+        }, 1000); // 等待1秒确保脚本已加载
+      });
+      
+      // 点击声音卡片时手动触发logo更新
+      document.addEventListener('click', function(e) {
+        const soundCard = e.target.closest('.sound-card');
+        if (soundCard) {
+          const soundId = soundCard.dataset.soundId;
+          if (soundId) {
+            console.log("点击声音卡片:", soundId);
+            // 延迟触发，确保toggleSound已经执行
+            setTimeout(function() {
+              document.dispatchEvent(new CustomEvent('soundActivated', {
+                detail: { soundId: soundId }
+              }));
+            }, 100);
+          }
+        }
+      });
+    });
+  </script>
 </body>
 </html> 

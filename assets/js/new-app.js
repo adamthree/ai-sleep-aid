@@ -29,41 +29,67 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用OpenGameArt和其他可靠音频源
+    // 使用可靠的开源音频源
     const soundUrls = {
-      'rain': 'https://opengameart.org/sites/default/files/rain_0.ogg',
-      'forest': 'https://opengameart.org/sites/default/files/Nature%20Sounds.mp3',
-      'ocean': 'https://opengameart.org/sites/default/files/audio_preview/Ocean_Waves-m.mp3',
-      'river': 'https://opengameart.org/sites/default/files/River%20Valley.mp3',
-      'tibetan-bowl': 'https://opengameart.org/sites/default/files/audio_preview/singing%20bowl%201.mp3',
+      'rain': 'https://freesound.org/data/previews/346/346176_5861568-lq.mp3',
+      'forest': 'https://freesound.org/data/previews/244/244942_1952064-lq.mp3',
+      'ocean': 'https://freesound.org/data/previews/527/527597_11597890-lq.mp3',
+      'river': 'https://freesound.org/data/previews/163/163578_2959932-lq.mp3',
+      'tibetan-bowl': 'https://freesound.org/data/previews/408/408740_5121236-lq.mp3',
       'om-chanting': 'https://freesound.org/data/previews/131/131645_2398403-lq.mp3',
       'white-noise': 'https://freesound.org/data/previews/505/505402_7443375-lq.mp3',
-      'pink-noise': 'https://freesound.org/data/previews/17/17831_75251-lq.mp3',
-      'piano-sleep': 'https://opengameart.org/sites/default/files/sleep_heaven_by_shiru8bit-d6mhxv2.ogg',
-      'ambient-sleep': 'https://opengameart.org/sites/default/files/audio_preview/Woodland%20Ambience%20Pack.ogg'
+      'pink-noise': 'https://freesound.org/data/previews/179/179562_1976076-lq.mp3',
+      'piano-sleep': 'https://freesound.org/data/previews/612/612095_5674468-lq.mp3',
+      'ambient-sleep': 'https://freesound.org/data/previews/419/419428_7866282-lq.mp3'
     };
     
-    // 备用本地音频
+    // 备用音频源
     const backupSounds = {
-      'rain': 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav',
-      'forest': 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav',
-      'ocean': 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav',
-      'river': 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav',
-      'tibetan-bowl': 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav',
-      'om-chanting': 'https://www2.cs.uic.edu/~i101/SoundFiles/Fanfare60.wav',
-      'white-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav',
-      'pink-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/spacemusic.wav',
-      'piano-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg10.wav',
-      'ambient-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg.wav'
+      'rain': 'https://www.soundjay.com/nature/rain-01.mp3',
+      'forest': 'https://www.soundjay.com/nature/sounds/forest-morning-1.mp3',
+      'ocean': 'https://www.soundjay.com/nature/ocean-wave-1.mp3',
+      'river': 'https://www.soundjay.com/nature/stream-1.mp3',
+      'tibetan-bowl': 'https://www.soundjay.com/bells/bell-meditation-01.mp3',
+      'om-chanting': 'https://freesound.org/data/previews/131/131645_2398403-lq.mp3',
+      'white-noise': 'https://freesound.org/data/previews/125/125930_1064124-lq.mp3',
+      'pink-noise': 'https://freesound.org/data/previews/22/22252_78093-lq.mp3',
+      'piano-sleep': 'https://freesound.org/data/previews/176/176387_1381134-lq.mp3',
+      'ambient-sleep': 'https://freesound.org/data/previews/59/59967_49271-lq.mp3'
     };
     
+    console.log(`获取音频URL: ${soundId}`);
     // 如果没有找到URL，返回备用音频
-    return soundUrls[soundId] || backupSounds[soundId] || 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav';
+    return soundUrls[soundId] || backupSounds[soundId] || 'https://freesound.org/data/previews/125/125930_1064124-lq.mp3';
+  }
+  
+  // 获取备用声音URL
+  function getBackupSoundUrl(soundId) {
+    const backupSounds = {
+      'rain': 'https://cdn.pixabay.com/download/audio/2022/03/26/audio_1c1b15c5a6.mp3',
+      'forest': 'https://cdn.pixabay.com/download/audio/2021/10/25/audio_d40dab1e68.mp3',
+      'ocean': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d1519592a5.mp3',
+      'river': 'https://cdn.pixabay.com/download/audio/2022/01/10/audio_d1aa7083e9.mp3',
+      'tibetan-bowl': 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_95fee22a33.mp3',
+      'om-chanting': 'https://cdn.pixabay.com/download/audio/2022/11/26/audio_7c84f4f4ea.mp3',
+      'white-noise': 'https://cdn.pixabay.com/download/audio/2022/02/07/audio_d6ba7a2592.mp3',
+      'pink-noise': 'https://cdn.pixabay.com/download/audio/2022/03/01/audio_c4d440ff4a.mp3',
+      'piano-sleep': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_8eb4bd8592.mp3',
+      'ambient-sleep': 'https://cdn.pixabay.com/download/audio/2022/04/27/audio_94aedc1721.mp3'
+    };
+    
+    console.log(`获取备用音频URL: ${soundId}`);
+    return backupSounds[soundId] || 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d1519592a5.mp3';
   }
   
   // 初始化声音列表
   function initSoundGrid() {
-    soundGrid.innerHTML = '';
+    const container = document.querySelector('.sounds-grid-container');
+    if (!container) {
+      console.error("找不到声音网格容器");
+      return;
+    }
+    
+    container.innerHTML = '';
     
     // 获取当前分类的声音
     const sounds = soundData[currentCategory] || [];
@@ -80,12 +106,15 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       soundCard.innerHTML = `
-        <img src="${sound.image}" alt="${sound.title}" class="sound-thumbnail">
-        <div class="sound-overlay">
-          <div class="sound-title">${sound.title}</div>
+        <div class="sound-card-img">
+          <img src="${sound.image}" alt="${sound.title}">
+          <div class="sound-play-btn">
+            <i class="fas ${activeSounds.some(s => s.id === sound.id) ? 'fa-pause' : 'fa-play'}"></i>
+          </div>
         </div>
-        <div class="sound-play-btn">
-          <i class="fas ${activeSounds.some(s => s.id === sound.id) ? 'fa-pause' : 'fa-play'}"></i>
+        <div class="sound-card-info">
+          <div class="sound-title">${sound.title}</div>
+          <div class="sound-subtitle">${sound.artist}</div>
         </div>
       `;
       
@@ -94,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
         toggleSound(sound);
       });
       
-      soundGrid.appendChild(soundCard);
+      container.appendChild(soundCard);
     });
   }
   
@@ -127,13 +156,18 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePlayerInfo(activeSounds[0]);
         updateMixerChannels();
       }
+      
+      // 触发自定义事件
+      document.dispatchEvent(new CustomEvent('soundDeactivated', {
+        detail: { soundId: sound.id }
+      }));
     } else {
       console.log("添加新声音");
-      // 直接播放声音，使用短音频确保播放
+      // 创建音频对象
       const audio = new Audio();
       
-      // 始终使用这些可靠的音频URL
-      const soundUrl = `https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav`;
+      // 获取声音URL
+      const soundUrl = getSoundUrl(sound.id);
       console.log("使用音频URL:", soundUrl);
       
       // 设置音频参数
@@ -141,7 +175,22 @@ document.addEventListener('DOMContentLoaded', function() {
       audio.loop = true;
       audio.volume = masterVolume;
       
-      // 尝试播放前先显示播放器，确保UI更新
+      // 音频加载错误处理
+      audio.onerror = function(e) {
+        console.error("音频加载错误", e);
+        // 尝试使用备用URL
+        const backupUrl = getBackupSoundUrl(sound.id);
+        console.log("尝试备用URL:", backupUrl);
+        audio.src = backupUrl;
+        
+        // 再次尝试播放
+        const playPromise = audio.play().catch(err => {
+          console.error("备用播放错误:", err);
+          showAudioInteractionPrompt();
+        });
+      };
+      
+      // 添加到活动声音列表
       activeSounds.push({
         id: sound.id,
         title: sound.title,
@@ -162,6 +211,11 @@ document.addEventListener('DOMContentLoaded', function() {
       // 更新混音器
       updateMixerChannels();
       
+      // 触发自定义事件
+      document.dispatchEvent(new CustomEvent('soundActivated', {
+        detail: { soundId: sound.id }
+      }));
+      
       // 尝试播放
       try {
         console.log("尝试播放音频");
@@ -172,20 +226,101 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log("播放成功");
             isPlaying = true;
             playIcon.className = 'fas fa-pause';
+            
+            // 确保logo更新
+            document.dispatchEvent(new CustomEvent('soundActivated', {
+              detail: { soundId: sound.id }
+            }));
           }).catch(error => {
             console.error('播放失败:', error);
             
-            // 尝试用户交互
-            document.addEventListener('click', function playHandler() {
-              audio.play().catch(e => console.error("点击尝试播放失败:", e));
-              document.removeEventListener('click', playHandler);
-            }, { once: true });
+            // 尝试使用备用URL
+            const backupUrl = getBackupSoundUrl(sound.id);
+            console.log("尝试备用URL:", backupUrl);
+            
+            audio.src = backupUrl;
+            audio.play().then(() => {
+              console.log("备用播放成功");
+              isPlaying = true;
+              playIcon.className = 'fas fa-pause';
+              
+              // 确保logo更新
+              document.dispatchEvent(new CustomEvent('soundActivated', {
+                detail: { soundId: sound.id }
+              }));
+            }).catch(e => {
+              console.error("备用播放失败:", e);
+              // 显示交互提示
+              showAudioInteractionPrompt();
+            });
           });
         }
       } catch (error) {
         console.error("播放时出错:", error);
+        showAudioInteractionPrompt();
       }
     }
+  }
+  
+  // 暴露toggleSound函数到window对象
+  window.toggleSound = toggleSound;
+  
+  // 显示音频交互提示
+  function showAudioInteractionPrompt() {
+    // 检查是否已有提示
+    if (document.querySelector('.audio-prompt')) return;
+    
+    const prompt = document.createElement('div');
+    prompt.className = 'audio-prompt';
+    prompt.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(40, 40, 60, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 9999;
+      text-align: center;
+      max-width: 80%;
+    `;
+    
+    prompt.innerHTML = `
+      <h3 style="margin-bottom: 15px; color: white;">点击启动音频</h3>
+      <p style="margin-bottom: 20px; color: rgba(255, 255, 255, 0.8);">
+        由于浏览器限制，播放音频需要用户交互。请点击下方按钮开始播放。
+      </p>
+      <button style="
+        background-color: #7F5CFF;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+      ">开始播放</button>
+    `;
+    
+    document.body.appendChild(prompt);
+    
+    const button = prompt.querySelector('button');
+    button.addEventListener('click', () => {
+      // 尝试播放所有活动声音
+      activeSounds.forEach(sound => {
+        if (sound.audio) {
+          sound.audio.play()
+            .then(() => {
+              console.log("用户交互后播放成功");
+              isPlaying = true;
+              playIcon.className = 'fas fa-pause';
+            })
+            .catch(e => console.error("用户交互后播放失败:", e));
+        }
+      });
+      
+      // 移除提示
+      prompt.remove();
+    });
   }
   
   // 更新声音卡片状态
@@ -221,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     playerThumbnail.src = sound.image || '';
     playerTitle.textContent = sound.title || '未知声音';
-    playerSubtitle.textContent = '';
+    playerSubtitle.textContent = sound.artist || '';
     
     // 确保播放器可见
     if (!playerContainer.classList.contains('active')) {
