@@ -29,18 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用更可靠的音源组合
+    // 使用Pixabay免费音效库作为主要音源
     const soundUrls = {
-      'rain': 'https://actions.google.com/sounds/v1/weather/rain_on_roof.ogg',
-      'forest': 'https://media.freesound.org/previews/629/629130_12652634-hq.mp3',
-      'ocean': 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
-      'river': 'https://media.freesound.org/previews/162/162361_2796536-hq.mp3',
-      'tibetan-bowl': 'https://actions.google.com/sounds/v1/household/metallic_bowl_struck.ogg',
-      'om-chanting': 'https://actions.google.com/sounds/v1/human_voices/male_humming.ogg',
-      'white-noise': 'https://actions.google.com/sounds/v1/ambiences/air_conditioner.ogg',
-      'pink-noise': 'https://actions.google.com/sounds/v1/ambiences/keyboard_typing.ogg',
-      'piano-sleep': 'https://actions.google.com/sounds/v1/musical_instruments/piano_music.ogg',
-      'ambient-sleep': 'https://actions.google.com/sounds/v1/ambiences/relaxed_atmosphere_hum.ogg'
+      'rain': 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_bfb9af44f0.mp3?filename=rain-noise-loop-5994.mp3',
+      'forest': 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_3eac42f671.mp3?filename=forest-with-small-river-birds-and-nature-field-recording-6735.mp3',
+      'ocean': 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_12b0c19614.mp3?filename=ocean-waves-1-6931.mp3',
+      'river': 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_88dab4ecc0.mp3?filename=a-small-river-in-a-canyon-1164.mp3',
+      'tibetan-bowl': 'https://cdn.pixabay.com/download/audio/2022/03/18/audio_aad05f5937.mp3?filename=tibetan-singing-bowl-meditation-112394.mp3',
+      'om-chanting': 'https://cdn.pixabay.com/download/audio/2022/03/19/audio_270f665b4b.mp3?filename=om-mantra-chant-116551.mp3',
+      'white-noise': 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_5fd823cae0.mp3?filename=lofi-white-noise-6758.mp3',
+      'pink-noise': 'https://cdn.pixabay.com/download/audio/2022/11/22/audio_cb337334c7.mp3?filename=pink-noise-10-mins-140565.mp3',
+      'piano-sleep': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_15a1c52413.mp3?filename=relaxing-music-vol1-124477.mp3',
+      'ambient-sleep': 'https://cdn.pixabay.com/download/audio/2022/01/13/audio_977be77047.mp3?filename=relaxed-vlog-night-street-131746.mp3'
     };
     
     return soundUrls[soundId] || null;
@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <img src="${sound.image}" alt="${sound.title}" class="sound-thumbnail">
         <div class="sound-overlay">
           <div class="sound-title">${sound.title}</div>
-          <div class="sound-artist">${sound.artist}</div>
         </div>
         <div class="sound-play-btn">
           <i class="fas ${activeSounds.some(s => s.id === sound.id) ? 'fa-pause' : 'fa-play'}"></i>
@@ -149,18 +148,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 尝试使用替代音源
   function tryAlternativeSource(sound) {
-    // 使用另一个可信源作为备选
+    // Freesound.org备用音源
     const alternativeSources = {
-      'rain': 'https://freesound.org/data/previews/169/169301_2975501-lq.mp3',
-      'forest': 'https://freesound.org/data/previews/342/342512_1329071-lq.mp3',
-      'ocean': 'https://freesound.org/data/previews/520/520173_6956517-lq.mp3',
-      'river': 'https://freesound.org/data/previews/44/44255_337984-lq.mp3',
-      'tibetan-bowl': 'https://freesound.org/data/previews/399/399934_7573596-lq.mp3',
-      'om-chanting': 'https://freesound.org/data/previews/381/381220_6275449-lq.mp3',
-      'white-noise': 'https://freesound.org/data/previews/194/194837_3272349-lq.mp3',
-      'pink-noise': 'https://freesound.org/data/previews/386/386551_7255534-lq.mp3',
-      'piano-sleep': 'https://freesound.org/data/previews/515/515544_11235851-lq.mp3',
-      'ambient-sleep': 'https://freesound.org/data/previews/436/436530_9022657-lq.mp3'
+      'rain': 'https://cdn.freesound.org/previews/169/169301_2975501-hq.mp3',
+      'forest': 'https://cdn.freesound.org/previews/342/342512_1329071-hq.mp3',
+      'ocean': 'https://cdn.freesound.org/previews/520/520173_6956517-hq.mp3',
+      'river': 'https://cdn.freesound.org/previews/162/162361_2796536-hq.mp3',
+      'tibetan-bowl': 'https://cdn.freesound.org/previews/399/399934_7573596-hq.mp3',
+      'om-chanting': 'https://cdn.freesound.org/previews/381/381220_6275449-hq.mp3',
+      'white-noise': 'https://cdn.freesound.org/previews/194/194837_3272349-hq.mp3',
+      'pink-noise': 'https://cdn.freesound.org/previews/386/386551_7255534-hq.mp3',
+      'piano-sleep': 'https://cdn.freesound.org/previews/515/515544_11235851-hq.mp3',
+      'ambient-sleep': 'https://cdn.freesound.org/previews/436/436530_9022657-hq.mp3'
     };
     
     const altUrl = alternativeSources[sound.id];
@@ -199,7 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
       activeSounds.push({
         id: sound.id,
         title: sound.title,
-        artist: sound.artist,
         image: sound.image,
         audio: audio
       });
@@ -235,7 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
           activeSounds.push({
             id: sound.id,
             title: sound.title,
-            artist: sound.artist,
             image: sound.image,
             audio: audio
           });
@@ -283,7 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
   function updatePlayerInfo(sound) {
     playerThumbnail.src = sound.image;
     playerTitle.textContent = sound.title;
-    playerSubtitle.textContent = sound.artist;
+    playerSubtitle.textContent = '';
   }
   
   // 更新混音器通道
