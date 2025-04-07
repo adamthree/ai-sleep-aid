@@ -684,13 +684,13 @@
 </head>
 <body>
   <!-- 欢迎提示层 -->
-  <div class="welcome-overlay" id="welcome-overlay">
+  <div id="welcome-overlay" class="welcome-overlay">
     <div class="welcome-content">
       <h1>欢迎使用 Nature Sleep</h1>
-      <p>点击任意声音卡片播放自然音效，混合多种声音创造最适合您的助眠环境。</p>
-      <p>如遇声音无法播放，请点击声音卡片并与页面互动以授权音频播放。</p>
-      <p>当前使用的是标准版本播放器，已优化PC和移动设备显示。</p>
-      <button id="welcome-close">开始体验</button>
+      <p>这是一款专业的助眠应用，助您获得高质量的睡眠体验。</p>
+      <p>点击声音卡片即可直接播放您喜欢的自然声音，无需额外点击播放按钮。</p>
+      <p>您可以混合多种声音，调节各声音的音量和速度，创建属于您的专属睡眠环境。</p>
+      <button id="welcome-close" class="action-btn">开始体验</button>
     </div>
   </div>
 
@@ -943,6 +943,17 @@
         });
       }
       
+      // 启用直接播放（预触发用户交互）
+      document.body.addEventListener('click', function initAudio() {
+        // 创建一个静音的音频上下文以触发用户交互
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const dummyOscillator = audioContext.createOscillator();
+        dummyOscillator.connect(audioContext.destination);
+        dummyOscillator.start();
+        dummyOscillator.stop(0.001); // 立即停止
+        document.body.removeEventListener('click', initAudio);
+      }, { once: true });
+      
       // 混音器切换显示
       if (mixerToggleBtn) {
         mixerToggleBtn.addEventListener('click', function() {
@@ -992,23 +1003,6 @@
       // 如果用户之前已经看过欢迎信息，不再显示
       if (localStorage.getItem('nature-sleep-welcomed') === 'true') {
         welcomeOverlay.style.display = 'none';
-      }
-      
-      // 音频问题修复按钮
-      const tryAlternativeBtn = document.getElementById('try-alternative-source');
-      const reloadAppBtn = document.getElementById('reload-app');
-      
-      if (tryAlternativeBtn) {
-        tryAlternativeBtn.addEventListener('click', function() {
-          localStorage.setItem('use-alternative-source', 'true');
-          document.getElementById('audio-fix-overlay').style.display = 'none';
-        });
-      }
-      
-      if (reloadAppBtn) {
-        reloadAppBtn.addEventListener('click', function() {
-          location.reload();
-        });
       }
       
       // 动态更新logo
