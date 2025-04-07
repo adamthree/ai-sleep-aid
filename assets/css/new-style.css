@@ -107,15 +107,48 @@ img {
 }
 
 .logo-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
+  background-color: #7B68EE;
+  border-radius: 50%;
   margin-right: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-icon::before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #1E1E2E;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.logo-icon::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 14px;
+  background-color: #7B68EE;
+  border-radius: 4px;
+  transform: rotate(45deg);
+  top: 7px;
+  left: 14px;
+  box-shadow: -10px -10px 0 -2px #7B68EE;
+  z-index: 2;
 }
 
 .logo-text {
   font-size: 16px;
   font-weight: bold;
   color: #fff;
+  letter-spacing: 0.5px;
+  margin-right: 5px;
 }
 
 .top-actions {
@@ -1029,4 +1062,39 @@ img {
   background-color: #121218;
   color: #fff;
   overflow: hidden;
+}
+
+/* 添加交互覆盖层样式 */
+.interaction-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.interaction-message {
+  background-color: var(--bg-secondary);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  max-width: 80%;
+}
+
+.interaction-message i {
+  font-size: 48px;
+  color: var(--primary-color);
+  margin-bottom: 16px;
+}
+
+.interaction-message p {
+  color: #fff;
+  font-size: 18px;
+  margin: 0;
 } 
