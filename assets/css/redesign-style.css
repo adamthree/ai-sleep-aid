@@ -1,0 +1,416 @@
+/* 
+ * Nature Sleep 2.0 Redesign
+ * 基于竞品分析优化的新版本样式表
+ */
+
+:root {
+  --app-bg: #121225;
+  --app-bg-lighter: #1a1a30;
+  --app-accent: #7F5CFF;
+  --app-accent-light: #9c83ff;
+  --app-secondary: #5BA4FF;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --transition-speed: 0.3s;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* 播放波形动画 */
+@keyframes soundWave {
+  0% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+  100% { transform: scaleY(0.5); }
+}
+
+.wave-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 15px;
+}
+
+.wave-bar {
+  width: 2px;
+  height: 100%;
+  background-color: var(--app-accent);
+  transform-origin: center bottom;
+}
+
+.wave-bar:nth-child(1) { animation: soundWave 1.2s infinite 0.1s; }
+.wave-bar:nth-child(2) { animation: soundWave 1.5s infinite 0.3s; }
+.wave-bar:nth-child(3) { animation: soundWave 1.0s infinite 0.5s; }
+.wave-bar:nth-child(4) { animation: soundWave 1.7s infinite 0.2s; }
+
+/* 音频时间显示和控制 */
+.time-display {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* 定时器样式 */
+.timer-container {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: rgba(30, 30, 50, 0.8);
+  border-radius: 12px;
+  margin: 15px 0;
+}
+
+.timer-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--app-accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.timer-content {
+  flex: 1;
+}
+
+.timer-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.timer-description {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.timer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* 标签和徽章 */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: var(--app-accent);
+}
+
+.badge.premium {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badge.new {
+  background-color: #4caf50;
+}
+
+/* 音效故事界面 */
+.story-card {
+  display: flex;
+  padding: 15px;
+  background-color: var(--app-bg-lighter);
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+.story-thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.story-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.story-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.story-meta {
+  display: flex;
+  align-items: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  gap: 10px;
+}
+
+.story-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* 探索地图界面 */
+.map-container {
+  position: relative;
+  height: 200px;
+  background-color: var(--app-bg-lighter);
+  border-radius: 15px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.map-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.7;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(18, 18, 37, 0.3), rgba(18, 18, 37, 0.8));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  text-align: center;
+}
+
+.map-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.map-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 15px;
+}
+
+/* 我的界面 */
+.profile-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+  border: 2px solid var(--app-accent);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.profile-level {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 0 20px 20px;
+}
+
+.stat-card {
+  background-color: var(--app-bg-lighter);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 设置菜单 */
+.settings-menu {
+  padding: 0 20px;
+}
+
+.menu-group {
+  margin-bottom: 20px;
+}
+
+.menu-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.menu-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+.menu-label {
+  flex: 1;
+  font-size: 15px;
+}
+
+.menu-value {
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+/* 音频交互提示 */
+.audio-prompt {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(35, 35, 55, 0.95);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  z-index: 1000;
+  text-align: center;
+  max-width: 85%;
+}
+
+.audio-prompt h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.audio-prompt p {
+  margin-bottom: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.audio-prompt button {
+  background-color: var(--app-accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.audio-prompt button:hover {
+  background-color: var(--app-accent-light);
+}
+
+/* 自定义开关控件 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 45px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: .3s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--app-accent);
+}
+
+input:checked + .slider:before {
+  transform: translateX(21px);
+} 

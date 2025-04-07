@@ -1,32 +1,36 @@
-// 声音数据
-const soundData = {
+/**
+ * Nature Sleep 2.0 Redesign
+ * 声音数据
+ */
+
+window.soundData = {
   // 自然声音
   'nature': [
     {
       id: 'rain',
       title: '雨声',
-      image: 'https://cdn-icons-png.flaticon.com/512/1779/1779891.png',
+      image: 'https://images.unsplash.com/photo-1501691223387-dd0500403074?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     },
     {
       id: 'forest',
       title: '森林',
-      image: 'https://cdn-icons-png.flaticon.com/512/620/620995.png',
+      image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     },
     {
       id: 'ocean',
       title: '海浪',
-      image: 'https://cdn-icons-png.flaticon.com/512/2784/2784399.png',
+      image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     },
     {
       id: 'river',
       title: '河流',
-      image: 'https://cdn-icons-png.flaticon.com/512/2080/2080056.png',
+      image: 'https://images.unsplash.com/photo-1437482078695-73f5ca6c96e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     }
@@ -36,15 +40,15 @@ const soundData = {
   'meditation': [
     {
       id: 'tibetan-bowl',
-      title: '西藏碗',
-      image: 'https://cdn-icons-png.flaticon.com/512/2829/2829661.png',
+      title: '藏音碗',
+      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     },
     {
       id: 'om-chanting',
-      title: 'Om吟唱',
-      image: 'https://cdn-icons-png.flaticon.com/512/1468/1468160.png',
+      title: 'OM吟唱',
+      image: 'https://images.unsplash.com/photo-1536623975707-c4b3b2af565d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     }
@@ -55,14 +59,14 @@ const soundData = {
     {
       id: 'white-noise',
       title: '白噪音',
-      image: 'https://cdn-icons-png.flaticon.com/512/3280/3280026.png',
+      image: 'https://images.unsplash.com/photo-1557682250-48bce9d32b37?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     },
     {
       id: 'pink-noise',
       title: '粉噪音',
-      image: 'https://cdn-icons-png.flaticon.com/512/2065/2065061.png',
+      image: 'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     }
@@ -72,15 +76,15 @@ const soundData = {
   'music': [
     {
       id: 'piano-sleep',
-      title: '钢琴安眠曲',
-      image: 'https://cdn-icons-png.flaticon.com/512/2829/2829076.png',
+      title: '钢琴曲',
+      image: 'https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     },
     {
       id: 'ambient-sleep',
       title: '环境音乐',
-      image: 'https://cdn-icons-png.flaticon.com/512/5274/5274728.png',
+      image: 'https://images.unsplash.com/photo-1546707012-c46675f12716?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
       duration: '10:00'
     }
@@ -89,44 +93,49 @@ const soundData = {
   // 故事
   'story': [
     {
-      id: 'nature-story',
-      title: '大自然的故事',
-      image: 'https://cdn-icons-png.flaticon.com/512/806/806292.png',
+      id: 'sleep-story-1',
+      title: '森林漫步',
+      image: 'https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
-      duration: '10:00'
+      duration: '15:00'
     },
     {
-      id: 'meditation-guide',
-      title: '引导冥想',
-      image: 'https://cdn-icons-png.flaticon.com/512/3048/3048319.png',
+      id: 'sleep-story-2',
+      title: '深海冥想',
+      image: 'https://images.unsplash.com/photo-1551244072-5d12893278ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
       artist: 'Nature Sleep',
-      duration: '10:00'
+      duration: '12:00'
     }
   ]
 };
 
 // 预设混音列表
-const mixData = [
+window.soundMixes = [
   {
-    id: 'mix-ocean-ambient',
-    title: '海洋环境',
-    image: 'https://cdn-icons-png.flaticon.com/512/2784/2784399.png',
-    artist: 'Nature Sleep',
-    description: '海洋与环境音乐的完美结合',
+    id: 'mix-rain-ambient',
+    title: '雨天氛围',
+    description: '雨声混合环境音乐，营造舒适放松的氛围',
     sounds: [
-      {id: 'ocean', volume: 0.6},
-      {id: 'ambient-sleep', volume: 0.4}
+      { id: 'rain', volume: 0.7, speed: 1 },
+      { id: 'ambient-sleep', volume: 0.4, speed: 1 }
     ]
   },
   {
-    id: 'mix-rain-piano',
-    title: '雨声钢琴',
-    image: 'https://cdn-icons-png.flaticon.com/512/1779/1779891.png',
-    artist: 'Nature Sleep',
-    description: '雨声与钢琴的浪漫组合',
+    id: 'mix-ocean-meditation',
+    title: '冥想海洋',
+    description: '海浪声与藏音碗的组合，帮助深度冥想',
     sounds: [
-      {id: 'rain', volume: 0.7},
-      {id: 'piano-sleep', volume: 0.5}
+      { id: 'ocean', volume: 0.6, speed: 1 },
+      { id: 'tibetan-bowl', volume: 0.5, speed: 0.75 }
+    ]
+  },
+  {
+    id: 'mix-forest-piano',
+    title: '森林钢琴',
+    description: '森林环境声与优美钢琴曲，帮助集中注意力',
+    sounds: [
+      { id: 'forest', volume: 0.5, speed: 1 },
+      { id: 'piano-sleep', volume: 0.6, speed: 1 }
     ]
   }
 ];
@@ -235,5 +244,5 @@ const recommendedMixes = [
 
 // 导出数据供其他模块使用
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = soundData;
+  module.exports = window.soundData;
 } 
