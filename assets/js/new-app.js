@@ -29,22 +29,36 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用公共音频托管服务
+    // 使用OpenGameArt和其他可靠音频源
     const soundUrls = {
-      'rain': 'https://storage.googleapis.com/public-audio-samples/rain.mp3',
-      'forest': 'https://storage.googleapis.com/public-audio-samples/forest.mp3',
-      'ocean': 'https://storage.googleapis.com/public-audio-samples/ocean.mp3',
-      'river': 'https://storage.googleapis.com/public-audio-samples/river.mp3',
-      'tibetan-bowl': 'https://storage.googleapis.com/public-audio-samples/tibetan-bowl.mp3',
-      'om-chanting': 'https://storage.googleapis.com/public-audio-samples/om-chanting.mp3',
-      'white-noise': 'https://storage.googleapis.com/public-audio-samples/white-noise.mp3',
-      'pink-noise': 'https://storage.googleapis.com/public-audio-samples/pink-noise.mp3',
-      'piano-sleep': 'https://storage.googleapis.com/public-audio-samples/piano-sleep.mp3',
-      'ambient-sleep': 'https://storage.googleapis.com/public-audio-samples/ambient-sleep.mp3'
+      'rain': 'https://opengameart.org/sites/default/files/rain_0.ogg',
+      'forest': 'https://opengameart.org/sites/default/files/Nature%20Sounds.mp3',
+      'ocean': 'https://opengameart.org/sites/default/files/audio_preview/Ocean_Waves-m.mp3',
+      'river': 'https://opengameart.org/sites/default/files/River%20Valley.mp3',
+      'tibetan-bowl': 'https://opengameart.org/sites/default/files/audio_preview/singing%20bowl%201.mp3',
+      'om-chanting': 'https://freesound.org/data/previews/131/131645_2398403-lq.mp3',
+      'white-noise': 'https://freesound.org/data/previews/505/505402_7443375-lq.mp3',
+      'pink-noise': 'https://freesound.org/data/previews/17/17831_75251-lq.mp3',
+      'piano-sleep': 'https://opengameart.org/sites/default/files/sleep_heaven_by_shiru8bit-d6mhxv2.ogg',
+      'ambient-sleep': 'https://opengameart.org/sites/default/files/audio_preview/Woodland%20Ambience%20Pack.ogg'
     };
     
-    // 如果没有找到URL，尝试使用本地测试音频
-    return soundUrls[soundId] || `https://file-examples.com/storage/fe8467f008521d6a03d1ecc/2017/11/file_example_MP3_700KB.mp3`;
+    // 备用本地音频
+    const backupSounds = {
+      'rain': 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav',
+      'forest': 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav',
+      'ocean': 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav',
+      'river': 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav',
+      'tibetan-bowl': 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav',
+      'om-chanting': 'https://www2.cs.uic.edu/~i101/SoundFiles/Fanfare60.wav',
+      'white-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav',
+      'pink-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/spacemusic.wav',
+      'piano-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg10.wav',
+      'ambient-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg.wav'
+    };
+    
+    // 如果没有找到URL，返回备用音频
+    return soundUrls[soundId] || backupSounds[soundId] || 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav';
   }
   
   // 初始化声音列表
@@ -111,276 +125,38 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMixerChannels();
       }
     } else {
-      // 添加新声音 - 使用本地声音测试
-      const localSoundMap = {
-        'rain': 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav',
-        'forest': 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav',
-        'ocean': 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav',
-        'river': 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav',
-        'tibetan-bowl': 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav',
-        'om-chanting': 'https://www2.cs.uic.edu/~i101/SoundFiles/Fanfare60.wav',
-        'white-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav',
-        'pink-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/spacemusic.wav',
-        'piano-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg10.wav',
-        'ambient-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg.wav'
-      };
-      
-      // 获取可靠的本地测试声音
-      const soundUrl = localSoundMap[sound.id] || 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav';
-      
-      if (!soundUrl) {
-        showNotification('加载失败', '无法找到音频资源', 'error');
-        return;
-      }
-      
-      const audio = new Audio();
-      // 设置CORS以确保跨域资源加载
-      audio.crossOrigin = "anonymous";
-      audio.preload = "auto";
+      // 添加新声音
+      const soundUrl = getSoundUrl(sound.id);
       
       // 音频加载中显示通知
       showNotification('正在加载', `正在准备 ${sound.title}`, 'info');
       
-      // 设置属性并加载
-      audio.src = soundUrl;
-      audio.loop = true;
-      audio.volume = masterVolume;
-      
-      // 立即尝试播放，不等待 canplaythrough 事件
-      try {
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            // 播放成功
-            isPlaying = true;
-            playIcon.className = 'fas fa-pause';
-            
-            // 添加到活动声音列表
-            activeSounds.push({
-              id: sound.id,
-              title: sound.title,
-              image: sound.image,
-              audio: audio
-            });
-            
-            // 更新UI
-            updateSoundCardState(sound.id, true);
-            updatePlayerInfo(sound);
-            playerContainer.classList.add('active');
-            
-            // 显示混音器（如果有多个声音）
-            if (activeSounds.length > 1) {
-              mixerContainer.style.display = 'block';
-            }
-            
-            // 更新混音器
-            updateMixerChannels();
-            
-            // 显示通知
-            showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-          }).catch(error => {
-            console.error('播放失败:', error);
-            
-            // 显示错误通知
-            showNotification('播放失败', '尝试点击屏幕以允许音频播放', 'error');
-            
-            // 尝试用户互动后再播放
-            tryPlayAfterInteraction(audio, sound);
-          });
-        }
-      } catch (error) {
-        console.error('播放尝试错误:', error);
-        tryPlayWithUserInteraction(sound);
-      }
+      // 创建简单的音频播放逻辑
+      playSimpleAudio(sound, soundUrl);
     }
   }
   
-  // 尝试使用用户交互播放
-  function tryPlayWithUserInteraction(sound) {
-    const overlay = document.createElement('div');
-    overlay.className = 'interaction-overlay';
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
-    overlay.style.zIndex = '9999';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.color = 'white';
-    
-    overlay.innerHTML = `
-      <div style="text-align:center; padding: 20px;">
-        <h2>点击这里开始播放</h2>
-        <p>由于浏览器限制，音频播放需要您的交互</p>
-        <button style="padding: 15px 30px; background: #5b4dff; border: none; color: white; border-radius: 30px; font-size: 16px; margin-top: 20px; cursor: pointer;">
-          <i class="fas fa-play" style="margin-right: 8px;"></i> 开始播放
-        </button>
-      </div>
-    `;
-    
-    document.body.appendChild(overlay);
-    
-    overlay.addEventListener('click', function() {
-      document.body.removeChild(overlay);
-      
-      // 使用简单短声音尝试播放
-      const testSound = new Audio('https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav');
-      testSound.play().then(() => {
-        // 现在尝试播放实际声音
-        toggleSound(sound);
-      }).catch(err => {
-        console.error('播放失败:', err);
-        showNotification('播放失败', '您的浏览器可能不支持自动播放', 'error');
-      });
-    });
-  }
-  
-  // 用户互动后尝试播放
-  function tryPlayAfterInteraction(audio, sound) {
-    const overlay = document.createElement('div');
-    overlay.className = 'interaction-overlay';
-    overlay.innerHTML = `
-      <div class="interaction-message">
-        <i class="fas fa-volume-up"></i>
-        <p>点击此处开始播放声音</p>
-      </div>
-    `;
-    
-    document.body.appendChild(overlay);
-    
-    overlay.addEventListener('click', function() {
-      audio.play().then(() => {
-        // 播放成功
-        isPlaying = true;
-        playIcon.className = 'fas fa-pause';
-        
-        // 添加到活动声音列表
-        activeSounds.push({
-          id: sound.id,
-          title: sound.title,
-          image: sound.image,
-          audio: audio
-        });
-        
-        // 更新UI
-        updateSoundCardState(sound.id, true);
-        updatePlayerInfo(sound);
-        playerContainer.classList.add('active');
-        
-        // 显示混音器（如果有多个声音）
-        if (activeSounds.length > 1) {
-          mixerContainer.style.display = 'block';
-        }
-        
-        // 更新混音器
-        updateMixerChannels();
-        
-        // 显示通知
-        showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-        
-        // 移除覆盖层
-        document.body.removeChild(overlay);
-      }).catch(error => {
-        console.error('用户互动后仍播放失败:', error);
-        document.body.removeChild(overlay);
-        tryAlternativeSource(sound);
-      });
-    });
-  }
-  
-  // 尝试使用替代音源
-  function tryAlternativeSource(sound) {
-    // 使用YouTube音频库作为备用音源
-    const alternativeSources = {
-      'rain': 'https://assets.mixkit.co/sfx/preview/mixkit-heavy-rain-with-distant-thunder-ambience-1249.mp3',
-      'forest': 'https://assets.mixkit.co/sfx/preview/mixkit-forest-birds-ambience-1210.mp3',
-      'ocean': 'https://assets.mixkit.co/sfx/preview/mixkit-sea-waves-ambience-1189.mp3',
-      'river': 'https://assets.mixkit.co/sfx/preview/mixkit-stream-running-over-pebbles-ambience-1206.mp3',
-      'tibetan-bowl': 'https://assets.mixkit.co/sfx/preview/mixkit-tibetan-bells-harmonics-686.mp3',
-      'om-chanting': 'https://assets.mixkit.co/sfx/preview/mixkit-ethereal-fairy-win-notification-2308.mp3',
-      'white-noise': 'https://assets.mixkit.co/sfx/preview/mixkit-city-distant-light-traffic-ambience-372.mp3',
-      'pink-noise': 'https://assets.mixkit.co/sfx/preview/mixkit-rain-ambience-with-light-distant-thunder-1252.mp3',
-      'piano-sleep': 'https://assets.mixkit.co/sfx/preview/mixkit-sad-piano-tone-2831.mp3',
-      'ambient-sleep': 'https://assets.mixkit.co/sfx/preview/mixkit-mystical-bass-671.mp3'
-    };
-    
-    const altUrl = alternativeSources[sound.id];
-    if (!altUrl) {
-      showNotification('播放失败', '无法找到可用的音频资源', 'error');
-      return;
-    }
-    
-    showNotification('尝试备用音源', `正在使用备用音源播放 ${sound.title}`, 'info');
-    
+  // 简化的音频播放逻辑
+  function playSimpleAudio(sound, soundUrl) {
     const audio = new Audio();
-    audio.crossOrigin = "anonymous";
-    audio.preload = "auto";
+    
+    // 音频设置
+    audio.src = soundUrl;
     audio.loop = true;
     audio.volume = masterVolume;
-    audio.src = altUrl;
     
-    audio.addEventListener('canplaythrough', function onCanPlay() {
-      audio.removeEventListener('canplaythrough', onCanPlay);
-      
-      audio.play().then(() => {
-        // 播放成功
-        startPlayingSound(audio, sound);
-        showNotification('使用备用音源', '已成功切换到备用音频源播放', 'success');
-      }).catch(error => {
-        console.error('备用音源播放失败:', error);
-        showNotification('播放失败', '请尝试使用其他浏览器或设备播放', 'error');
-      });
-    });
+    // 显示加载状态
+    const loadingTimeout = setTimeout(() => {
+      showNotification('加载中...', '音频加载时间较长，请耐心等待', 'info');
+    }, 2000);
     
-    audio.addEventListener('error', function() {
-      console.error('备用音源加载失败:', sound.id);
-      showNotification('播放失败', '所有音频资源加载失败，请检查网络连接', 'error');
-    });
-  }
-  
-  // 开始播放声音
-  function startPlayingSound(audio, sound) {
     // 尝试播放
-    audio.play().then(() => {
-      // 播放成功
-      isPlaying = true;
-      playIcon.className = 'fas fa-pause';
+    audio.oncanplaythrough = function() {
+      clearTimeout(loadingTimeout);
       
-      // 添加到活动声音列表
-      activeSounds.push({
-        id: sound.id,
-        title: sound.title,
-        image: sound.image,
-        audio: audio
-      });
-      
-      // 更新UI
-      updateSoundCardState(sound.id, true);
-      updatePlayerInfo(sound);
-      playerContainer.classList.add('active');
-      
-      // 显示混音器（如果有多个声音）
-      if (activeSounds.length > 1) {
-        mixerContainer.style.display = 'block';
-      }
-      
-      // 更新混音器
-      updateMixerChannels();
-      
-      // 显示通知
-      showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-    }).catch(error => {
-      console.error('播放失败:', error);
-      
-      // 显示错误通知
-      showNotification('播放失败', '请点击屏幕以允许音频播放', 'error');
-      
-      // 添加一次性点击事件以启动播放
-      document.body.addEventListener('click', function playOnClick() {
-        audio.play().then(() => {
+      audio.play()
+        .then(() => {
+          // 播放成功
           isPlaying = true;
           playIcon.className = 'fas fa-pause';
           
@@ -407,13 +183,147 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // 显示通知
           showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-        }).catch(e => {
-          console.error('用户交互后仍播放失败:', e);
-          showNotification('播放失败', '尝试使用其他浏览器或设备', 'error');
+        })
+        .catch(error => {
+          // 播放失败时使用备用方法
+          console.error('播放失败, 使用备用方法:', error);
+          playWithFallback(sound);
         });
-        
-        document.body.removeEventListener('click', playOnClick);
-      }, { once: true });
+    };
+    
+    // 处理加载错误
+    audio.onerror = function() {
+      clearTimeout(loadingTimeout);
+      console.error('音频加载失败:', sound.id);
+      playWithFallback(sound);
+    };
+    
+    // 设置超时，防止长时间加载
+    setTimeout(() => {
+      if (audio.readyState < 3) { // HAVE_FUTURE_DATA
+        clearTimeout(loadingTimeout);
+        console.warn('音频加载超时，尝试备用方法');
+        playWithFallback(sound);
+      }
+    }, 5000);
+  }
+  
+  // 使用备用方法播放
+  function playWithFallback(sound) {
+    // 使用UIC教育网站的可靠短音频
+    const backupUrl = `https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav`;
+    
+    const audio = new Audio(backupUrl);
+    audio.loop = true;
+    audio.volume = masterVolume;
+    
+    try {
+      audio.play()
+        .then(() => {
+          isPlaying = true;
+          playIcon.className = 'fas fa-pause';
+          
+          // 添加到活动声音列表
+          activeSounds.push({
+            id: sound.id,
+            title: sound.title,
+            image: sound.image,
+            audio: audio
+          });
+          
+          // 更新UI
+          updateSoundCardState(sound.id, true);
+          updatePlayerInfo(sound);
+          playerContainer.classList.add('active');
+          
+          // 显示混音器（如果有多个声音）
+          if (activeSounds.length > 1) {
+            mixerContainer.style.display = 'block';
+          }
+          
+          // 更新混音器
+          updateMixerChannels();
+          
+          showNotification('备用声音', '使用备用声音播放', 'info');
+        })
+        .catch(err => {
+          console.error('备用播放失败:', err);
+          showNotification('播放失败', '请点击屏幕尝试手动播放', 'error');
+          showPlayButton(sound);
+        });
+    } catch (error) {
+      console.error('尝试备用播放错误:', error);
+      showNotification('播放失败', '请点击屏幕尝试手动播放', 'error');
+      showPlayButton(sound);
+    }
+  }
+  
+  // 显示大播放按钮
+  function showPlayButton(sound) {
+    const playOverlay = document.createElement('div');
+    playOverlay.className = 'play-overlay';
+    playOverlay.style.position = 'fixed';
+    playOverlay.style.top = '0';
+    playOverlay.style.left = '0';
+    playOverlay.style.width = '100%';
+    playOverlay.style.height = '100%';
+    playOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    playOverlay.style.display = 'flex';
+    playOverlay.style.justifyContent = 'center';
+    playOverlay.style.alignItems = 'center';
+    playOverlay.style.zIndex = '9999';
+    
+    playOverlay.innerHTML = `
+      <div style="text-align:center; color:white;">
+        <h3>点击播放 ${sound.title}</h3>
+        <p>由于浏览器限制，需要您的操作才能播放声音</p>
+        <button style="background: #5B4DFF; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; margin-top: 20px; cursor: pointer;">
+          <i class="fas fa-play" style="margin-right: 8px;"></i> 播放${sound.title}
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(playOverlay);
+    
+    playOverlay.addEventListener('click', function() {
+      // 移除覆盖层
+      document.body.removeChild(playOverlay);
+      
+      // 最后的尝试 - 使用最简短的音频
+      const simpleAudio = new Audio('https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav');
+      simpleAudio.loop = true;
+      simpleAudio.volume = masterVolume;
+      
+      simpleAudio.play()
+        .then(() => {
+          // 播放成功
+          isPlaying = true;
+          playIcon.className = 'fas fa-pause';
+          
+          // 添加到活动声音列表
+          activeSounds.push({
+            id: sound.id,
+            title: sound.title,
+            image: sound.image,
+            audio: simpleAudio
+          });
+          
+          // 更新UI
+          updateSoundCardState(sound.id, true);
+          updatePlayerInfo(sound);
+          playerContainer.classList.add('active');
+          
+          if (activeSounds.length > 1) {
+            mixerContainer.style.display = 'block';
+          }
+          
+          updateMixerChannels();
+          showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
+        })
+        .catch(error => {
+          console.error('最终尝试失败:', error);
+          showNotification('播放失败', '您的浏览器可能不支持自动播放功能', 'error');
+        });
     });
   }
   
