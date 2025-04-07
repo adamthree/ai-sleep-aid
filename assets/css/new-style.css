@@ -93,12 +93,12 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 6px 15px;
   background-color: rgba(18, 18, 24, 0.95);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   position: relative;
   z-index: 10;
-  height: 50px;
+  height: 44px;
 }
 
 .logo {
@@ -107,25 +107,25 @@ img {
 }
 
 .logo-icon {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   margin-right: 8px;
 }
 
 .logo-text {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   color: #fff;
 }
 
 .top-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .top-action-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -140,7 +140,7 @@ img {
 }
 
 .main-content {
-  padding-top: 10px;
+  padding-top: 5px;
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
@@ -894,14 +894,14 @@ img {
 /* 通知样式 */
 .notification {
   position: fixed;
-  top: 60px;
+  top: 50px;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  max-width: 400px;
+  width: 80%;
+  max-width: 360px;
   background-color: rgba(25, 25, 35, 0.95);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 8px;
+  padding: 8px;
   display: flex;
   align-items: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);

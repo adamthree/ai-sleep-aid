@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="高品质自然声音助眠应用，帮助您更快入睡">
-  <meta name="theme-color" content="#121212">
+  <meta name="theme-color" content="#1E1E2E">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Nature Sleep - 高级助眠应用</title>
@@ -12,18 +12,50 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/images/app-icon.png">
+  <style>
+    /* 修复logo样式，确保不会遮挡内容 */
+    .top-nav {
+      height: 50px;
+      background-color: rgba(18, 18, 24, 0.95);
+      position: relative;
+      z-index: 10;
+    }
+    
+    .logo-icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+    
+    .logo-text {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .main-content {
+      padding-top: 12px;
+      margin-top: 0;
+    }
+    
+    /* 修复通知样式使其不会占用太多空间 */
+    .notification {
+      top: 60px;
+      max-width: 90%;
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
     <!-- 顶部导航栏 -->
     <div class="top-nav">
       <div class="logo">
-        <img src="assets/images/app-icon.svg" alt="Nature Sleep" class="logo-icon">
+        <img src="assets/img/logo.svg" alt="Logo" class="logo-icon">
         <span class="logo-text">Nature Sleep</span>
       </div>
       <div class="top-actions">
-        <button class="action-btn"><i class="fas fa-moon"></i></button>
-        <button class="action-btn"><i class="fas fa-gear"></i></button>
+        <button class="top-action-btn"><i class="fas fa-search"></i></button>
+        <button class="top-action-btn"><i class="fas fa-cog"></i></button>
       </div>
     </div>
     

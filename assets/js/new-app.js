@@ -29,12 +29,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用Google Actions的开源音频作为主要来源
+    // 使用多种可靠音源组合
     const soundUrls = {
       'rain': 'https://actions.google.com/sounds/v1/weather/rain_on_roof.ogg',
-      'forest': 'https://actions.google.com/sounds/v1/ambiences/forest_ambience.ogg',
+      'forest': 'https://storage.googleapis.com/files.freesound.org/previews/617/617730_1648170-hq.mp3',
       'ocean': 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
-      'river': 'https://actions.google.com/sounds/v1/water/stream_running_in_forest.ogg',
+      'river': 'https://storage.googleapis.com/files.freesound.org/previews/44/44255_337984-hq.mp3',
       'tibetan-bowl': 'https://actions.google.com/sounds/v1/household/metallic_bowl_struck.ogg',
       'om-chanting': 'https://actions.google.com/sounds/v1/human_voices/male_humming.ogg',
       'white-noise': 'https://actions.google.com/sounds/v1/ambiences/air_conditioner.ogg',
