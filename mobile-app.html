@@ -3,17 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#14152e">
   <title>梦境守护者 - 智能助眠</title>
   <link rel="stylesheet" href="assets/css/mobile-app.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="assets/images/app-icon.svg">
-  <link rel="icon" type="image/svg+xml" href="assets/images/app-icon.svg">
   <style>
-    /* 修复PC端样式 */
+    /* 基础样式 */
     html, body {
       height: 100%;
       margin: 0;
@@ -22,30 +16,75 @@
       font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
       color: #ffffff;
       overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
     
     .app-container {
       width: 100%;
-      max-width: 414px;
       height: 100vh;
+      max-width: 414px;
       margin: 0 auto;
-      background-color: #14152e;
       position: relative;
+      background-color: #14152e;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     }
     
     .main-content {
-      padding: 15px;
-      padding-bottom: 80px;
+      height: calc(100% - 60px);
       overflow-y: auto;
-      height: calc(100vh - 70px);
+      padding-bottom: 70px;
     }
-
-    /* 播放器样式增强 */
+    
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 414px;
+      height: 60px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background-color: rgba(26, 27, 70, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 998;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 0;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+      cursor: pointer;
+    }
+    
+    .tab-item.active {
+      opacity: 1;
+      color: #8093f1;
+    }
+    
+    .tab-item i {
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+    }
+    
+    .tab-item span {
+      font-size: 0.7rem;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 15px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* 播放器样式 */
     #audio-player {
       position: fixed;
       bottom: 70px;
@@ -61,6 +100,8 @@
       z-index: 900;
       box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
+      margin-left: 8px;
+      margin-right: 8px;
     }
     
     #audio-player.active {
@@ -71,8 +112,8 @@
       position: absolute;
       top: 8px;
       right: 8px;
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -80,6 +121,7 @@
       border-radius: 50%;
       cursor: pointer;
       z-index: 10;
+      font-size: 12px;
     }
     
     .player-close:hover {
@@ -87,8 +129,8 @@
     }
     
     .player-image {
-      width: 60px;
-      height: 60px;
+      width: 48px;
+      height: 48px;
       border-radius: 8px;
       margin-right: 12px;
       object-fit: cover;
@@ -138,30 +180,55 @@
     .player-controls {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       margin-left: 10px;
     }
     
-    .player-btn {
+    .player-play {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.2);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-left: 8px;
       cursor: pointer;
     }
     
-    .player-play {
-      width: 42px;
-      height: 42px;
-      background: #8093f1;
+    .player-play:hover {
+      background: rgba(255, 255, 255, 0.3);
     }
     
-    .player-btn:hover {
-      transform: scale(1.05);
+    /* 通知样式 */
+    .notification {
+      position: fixed;
+      bottom: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(25, 26, 58, 0.95);
+      border-radius: 8px;
+      padding: 10px 15px;
+      color: white;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      max-width: 80%;
+      opacity: 0;
+      transform: translateX(-50%) translateY(20px);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    
+    .notification.active {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .notification-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    
+    .notification-message {
+      font-size: 0.9rem;
+      opacity: 0.9;
     }
     
     @keyframes slideUp {
@@ -174,21 +241,283 @@
         opacity: 1;
       }
     }
+    
+    /* 分类导航 */
+    .category-nav {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px 5px;
+      margin: 0 -5px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    
+    .category-nav::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .category-item {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      margin: 0 5px;
+      opacity: 0.7;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    
+    .category-item.active {
+      opacity: 1;
+    }
+    
+    .category-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+    
+    .category-item.active .category-icon {
+      background: rgba(128, 147, 241, 0.2);
+    }
+    
+    .category-icon img {
+      width: 24px;
+      height: 24px;
+    }
+    
+    .category-name {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    
+    /* 声音列表 */
+    .sound-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      padding: 10px 0;
+    }
+    
+    .sound-item {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background-color: rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+    
+    .sound-item-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .sound-item-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 15px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    }
+    
+    .sound-item-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .sound-item-artist {
+      font-size: 12px;
+      opacity: 0.8;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .sound-item-play {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .sound-item:hover .sound-item-play {
+      opacity: 1;
+    }
+    
+    /* 改进布局样式 */
+    .app-container {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    
+    .card {
+      margin-bottom: 15px; /* 减少卡片间距 */
+    }
+    
+    .hero-section {
+      padding: 20px 15px; /* 减小hero区域的内边距 */
+    }
+    
+    .sleep-stats {
+      flex-wrap: wrap; /* 让统计卡片自动折行 */
+    }
+    
+    .stat-card {
+      min-width: 70px; /* 减小统计卡片的最小宽度 */
+      margin: 5px; /* 减小统计卡片间距 */
+    }
+    
+    .sound-categories {
+      justify-content: space-between; /* 均匀分布类别项 */
+    }
+    
+    .category-item {
+      padding: 5px; /* 减少类别项内边距 */
+    }
+    
+    .tab-content {
+      padding-bottom: 70px; /* 增加底部内边距，避免被底部导航遮挡 */
+    }
+    
+    /* 提高主要内容区域的可见性 */
+    .main-content {
+      padding-top: 60px; /* 减小顶部内边距 */
+    }
+    
+    /* 减小底部导航的高度 */
+    .tab-bar {
+      height: 55px; /* 减小底部导航的高度 */
+    }
+    
+    /* 添加滚动指示器 */
+    .card.scrollable {
+      max-height: 250px;
+      overflow-y: auto;
+      position: relative;
+    }
+    
+    .card.scrollable::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30px;
+      background: linear-gradient(transparent, rgba(20, 21, 46, 0.7));
+      pointer-events: none;
+    }
+
+    /* PC端响应式布局 */
+    @media (min-width: 768px) {
+      body {
+        background-color: #0e1030;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+      }
+      
+      .app-container {
+        width: 414px; /* 标准手机宽度 */
+        height: 896px; /* 标准手机高度 */
+        overflow: hidden;
+        position: relative;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        background-color: #14152e;
+      }
+      
+      .main-content {
+        max-height: calc(100% - 55px);
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        bottom: 55px;
+      }
+      
+      .tab-content {
+        max-height: 100%;
+        overflow-y: auto;
+      }
+      
+      .app-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+      }
+      
+      .tab-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+      }
+      
+      .audio-player {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 370px;
+      }
+      
+      /* 音乐播放器样式 */
+      .audio-player.expanded {
+        max-height: 400px;
+      }
+      
+      /* 弹出模态窗口样式 */
+      .share-modal {
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      
+      .share-content {
+        width: 90%;
+        max-width: 370px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="app-container">
     <div class="main-content">
-      <!-- 英雄区域 -->
-      <div class="hero-section">
-        <div class="hero-header">
-          <h1 class="hero-title">梦境守护者</h1>
-          <div class="hero-subtitle">让每晚睡眠更轻松</div>
-          <button class="hero-cta" data-action="start-sleep">开始助眠</button>
-        </div>
-        <img src="assets/images/hero-sleep.png" alt="睡眠插图" class="hero-image">
-      </div>
-      
       <!-- 分类导航 -->
       <div class="category-nav">
         <div class="category-item active" data-category="nature">
@@ -253,84 +582,6 @@
           </div>
         </div>
         
-        <div class="tab-content" id="sleeplab-tab">
-          <div class="sleeplab-header">
-            <h2>睡眠实验室</h2>
-            <p>科学改善您的睡眠质量</p>
-          </div>
-          
-          <div class="sleeplab-cards">
-            <div class="sleeplab-card">
-              <div class="sleeplab-card-icon">
-                <i class="fas fa-brain"></i>
-              </div>
-              <div class="sleeplab-card-title">脑波助眠</div>
-              <div class="sleeplab-card-desc">使用特定频率的声音帮助大脑进入深度睡眠状态</div>
-              <button class="sleeplab-card-btn">开始</button>
-            </div>
-            
-            <div class="sleeplab-card">
-              <div class="sleeplab-card-icon">
-                <i class="fas fa-moon"></i>
-              </div>
-              <div class="sleeplab-card-title">睡眠周期分析</div>
-              <div class="sleeplab-card-desc">记录并分析您的睡眠周期，提供个性化改善方案</div>
-              <button class="sleeplab-card-btn">分析</button>
-            </div>
-            
-            <div class="sleeplab-card">
-              <div class="sleeplab-card-icon">
-                <i class="fas fa-music"></i>
-              </div>
-              <div class="sleeplab-card-title">AI声音混合器</div>
-              <div class="sleeplab-card-desc">根据您的睡眠状况智能推荐声音组合</div>
-              <button class="sleeplab-card-btn">混合</button>
-            </div>
-          </div>
-          
-          <div class="mixer-panel">
-            <h3>声音混合器</h3>
-            <div class="mixer-channels">
-              <!-- JS动态填充 -->
-            </div>
-            <div class="mixer-controls">
-              <button class="mixer-btn add-sound-btn"><i class="fas fa-plus"></i> 添加声音</button>
-              <button class="mixer-btn ai-optimize-btn"><i class="fas fa-magic"></i> AI优化</button>
-              <button class="mixer-btn save-mix-btn"><i class="fas fa-save"></i> 保存</button>
-              <button class="mixer-btn share-mix-btn"><i class="fas fa-share-alt"></i> 分享</button>
-            </div>
-          </div>
-          
-          <div class="recommendations">
-            <h3>AI推荐组合</h3>
-            <div class="recommendation-items">
-              <div class="recommendation-item" data-mix="focus">
-                <div class="recommendation-icon"><i class="fas fa-tasks"></i></div>
-                <div class="recommendation-title">专注工作</div>
-                <div class="recommendation-desc">雨声 + 咖啡馆 + 轻音乐</div>
-              </div>
-              
-              <div class="recommendation-item" data-mix="deep-sleep">
-                <div class="recommendation-icon"><i class="fas fa-moon"></i></div>
-                <div class="recommendation-title">深度睡眠</div>
-                <div class="recommendation-desc">白噪音 + 风扇声 + 心跳</div>
-              </div>
-              
-              <div class="recommendation-item" data-mix="relax">
-                <div class="recommendation-icon"><i class="fas fa-spa"></i></div>
-                <div class="recommendation-title">放松减压</div>
-                <div class="recommendation-desc">海浪 + 鸟鸣 + 轻风</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="emotion-detection">
-            <h3>情绪睡眠助手</h3>
-            <p>通过分析您的情绪状态，推荐最适合您当前情绪的声音组合</p>
-            <button class="emotion-scan-btn"><i class="fas fa-heartbeat"></i> 开始情绪检测</button>
-          </div>
-        </div>
-        
         <div class="tab-content" id="map-tab">
           <div class="map-header">
             <h2>世界声音地图</h2>
@@ -372,33 +623,6 @@
               </div>
             </div>
           </div>
-          
-          <div class="sleep-checkins">
-            <div class="checkins-header">
-              <h3>睡眠打卡</h3>
-              <button class="create-checkin-btn"><i class="fas fa-plus"></i> 生成打卡</button>
-            </div>
-            
-            <div class="checkin-item">
-              <img src="assets/images/checkins/forest-checkin.jpg" alt="森林睡眠打卡" class="checkin-image">
-              <div class="checkin-info">
-                <div class="checkin-location">北欧森林</div>
-                <div class="checkin-date">2023/05/10</div>
-                <div class="checkin-quality">睡眠质量: 92%</div>
-              </div>
-              <button class="share-checkin-btn"><i class="fas fa-share-alt"></i></button>
-            </div>
-            
-            <div class="checkin-item">
-              <img src="assets/images/checkins/ocean-checkin.jpg" alt="海洋睡眠打卡" class="checkin-image">
-              <div class="checkin-info">
-                <div class="checkin-location">太平洋</div>
-                <div class="checkin-date">2023/05/08</div>
-                <div class="checkin-quality">睡眠质量: 88%</div>
-              </div>
-              <button class="share-checkin-btn"><i class="fas fa-share-alt"></i></button>
-            </div>
-          </div>
         </div>
         
         <div class="tab-content" id="me-tab">
@@ -407,7 +631,7 @@
               <img src="assets/images/avatar.jpg" alt="用户头像">
             </div>
             <div class="profile-info">
-              <div class="profile-name">梦境探索者</div>
+              <div class="profile-name">睡眠达人</div>
               <div class="profile-stats">
                 <div class="stat-item">
                   <div class="stat-value">28</div>
@@ -424,91 +648,8 @@
               </div>
             </div>
           </div>
-          
-          <div class="sleep-stats">
-            <h3>睡眠统计</h3>
-            <div class="stats-graph">
-              <!-- 睡眠图表 -->
-              <div class="graph-placeholder">
-                <img src="assets/images/sleep-graph.svg" alt="睡眠图表">
-              </div>
-            </div>
-            <div class="stats-info">
-              <div class="stat-detail">
-                <div class="stat-label">深度睡眠</div>
-                <div class="stat-value">2.3小时</div>
-                <div class="stat-bar">
-                  <div class="stat-bar-fill" style="width: 35%;"></div>
-                </div>
-              </div>
-              <div class="stat-detail">
-                <div class="stat-label">轻度睡眠</div>
-                <div class="stat-value">4.5小时</div>
-                <div class="stat-bar">
-                  <div class="stat-bar-fill" style="width: 65%;"></div>
-                </div>
-              </div>
-              <div class="stat-detail">
-                <div class="stat-label">REM睡眠</div>
-                <div class="stat-value">1.4小时</div>
-                <div class="stat-bar">
-                  <div class="stat-bar-fill" style="width: 25%;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="settings-section">
-            <h3>设置</h3>
-            <div class="settings-items">
-              <div class="settings-item">
-                <div class="settings-icon"><i class="fas fa-bell"></i></div>
-                <div class="settings-text">提醒设置</div>
-                <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-              <div class="settings-item">
-                <div class="settings-icon"><i class="fas fa-palette"></i></div>
-                <div class="settings-text">主题设置</div>
-                <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-              <div class="settings-item">
-                <div class="settings-icon"><i class="fas fa-cog"></i></div>
-                <div class="settings-text">偏好设置</div>
-                <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-              <div class="settings-item" data-action="share">
-                <div class="settings-icon"><i class="fas fa-share-alt"></i></div>
-                <div class="settings-text">分享应用</div>
-                <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-              <div class="settings-item">
-                <div class="settings-icon"><i class="fas fa-question-circle"></i></div>
-                <div class="settings-text">帮助与反馈</div>
-                <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-              <div class="settings-item" id="show-audio-sources">
-                <div class="settings-icon"><i class="fas fa-music"></i></div>
-                <div class="settings-text">音频来源</div>
-                <div class="settings-arrow"><i class="fas fa-chevron-right"></i></div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="membership-section">
-            <div class="membership-card">
-              <div class="membership-title">开通高级会员</div>
-              <div class="membership-features">
-                <div class="membership-feature"><i class="fas fa-check"></i> 无限制音频访问</div>
-                <div class="membership-feature"><i class="fas fa-check"></i> 高级AI助手</div>
-                <div class="membership-feature"><i class="fas fa-check"></i> 睡眠分析报告</div>
-                <div class="membership-feature"><i class="fas fa-check"></i> 无广告体验</div>
-              </div>
-              <button class="membership-btn">立即开通</button>
-            </div>
-          </div>
         </div>
       </div>
-      
     </div>
     
     <!-- 底部导航 -->
@@ -520,10 +661,6 @@
       <div class="tab-item" data-tab="ai-tab">
         <i class="fas fa-robot"></i>
         <span>AI</span>
-      </div>
-      <div class="tab-item" data-tab="sleeplab-tab">
-        <i class="fas fa-flask"></i>
-        <span>睡眠实验室</span>
       </div>
       <div class="tab-item" data-tab="map-tab">
         <i class="fas fa-map-marked-alt"></i>
@@ -549,100 +686,8 @@
         </div>
       </div>
       <div class="player-controls">
-        <div class="player-btn player-play">
+        <div class="player-play">
           <i class="fas fa-play"></i>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 分享弹窗 -->
-    <div class="share-modal" id="share-modal">
-      <div class="share-content">
-        <div class="share-close"><i class="fas fa-times"></i></div>
-        <h3>分享给朋友</h3>
-        <div class="share-link">
-          <input type="text" value="https://dreamguardian.app/share" readonly>
-          <button id="copy-link-btn"><i class="fas fa-copy"></i></button>
-        </div>
-        <div class="share-options">
-          <div class="share-option">
-            <div class="share-option-icon"><i class="fab fa-weixin"></i></div>
-            <div class="share-option-name">微信</div>
-          </div>
-          <div class="share-option">
-            <div class="share-option-icon"><i class="fab fa-qq"></i></div>
-            <div class="share-option-name">QQ</div>
-          </div>
-          <div class="share-option">
-            <div class="share-option-icon"><i class="fab fa-weibo"></i></div>
-            <div class="share-option-name">微博</div>
-          </div>
-          <div class="share-option">
-            <div class="share-option-icon"><i class="fas fa-link"></i></div>
-            <div class="share-option-name">复制链接</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 音频源弹窗 -->
-    <div class="share-modal" id="audio-sources-modal">
-      <div class="share-content">
-        <div class="share-close"><i class="fas fa-times"></i></div>
-        <h3>音频来源</h3>
-        <p class="audio-sources-intro">我们使用的音频来自以下来源，感谢这些创作者的贡献。</p>
-        <div class="audio-sources-list">
-          <!-- JS动态填充 -->
-        </div>
-      </div>
-    </div>
-    
-    <!-- 声音选择器弹窗 -->
-    <div class="share-modal" id="sound-selector-modal">
-      <div class="share-content">
-        <div class="share-close sound-selector-close"><i class="fas fa-times"></i></div>
-        <h3>添加声音</h3>
-        <div class="sound-selector-categories">
-          <div class="sound-selector-category active" data-category="nature">自然</div>
-          <div class="sound-selector-category" data-category="meditation">冥想</div>
-          <div class="sound-selector-category" data-category="whitenoise">白噪音</div>
-          <div class="sound-selector-category" data-category="music">音乐</div>
-        </div>
-        <div class="selectable-sounds">
-          <!-- JS动态填充 -->
-        </div>
-      </div>
-    </div>
-    
-    <!-- 情绪检测弹窗 -->
-    <div class="share-modal" id="emotion-detection-modal">
-      <div class="share-content">
-        <div class="share-close"><i class="fas fa-times"></i></div>
-        <h3>情绪检测</h3>
-        
-        <div class="emotion-detection-status">
-          <div class="detection-scanning">
-            <i class="fas fa-spinner fa-spin"></i>
-            <div>正在分析您的情绪状态...</div>
-          </div>
-        </div>
-        
-        <div class="emotion-result">
-          <div class="emotion-icon">
-            <i class="fas fa-battery-quarter"></i>
-          </div>
-          <div class="emotion-name">疲惫</div>
-          <div class="emotion-description">
-            您当前处于疲惫状态，可能需要深度放松和足够的睡眠来恢复能量。
-          </div>
-          <div class="emotion-recommendation">
-            <h4>推荐声音组合</h4>
-            <div class="recommendation-detail">
-              <div class="rec-sound-item">轻雨声</div>
-              <div class="rec-sound-item">低频白噪音</div>
-            </div>
-            <button class="apply-rec-btn">立即应用</button>
-          </div>
         </div>
       </div>
     </div>
@@ -809,22 +854,6 @@
           coordinates: [230, 90],
           description: '北欧的针叶林，四季分明，拥有丰富的自然声音。',
           sounds: ['forest', 'river', 'birds']
-        },
-        {
-          id: 'mountains',
-          name: '喜马拉雅山',
-          type: '高山',
-          coordinates: [300, 150],
-          description: '世界屋脊，独特的高海拔环境创造了宁静的声音景观。',
-          sounds: ['wind', 'tibetan-bowl']
-        },
-        {
-          id: 'desert',
-          name: '撒哈拉沙漠',
-          type: '沙漠',
-          coordinates: [230, 160],
-          description: '世界上最大的沙漠之一，夜晚的风声和宁静是其特色。',
-          sounds: ['wind', 'brown-noise']
         }
       ]
     };
