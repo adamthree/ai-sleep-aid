@@ -13,7 +13,41 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/images/app-icon.png">
   <style>
-    /* 进一步优化顶部导航和logo，防止遮挡 */
+    /* 继承网站的默认样式，并扩展适配新应用 */
+    :root {
+      --app-background: #161623;
+      --app-text: #f5f5f7;
+      --app-primary: #7F5CFF;
+      --app-secondary: #5B4DFF;
+      --app-accent: #FF5CAA;
+      --app-dark: #121218;
+      --app-card: rgba(28, 28, 45, 0.7);
+      --app-transition: all 0.3s ease;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--app-background);
+      color: var(--app-text);
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    
+    .app-container {
+      position: relative;
+      max-width: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16162c 100%);
+    }
+    
+    /* 确保顶部导航和logo正确显示 */
     .top-nav {
       height: 44px !important;
       background-color: rgba(18, 18, 24, 0.85);
@@ -21,6 +55,9 @@
       z-index: 10;
       padding: 0 15px !important;
       box-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     
     /* 全新设计的logo样式 */
@@ -49,94 +86,177 @@
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
     
-    /* 全屏加载遮罩 */
-    .interaction-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(26, 26, 46, 0.9);
-      z-index: 9999;
+    /* 主内容区域 */
+    #main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      padding-bottom: 80px; /* 为底部导航腾出空间 */
+    }
+    
+    /* 分类导航 */
+    .sound-categories {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      text-align: center;
+      overflow-x: auto;
+      padding: 10px 0;
+      margin: 0 -10px;
+      scrollbar-width: none; /* 隐藏滚动条 */
     }
     
-    /* 确保播放器在底部可见 */
-    .player-container {
-      z-index: 80;
+    .sound-categories::-webkit-scrollbar {
+      display: none;
     }
     
-    /* 确保底部导航栏在最上层 */
-    .bottom-nav {
-      z-index: 90;
-    }
-    
-    /* 修复通知位置 */
-    .notification {
-      top: 50px !important;
-      z-index: 100;
-    }
-    
-    /* 修复音频加载问题的全屏提示 */
-    .audio-fix-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(26, 26, 46, 0.95);
-      z-index: 9999;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-    
-    .audio-fix-overlay button {
-      background: linear-gradient(135deg, #7F5CFF, #5B4DFF);
-      border: none;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 16px;
-      margin-top: 20px;
+    .category-item {
+      padding: 8px 16px;
+      margin: 0 5px;
+      background-color: rgba(30, 30, 40, 0.6);
+      border-radius: 20px;
+      color: rgba(255, 255, 255, 0.7);
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(91, 77, 255, 0.3);
+      white-space: nowrap;
+      transition: all 0.2s ease;
+    }
+    
+    .category-item.active {
+      background-color: var(--app-primary);
+      color: white;
+    }
+    
+    /* 声音网格样式 */
+    .sounds-grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+      margin-bottom: 20px;
+    }
+    
+    /* 声音卡片样式 */
+    .sound-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 1/1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
     }
     
-    .audio-fix-overlay button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 77, 255, 0.4);
+    .sound-card.active {
+      box-shadow: 0 0 0 2px var(--app-primary), 0 4px 12px rgba(0, 0, 0, 0.4);
     }
     
-    /* 调整播放器容器样式，确保尺寸合适 */
+    .sound-card-img {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    
+    .sound-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .sound-play-btn {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    
+    .sound-play-btn i {
+      color: white;
+      font-size: 30px;
+    }
+    
+    .sound-card-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 10px;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+      color: white;
+    }
+    
+    .sound-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .sound-subtitle {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    /* 底部导航栏样式 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background-color: rgba(18, 18, 24, 0.95);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      z-index: 100;
+    }
+    
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 8px 0;
+      width: 100%;
+    }
+    
+    .nav-item i {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+    
+    .nav-item.active {
+      color: var(--app-primary);
+    }
+    
+    /* 选项卡内容 */
+    .tab-content {
+      display: none;
+      padding-bottom: 60px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* 播放器容器样式 */
     #player-container {
       position: fixed;
       bottom: 60px;
       left: 0;
       right: 0;
-      display: flex;
-      align-items: center;
       background-color: rgba(26, 26, 46, 0.95);
-      padding: 8px 12px;
+      padding: 12px 16px;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       transform: translateY(100%);
       opacity: 0;
       transition: transform 0.3s ease, opacity 0.3s ease;
       z-index: 50;
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
-      height: auto;
-      min-height: 60px;
+      display: flex;
+      align-items: center;
     }
     
     #player-container.active {
@@ -144,12 +264,11 @@
       opacity: 1;
     }
     
-    /* 调整播放器内容区域 */
+    /* 播放器内容样式 */
     .player-content {
       display: flex;
       align-items: center;
       width: 100%;
-      justify-content: space-between;
     }
     
     .player-thumbnail {
@@ -157,8 +276,7 @@
       height: 40px;
       border-radius: 8px;
       overflow: hidden;
-      margin-right: 10px;
-      flex-shrink: 0;
+      margin-right: 12px;
     }
     
     .player-thumbnail img {
@@ -168,14 +286,12 @@
     }
     
     .player-info {
-      flex-grow: 1;
+      flex: 1;
       overflow: hidden;
-      margin-right: 10px;
     }
     
     #player-title {
-      font-size: 14px;
-      font-weight: 600;
+      font-weight: 500;
       color: white;
       margin: 0;
       white-space: nowrap;
@@ -195,7 +311,6 @@
     .player-controls {
       display: flex;
       gap: 12px;
-      flex-shrink: 0;
     }
     
     .control-btn {
@@ -208,10 +323,26 @@
       justify-content: center;
       cursor: pointer;
       color: white;
-      font-size: 14px;
     }
     
-    /* 确保混音器容器正确显示 */
+    /* 播放器进度条 */
+    .player-progress {
+      width: 100%;
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    
+    #player-progress-bar {
+      height: 100%;
+      background: linear-gradient(to right, var(--app-primary), var(--app-accent));
+      width: 0%;
+      transition: width 0.5s linear;
+    }
+    
+    /* 混音器容器样式 */
     #mixer-container {
       display: none;
       position: fixed;
@@ -220,31 +351,372 @@
       right: 0;
       background-color: rgba(26, 26, 46, 0.95);
       padding: 12px 16px;
-      max-height: 30vh;
+      max-height: 40vh;
       overflow-y: auto;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       z-index: 45;
-      width: 100%;
-      max-width: 100%;
-      box-sizing: border-box;
     }
     
-    /* 调整声音卡片样式 */
-    .sound-card {
-      position: relative;
-      border-radius: 12px;
-      overflow: hidden;
-      aspect-ratio: 1/1;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    .mixer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .mixer-header h3 {
+      margin: 0;
+      font-size: 16px;
+      color: white;
+    }
+    
+    .mixer-toggle {
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .mixer-channel {
+      margin-bottom: 10px;
+      padding: 8px;
+      background-color: rgba(40, 40, 60, 0.5);
+      border-radius: 8px;
+    }
+    
+    .channel-info {
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    
+    .channel-controls {
+      display: flex;
+      align-items: center;
+    }
+    
+    .channel-volume {
+      flex: 1;
+      height: 5px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+    }
+    
+    .channel-volume::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: var(--app-primary);
+    }
+    
+    .channel-value {
+      width: 40px;
+      text-align: right;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .channel-remove {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    
+    /* AI聊天界面样式 */
+    .ai-chat {
+      height: calc(100vh - 150px);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+    }
+    
+    .message {
       margin-bottom: 15px;
+      max-width: 80%;
     }
     
-    .sound-card.active {
-      box-shadow: 0 0 0 2px #7F5CFF, 0 4px 12px rgba(0, 0, 0, 0.4);
+    .message-ai {
+      background-color: rgba(35, 35, 55, 0.7);
+      padding: 12px;
+      border-radius: 15px 15px 15px 5px;
+    }
+    
+    .message-user {
+      background-color: rgba(91, 77, 255, 0.5);
+      padding: 12px;
+      border-radius: 15px 15px 5px 15px;
+      margin-left: auto;
+    }
+    
+    .message-time {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.5);
+      margin-top: 5px;
+    }
+    
+    .ai-input {
+      background-color: rgba(35, 35, 55, 0.7);
+      padding: 15px;
+      display: flex;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    #ai-input-field {
+      flex: 1;
+      background-color: rgba(45, 45, 65, 0.7);
+      border: none;
+      border-radius: 20px;
+      padding: 10px 15px;
+      color: white;
+      margin-right: 10px;
+    }
+    
+    #ai-voice-btn, #ai-send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(91, 77, 255, 0.7);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    
+    /* 通知样式 */
+    .notification {
+      position: fixed;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(30, 30, 50, 0.9);
+      border-radius: 10px;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      max-width: 80%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateX(-50%) translateY(-10px);
+    }
+    
+    .notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    
+    .notification-icon {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    
+    .notification-message {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    @media (min-width: 768px) {
+      .app-container {
+        max-width: 500px;
+        margin: 0 auto;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        min-height: 100vh;
+      }
+      
+      .bottom-nav, #player-container, #mixer-container {
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      
+      #player-container {
+        transform: translateX(-50%) translateY(100%);
+      }
+      
+      #player-container.active {
+        transform: translateX(-50%) translateY(0);
+      }
+      
+      .sounds-grid-container {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    
+    /* 欢迎提示层样式 */
+    .welcome-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(26, 26, 46, 0.97);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+    
+    .welcome-content {
+      background-color: rgba(35, 35, 60, 0.8);
+      border-radius: 16px;
+      padding: 25px;
+      max-width: 85%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .welcome-content h1 {
+      color: white;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    
+    .welcome-content p {
+      margin-bottom: 15px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .welcome-content button {
+      background: linear-gradient(135deg, #7F5CFF, #5B4DFF);
+      border: none;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 30px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(91, 77, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .welcome-content button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(91, 77, 255, 0.4);
+    }
+    
+    /* 音频交互提示和修复样式 */
+    .interaction-overlay, .audio-fix-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(26, 26, 46, 0.95);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      flex-direction: column;
+      padding: 20px;
+    }
+    
+    .interaction-overlay button, .audio-fix-overlay button {
+      background: linear-gradient(135deg, #7F5CFF, #5B4DFF);
+      border: none;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(91, 77, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .interaction-overlay button:hover, .audio-fix-overlay button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(91, 77, 255, 0.4);
+    }
+    
+    /* 混音器操作按钮 */
+    .mixer-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+    }
+    
+    .mixer-action-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+    
+    .mixer-action-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
   </style>
 </head>
 <body>
+  <!-- 欢迎提示层 -->
+  <div class="welcome-overlay" id="welcome-overlay">
+    <div class="welcome-content">
+      <h1>欢迎使用 Nature Sleep</h1>
+      <p>点击任意声音卡片播放自然音效，混合多种声音创造最适合您的助眠环境。</p>
+      <p>如遇声音无法播放，请点击声音卡片并与页面互动以授权音频播放。</p>
+      <p>当前使用的是标准版本播放器，已优化PC和移动设备显示。</p>
+      <button id="welcome-close">开始体验</button>
+    </div>
+  </div>
+
+  <!-- 音频交互提示层 -->
+  <div class="interaction-overlay" id="interaction-overlay" style="display: none;">
+    <div>
+      <h3>请点击下方按钮以启用音频播放</h3>
+      <p>由于浏览器安全策略，需要您的互动才能播放音频</p>
+      <button id="interaction-btn">授权播放</button>
+    </div>
+  </div>
+
+  <!-- 音频修复提示层 -->
+  <div class="audio-fix-overlay" id="audio-fix-overlay" style="display: none;">
+    <h3>音频播放困难？</h3>
+    <p>我们注意到音频播放可能遇到了问题。这可能是由于：</p>
+    <ul style="text-align: left; margin: 10px auto; max-width: 80%;">
+      <li>浏览器的自动播放限制</li>
+      <li>音频资源暂时不可用</li>
+      <li>网络连接问题</li>
+    </ul>
+    <p>请尝试以下解决方案：</p>
+    <button id="try-alternative-source">尝试替代音源</button>
+    <button id="reload-app" style="background: rgba(255,255,255,0.2); margin-top: 10px;">刷新应用</button>
+  </div>
+  
   <div id="app-container">
     <!-- 顶部导航栏 -->
     <div class="top-nav">
@@ -306,16 +778,19 @@
           <div id="player-subtitle"></div>
         </div>
         <div class="player-controls">
-          <div id="play-all-btn" class="control-btn">
+          <div id="player-play-btn" class="control-btn">
             <i id="play-icon" class="fas fa-play"></i>
           </div>
           <div id="clear-all-btn" class="control-btn">
             <i class="fas fa-times"></i>
           </div>
-          <div id="save-mix-btn" class="control-btn">
-            <i class="fas fa-save"></i>
+          <div id="mixer-toggle-btn" class="control-btn">
+            <i class="fas fa-sliders-h"></i>
           </div>
         </div>
+      </div>
+      <div class="player-progress">
+        <div id="player-progress-bar" style="width: 0%"></div>
       </div>
     </div>
     
@@ -327,8 +802,12 @@
           <i class="fas fa-chevron-down"></i>
         </div>
       </div>
-      <div class="mixer-channels">
+      <div id="mixer-channels" class="mixer-channels">
         <!-- 通道将通过JS动态生成 -->
+      </div>
+      <div class="mixer-actions">
+        <button id="clear-mix-btn" class="mixer-action-btn"><i class="fas fa-trash-alt"></i> 清空</button>
+        <button id="save-mix-btn" class="mixer-action-btn"><i class="fas fa-save"></i> 保存</button>
       </div>
     </div>
     
@@ -445,9 +924,95 @@
   <!-- 添加音频播放相关js -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // 欢迎层控制
+      const welcomeOverlay = document.getElementById('welcome-overlay');
+      const welcomeCloseBtn = document.getElementById('welcome-close');
+      const playerPlayBtn = document.getElementById('player-play-btn');
+      const clearAllBtn = document.getElementById('clear-all-btn');
+      const mixerToggleBtn = document.getElementById('mixer-toggle-btn');
+      const clearMixBtn = document.getElementById('clear-mix-btn');
+      const saveMixBtn = document.getElementById('save-mix-btn');
+      const mixerContainer = document.getElementById('mixer-container'); 
+      
+      // 绑定播放器控制事件
+      if (playerPlayBtn) {
+        playerPlayBtn.addEventListener('click', function() {
+          if (typeof window.togglePlayAll === 'function') {
+            window.togglePlayAll();
+          }
+        });
+      }
+      
+      // 混音器切换显示
+      if (mixerToggleBtn) {
+        mixerToggleBtn.addEventListener('click', function() {
+          if (mixerContainer) {
+            if (mixerContainer.style.display === 'none' || !mixerContainer.style.display) {
+              mixerContainer.style.display = 'block';
+            } else {
+              mixerContainer.style.display = 'none';
+            }
+          }
+        });
+      }
+      
+      // 清空所有声音
+      if (clearAllBtn) {
+        clearAllBtn.addEventListener('click', function() {
+          if (typeof window.clearAllSounds === 'function') {
+            window.clearAllSounds();
+          }
+        });
+      }
+      
+      // 清空混音
+      if (clearMixBtn) {
+        clearMixBtn.addEventListener('click', function() {
+          if (typeof window.clearAllSounds === 'function') {
+            window.clearAllSounds();
+          }
+        });
+      }
+      
+      // 保存混音
+      if (saveMixBtn) {
+        saveMixBtn.addEventListener('click', function() {
+          if (typeof window.saveMix === 'function') {
+            window.saveMix();
+          }
+        });
+      }
+      
+      // 欢迎窗口关闭
+      welcomeCloseBtn.addEventListener('click', function() {
+        welcomeOverlay.style.display = 'none';
+        localStorage.setItem('nature-sleep-welcomed', 'true');
+      });
+      
+      // 如果用户之前已经看过欢迎信息，不再显示
+      if (localStorage.getItem('nature-sleep-welcomed') === 'true') {
+        welcomeOverlay.style.display = 'none';
+      }
+      
+      // 音频问题修复按钮
+      const tryAlternativeBtn = document.getElementById('try-alternative-source');
+      const reloadAppBtn = document.getElementById('reload-app');
+      
+      if (tryAlternativeBtn) {
+        tryAlternativeBtn.addEventListener('click', function() {
+          localStorage.setItem('use-alternative-source', 'true');
+          document.getElementById('audio-fix-overlay').style.display = 'none';
+        });
+      }
+      
+      if (reloadAppBtn) {
+        reloadAppBtn.addEventListener('click', function() {
+          location.reload();
+        });
+      }
+      
       // 动态更新logo
       function updateLogoForSound(soundId) {
-        console.log("更新logo为:", soundId);
         const logoContainer = document.getElementById('dynamic-logo');
         if (!logoContainer) {
           console.error("未找到logo容器元素");
@@ -539,6 +1104,41 @@
           }
         }
       });
+      
+      // 确保初始化声音网格
+      setTimeout(function() {
+        if (typeof window.initSoundGrid === 'function') {
+          window.initSoundGrid();
+          console.log("初始化声音网格完成");
+        } else {
+          console.error("找不到初始化函数");
+          // 手动初始化，以防JavaScript文件加载问题
+          const container = document.querySelector('.sounds-grid-container');
+          if (container && window.soundData && window.soundData.nature) {
+            container.innerHTML = '';
+            window.soundData.nature.forEach(sound => {
+              const soundCard = document.createElement('div');
+              soundCard.className = 'sound-card';
+              soundCard.dataset.soundId = sound.id;
+              
+              soundCard.innerHTML = `
+                <div class="sound-card-img">
+                  <img src="${sound.image}" alt="${sound.title}">
+                  <div class="sound-play-btn">
+                    <i class="fas fa-play"></i>
+                  </div>
+                </div>
+                <div class="sound-card-info">
+                  <div class="sound-title">${sound.title}</div>
+                  <div class="sound-subtitle">${sound.artist || 'Nature Sleep'}</div>
+                </div>
+              `;
+              
+              container.appendChild(soundCard);
+            });
+          }
+        }
+      }, 500);
     });
   </script>
 </body>
