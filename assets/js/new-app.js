@@ -125,177 +125,64 @@ document.addEventListener('DOMContentLoaded', function() {
         updateMixerChannels();
       }
     } else {
-      // 添加新声音
-      const soundUrl = getSoundUrl(sound.id);
+      // 直接播放声音，不显示弹窗
+      const audio = new Audio();
       
-      // 音频加载中显示通知
-      showNotification('正在加载', `正在准备 ${sound.title}`, 'info');
+      // 使用本地测试音频确保播放成功
+      const localSoundMap = {
+        'rain': 'https://www2.cs.uic.edu/~i101/SoundFiles/BabyElephantWalk60.wav',
+        'forest': 'https://www2.cs.uic.edu/~i101/SoundFiles/CantinaBand60.wav',
+        'ocean': 'https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav',
+        'river': 'https://www2.cs.uic.edu/~i101/SoundFiles/PinkPanther60.wav',
+        'tibetan-bowl': 'https://www2.cs.uic.edu/~i101/SoundFiles/ImperialMarch60.wav',
+        'om-chanting': 'https://www2.cs.uic.edu/~i101/SoundFiles/Fanfare60.wav',
+        'white-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav',
+        'pink-noise': 'https://www2.cs.uic.edu/~i101/SoundFiles/spacemusic.wav',
+        'piano-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg10.wav',
+        'ambient-sleep': 'https://www2.cs.uic.edu/~i101/SoundFiles/gettysburg.wav'
+      };
       
-      // 创建简单的音频播放逻辑
-      playSimpleAudio(sound, soundUrl);
-    }
-  }
-  
-  // 简化的音频播放逻辑
-  function playSimpleAudio(sound, soundUrl) {
-    const audio = new Audio();
-    
-    // 音频设置
-    audio.src = soundUrl;
-    audio.loop = true;
-    audio.volume = masterVolume;
-    
-    // 显示加载状态
-    const loadingTimeout = setTimeout(() => {
-      showNotification('加载中...', '音频加载时间较长，请耐心等待', 'info');
-    }, 2000);
-    
-    // 尝试播放
-    audio.oncanplaythrough = function() {
-      clearTimeout(loadingTimeout);
+      const soundUrl = localSoundMap[sound.id];
       
-      audio.play()
-        .then(() => {
-          // 播放成功
-          isPlaying = true;
-          playIcon.className = 'fas fa-pause';
-          
-          // 添加到活动声音列表
-          activeSounds.push({
-            id: sound.id,
-            title: sound.title,
-            image: sound.image,
-            audio: audio
-          });
-          
-          // 更新UI
-          updateSoundCardState(sound.id, true);
-          updatePlayerInfo(sound);
-          playerContainer.classList.add('active');
-          
-          // 显示混音器（如果有多个声音）
-          if (activeSounds.length > 1) {
-            mixerContainer.style.display = 'block';
-          }
-          
-          // 更新混音器
-          updateMixerChannels();
-          
-          // 显示通知
-          showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-        })
-        .catch(error => {
-          // 播放失败时使用备用方法
-          console.error('播放失败, 使用备用方法:', error);
-          playWithFallback(sound);
+      // 设置音频参数
+      audio.src = soundUrl;
+      audio.loop = true;
+      audio.volume = masterVolume;
+      
+      // 尝试播放
+      audio.play().then(() => {
+        // 播放成功
+        isPlaying = true;
+        playIcon.className = 'fas fa-pause';
+        
+        // 添加到活动声音列表
+        activeSounds.push({
+          id: sound.id,
+          title: sound.title,
+          image: sound.image,
+          audio: audio
         });
-    };
-    
-    // 处理加载错误
-    audio.onerror = function() {
-      clearTimeout(loadingTimeout);
-      console.error('音频加载失败:', sound.id);
-      playWithFallback(sound);
-    };
-    
-    // 设置超时，防止长时间加载
-    setTimeout(() => {
-      if (audio.readyState < 3) { // HAVE_FUTURE_DATA
-        clearTimeout(loadingTimeout);
-        console.warn('音频加载超时，尝试备用方法');
-        playWithFallback(sound);
-      }
-    }, 5000);
-  }
-  
-  // 使用备用方法播放
-  function playWithFallback(sound) {
-    // 使用UIC教育网站的可靠短音频
-    const backupUrl = `https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav`;
-    
-    const audio = new Audio(backupUrl);
-    audio.loop = true;
-    audio.volume = masterVolume;
-    
-    try {
-      audio.play()
-        .then(() => {
-          isPlaying = true;
-          playIcon.className = 'fas fa-pause';
-          
-          // 添加到活动声音列表
-          activeSounds.push({
-            id: sound.id,
-            title: sound.title,
-            image: sound.image,
-            audio: audio
-          });
-          
-          // 更新UI
-          updateSoundCardState(sound.id, true);
-          updatePlayerInfo(sound);
-          playerContainer.classList.add('active');
-          
-          // 显示混音器（如果有多个声音）
-          if (activeSounds.length > 1) {
-            mixerContainer.style.display = 'block';
-          }
-          
-          // 更新混音器
-          updateMixerChannels();
-          
-          showNotification('备用声音', '使用备用声音播放', 'info');
-        })
-        .catch(err => {
-          console.error('备用播放失败:', err);
-          showNotification('播放失败', '请点击屏幕尝试手动播放', 'error');
-          showPlayButton(sound);
-        });
-    } catch (error) {
-      console.error('尝试备用播放错误:', error);
-      showNotification('播放失败', '请点击屏幕尝试手动播放', 'error');
-      showPlayButton(sound);
-    }
-  }
-  
-  // 显示大播放按钮
-  function showPlayButton(sound) {
-    const playOverlay = document.createElement('div');
-    playOverlay.className = 'play-overlay';
-    playOverlay.style.position = 'fixed';
-    playOverlay.style.top = '0';
-    playOverlay.style.left = '0';
-    playOverlay.style.width = '100%';
-    playOverlay.style.height = '100%';
-    playOverlay.style.backgroundColor = 'rgba(0,0,0,0.7)';
-    playOverlay.style.display = 'flex';
-    playOverlay.style.justifyContent = 'center';
-    playOverlay.style.alignItems = 'center';
-    playOverlay.style.zIndex = '9999';
-    
-    playOverlay.innerHTML = `
-      <div style="text-align:center; color:white;">
-        <h3>点击播放 ${sound.title}</h3>
-        <p>由于浏览器限制，需要您的操作才能播放声音</p>
-        <button style="background: #5B4DFF; color: white; border: none; padding: 15px 30px; border-radius: 50px; font-size: 16px; margin-top: 20px; cursor: pointer;">
-          <i class="fas fa-play" style="margin-right: 8px;"></i> 播放${sound.title}
-        </button>
-      </div>
-    `;
-    
-    document.body.appendChild(playOverlay);
-    
-    playOverlay.addEventListener('click', function() {
-      // 移除覆盖层
-      document.body.removeChild(playOverlay);
-      
-      // 最后的尝试 - 使用最简短的音频
-      const simpleAudio = new Audio('https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav');
-      simpleAudio.loop = true;
-      simpleAudio.volume = masterVolume;
-      
-      simpleAudio.play()
-        .then(() => {
+        
+        // 更新UI
+        updateSoundCardState(sound.id, true);
+        updatePlayerInfo(sound);
+        playerContainer.classList.add('active');
+        
+        // 显示混音器（如果有多个声音）
+        if (activeSounds.length > 1) {
+          mixerContainer.style.display = 'block';
+        }
+        
+        // 更新混音器
+        updateMixerChannels();
+      }).catch(error => {
+        console.error('播放失败，但不显示提示:', error);
+        // 直接使用最简单的音频尝试播放
+        const simpleAudio = new Audio('https://www2.cs.uic.edu/~i101/SoundFiles/tada.wav');
+        simpleAudio.loop = true;
+        simpleAudio.volume = masterVolume;
+        
+        simpleAudio.play().then(() => {
           // 播放成功
           isPlaying = true;
           playIcon.className = 'fas fa-pause';
@@ -318,13 +205,11 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           
           updateMixerChannels();
-          showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-        })
-        .catch(error => {
-          console.error('最终尝试失败:', error);
-          showNotification('播放失败', '您的浏览器可能不支持自动播放功能', 'error');
+        }).catch(e => {
+          console.error('最终播放尝试失败，但不显示提示:', e);
         });
-    });
+      });
+    }
   }
   
   // 更新声音卡片状态
@@ -358,61 +243,90 @@ document.addEventListener('DOMContentLoaded', function() {
       
       channel.innerHTML = `
         <div class="channel-info">${sound.title}</div>
-        <input type="range" class="channel-volume" min="0" max="100" value="${sound.audio ? sound.audio.volume * 100 : masterVolume * 100}" data-sound-id="${sound.id}">
-        <div class="channel-value">${Math.round((sound.audio ? sound.audio.volume : masterVolume) * 100)}%</div>
-        <button class="channel-remove" data-sound-id="${sound.id}"><i class="fas fa-times"></i></button>
+        <div class="channel-controls">
+          <input type="range" class="channel-volume" min="0" max="100" value="${sound.audio ? sound.audio.volume * 100 : masterVolume * 100}" data-sound-id="${sound.id}">
+          <div class="channel-value">${Math.round((sound.audio ? sound.audio.volume : masterVolume) * 100)}%</div>
+          <!-- 添加播放速度控制 -->
+          <select class="channel-speed" data-sound-id="${sound.id}">
+            <option value="0.5" ${sound.audio && sound.audio.playbackRate === 0.5 ? 'selected' : ''}>0.5x</option>
+            <option value="0.75" ${sound.audio && sound.audio.playbackRate === 0.75 ? 'selected' : ''}>0.75x</option>
+            <option value="1" ${!sound.audio || sound.audio.playbackRate === 1 ? 'selected' : ''}>1x</option>
+            <option value="1.25" ${sound.audio && sound.audio.playbackRate === 1.25 ? 'selected' : ''}>1.25x</option>
+            <option value="1.5" ${sound.audio && sound.audio.playbackRate === 1.5 ? 'selected' : ''}>1.5x</option>
+          </select>
+          <button class="channel-remove" data-sound-id="${sound.id}"><i class="fas fa-times"></i></button>
+        </div>
       `;
       
-      // 音量调节事件
+      // 添加音量变更事件
       const volumeSlider = channel.querySelector('.channel-volume');
+      const volumeValue = channel.querySelector('.channel-value');
+      
       volumeSlider.addEventListener('input', function() {
-        const value = parseInt(this.value) / 100;
+        const value = parseFloat(this.value) / 100;
         const soundId = this.dataset.soundId;
-        const sound = activeSounds.find(s => s.id === soundId);
+        const soundIndex = activeSounds.findIndex(s => s.id === soundId);
         
-        if (sound && sound.audio) {
-          sound.audio.volume = value;
-          channel.querySelector('.channel-value').textContent = Math.round(value * 100) + '%';
+        if (soundIndex >= 0 && activeSounds[soundIndex].audio) {
+          activeSounds[soundIndex].audio.volume = value;
+          volumeValue.textContent = `${Math.round(value * 100)}%`;
         }
       });
       
-      // 移除按钮事件
-      const removeBtn = channel.querySelector('.channel-remove');
-      removeBtn.addEventListener('click', function() {
+      // 添加播放速度变更事件
+      const speedSelector = channel.querySelector('.channel-speed');
+      speedSelector.addEventListener('change', function() {
+        const speed = parseFloat(this.value);
         const soundId = this.dataset.soundId;
-        const sound = activeSounds.find(s => s.id === soundId);
+        const soundIndex = activeSounds.findIndex(s => s.id === soundId);
         
-        if (sound) {
-          const index = activeSounds.indexOf(sound);
-          if (index >= 0) {
-            activeSounds.splice(index, 1);
-            
-            if (sound.audio) {
-              sound.audio.pause();
-            }
-            
-            updateSoundCardState(soundId, false);
-            updateMixerChannels();
-            
-            // 如果没有活动声音，隐藏播放器和混音器
-            if (activeSounds.length === 0) {
-              playerContainer.classList.remove('active');
-              mixerContainer.style.display = 'none';
-              isPlaying = false;
-            } else if (activeSounds.length === 1) {
-              // 如果只剩一个声音，隐藏混音器
-              mixerContainer.style.display = 'none';
-              updatePlayerInfo(activeSounds[0]);
-            } else {
-              updatePlayerInfo(activeSounds[0]);
-            }
-          }
+        if (soundIndex >= 0 && activeSounds[soundIndex].audio) {
+          activeSounds[soundIndex].audio.playbackRate = speed;
         }
+      });
+      
+      // 添加删除事件
+      const removeButton = channel.querySelector('.channel-remove');
+      removeButton.addEventListener('click', function() {
+        const soundId = this.dataset.soundId;
+        toggleSound(soundData[currentCategory].find(s => s.id === soundId));
       });
       
       mixerChannels.appendChild(channel);
     });
   }
+  
+  // 样式添加
+  function addStyles() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      .channel-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .channel-speed {
+        background-color: rgba(40, 40, 60, 0.8);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        padding: 4px;
+        font-size: 12px;
+      }
+      
+      .mixer-channel {
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        background-color: rgba(30, 30, 40, 0.6);
+        border-radius: 8px;
+      }
+    `;
+    document.head.appendChild(styleElement);
+  }
+  
+  // 初始化时添加样式
+  addStyles();
   
   // 播放/暂停所有声音
   function togglePlayAll() {
