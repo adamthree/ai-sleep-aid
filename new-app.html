@@ -3,39 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="高品质自然声音助眠应用，帮助您更快入睡">
+  <meta name="theme-color" content="#121212">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#1E1E2E">
-  <title>梦境守护 - 高级助眠应用</title>
+  <title>Nature Sleep - 高级助眠应用</title>
   <link rel="stylesheet" href="assets/css/new-style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="icon" href="assets/images/app-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/images/app-icon.png">
 </head>
 <body>
   <div class="app-container">
     <!-- 顶部导航栏 -->
     <div class="top-nav">
       <div class="logo">
-        <img src="assets/images/app-icon.svg" alt="梦境守护" width="30" height="30">
-        <span>梦境守护</span>
+        <img src="assets/images/app-icon.svg" alt="Nature Sleep" class="logo-icon">
+        <span class="logo-text">Nature Sleep</span>
       </div>
       <div class="top-actions">
-        <button id="save-btn" class="top-action-btn">
-          <i class="fas fa-bookmark"></i>
-        </button>
-        <button id="settings-btn" class="top-action-btn">
-          <i class="fas fa-cog"></i>
-        </button>
-        <button id="profile-btn" class="top-action-btn">
-          <i class="fas fa-user-circle"></i>
-        </button>
+        <button class="action-btn"><i class="fas fa-moon"></i></button>
+        <button class="action-btn"><i class="fas fa-gear"></i></button>
       </div>
     </div>
-
-    <!-- 主要内容区域 -->
+    
+    <!-- 主内容区 -->
     <div class="main-content">
-      <div id="tab-sounds" class="tab-content active">
+      <!-- 声音标签页 -->
+      <div id="sounds-tab" class="tab-content active">
         <!-- 声音分类导航 -->
         <div class="category-nav">
           <div class="category-item active" data-category="nature">
@@ -43,7 +38,7 @@
             <span>自然</span>
           </div>
           <div class="category-item" data-category="meditation">
-            <i class="fas fa-spa"></i>
+            <i class="fas fa-om"></i>
             <span>冥想</span>
           </div>
           <div class="category-item" data-category="whitenoise">
@@ -66,16 +61,12 @@
         </div>
         
         <!-- 混音器 -->
-        <div id="mixer-container" class="mixer-container">
+        <div id="mixer-container" class="mixer-container" style="display: none;">
           <div class="mixer-header">
-            <h3>声音混合器</h3>
+            <h3>混音器</h3>
             <div class="mixer-actions">
-              <button id="clear-mix-btn" class="mixer-action-btn">
-                <i class="fas fa-trash-alt"></i> 清空
-              </button>
-              <button id="save-mix-btn" class="mixer-action-btn">
-                <i class="fas fa-save"></i> 保存
-              </button>
+              <button id="clear-mix-btn" class="mixer-btn">清空</button>
+              <button id="save-mix-btn" class="mixer-btn primary">保存</button>
             </div>
           </div>
           <div id="mixer-channels" class="mixer-channels">
@@ -84,187 +75,194 @@
         </div>
       </div>
       
-      <!-- AI助手部分 -->
-      <div id="tab-ai" class="tab-content">
+      <!-- AI助手标签页 -->
+      <div id="ai-tab" class="tab-content">
         <div class="ai-container">
-          <div class="ai-header">
-            <h3>睡眠助手</h3>
-            <span>由AI驱动，为您提供个性化的睡眠建议</span>
-          </div>
           <div id="ai-messages" class="ai-messages">
             <div class="message message-ai">
-              <div class="message-content">您好，我是您的睡眠助手。请告诉我您想听什么类型的声音，或者您有什么睡眠问题需要解决？</div>
-              <div class="message-time">00:00</div>
+              <div class="message-content">你好！我是你的睡眠助手。你可以告诉我你想听的声音，或者询问我睡眠相关的建议。</div>
+              <div class="message-time">现在</div>
             </div>
           </div>
           <div class="ai-input">
-            <input type="text" id="ai-input-field" placeholder="输入您的问题或请求..." />
-            <button id="ai-voice-btn" class="ai-action-btn"><i class="fas fa-microphone"></i></button>
-            <button id="ai-send-btn" class="ai-action-btn"><i class="fas fa-paper-plane"></i></button>
+            <input type="text" id="ai-input-field" placeholder="输入消息..." />
+            <button id="ai-voice-btn" class="ai-btn"><i class="fas fa-microphone"></i></button>
+            <button id="ai-send-btn" class="ai-btn"><i class="fas fa-paper-plane"></i></button>
           </div>
         </div>
       </div>
       
-      <!-- 地图部分 -->
-      <div id="tab-map" class="tab-content">
+      <!-- 探索地图标签页 -->
+      <div id="map-tab" class="tab-content">
         <div class="map-container">
           <div class="map-header">
-            <h3>声音探索地图</h3>
-            <span>探索世界各地的独特声音体验</span>
+            <h3>声音探索</h3>
+            <p>探索世界各地流行的声音地点</p>
           </div>
-          <div class="map-popular">
-            <h4>热门地点</h4>
-            <div class="location-grid">
-              <!-- 位置卡片将通过JavaScript动态生成，或者可以在此处静态定义 -->
-              <div class="location-card" data-location-id="location-1">
-                <img src="assets/images/locations/kyoto.jpg" alt="京都竹林" class="location-image">
-                <div class="location-overlay">
-                  <div class="location-title">京都竹林</div>
-                  <div class="location-location">日本</div>
-                  <div class="location-popularity">
-                    <i class="fas fa-heart"></i> 87%
-                  </div>
-                </div>
-              </div>
-              <div class="location-card" data-location-id="location-2">
-                <img src="assets/images/locations/hawaii.jpg" alt="夏威夷海滩" class="location-image">
-                <div class="location-overlay">
-                  <div class="location-title">夏威夷海滩</div>
-                  <div class="location-location">美国</div>
-                  <div class="location-popularity">
-                    <i class="fas fa-heart"></i> 92%
-                  </div>
-                </div>
-              </div>
-              <div class="location-card" data-location-id="location-3">
-                <img src="assets/images/locations/amazon.jpg" alt="亚马逊雨林" class="location-image">
-                <div class="location-overlay">
-                  <div class="location-title">亚马逊雨林</div>
-                  <div class="location-location">巴西</div>
-                  <div class="location-popularity">
-                    <i class="fas fa-heart"></i> 79%
-                  </div>
-                </div>
+          <div class="map-content">
+            <div class="location-card">
+              <img src="assets/images/locations/kyoto.jpg" alt="京都竹林" class="location-image">
+              <div class="location-info">
+                <h4>京都竹林</h4>
+                <p>日本传统竹林的沙沙声</p>
+                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
               </div>
             </div>
-          </div>
-          <div class="map-view">
-            <div class="map-interactive">
-              <!-- 这里可以放置一个交互式地图，或者使用图片占位 -->
-              <img src="assets/images/world-map.jpg" alt="世界地图" class="map-image">
-              <!-- 地图上的标记点可以通过JavaScript动态添加 -->
+            <div class="location-card">
+              <img src="assets/images/locations/hawaii.jpg" alt="夏威夷海滩" class="location-image">
+              <div class="location-info">
+                <h4>夏威夷海滩</h4>
+                <p>热带海滩的波浪声</p>
+                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
+              </div>
+            </div>
+            <div class="location-card">
+              <img src="assets/images/locations/amazon.jpg" alt="亚马逊雨林" class="location-image">
+              <div class="location-info">
+                <h4>亚马逊雨林</h4>
+                <p>雨林丰富的生态系统声音</p>
+                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
+              </div>
+            </div>
+            <div class="location-card">
+              <img src="assets/images/locations/iceland.jpg" alt="冰岛瀑布" class="location-image">
+              <div class="location-info">
+                <h4>冰岛瀑布</h4>
+                <p>壮观瀑布的轰鸣声</p>
+                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
+              </div>
+            </div>
+            <div class="location-card">
+              <img src="assets/images/locations/tibet.jpg" alt="喜马拉雅寺庙" class="location-image">
+              <div class="location-info">
+                <h4>喜马拉雅寺庙</h4>
+                <p>高山僧侣的平静颂歌</p>
+                <button class="location-play-btn"><i class="fas fa-play"></i> 播放</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- 个人部分 -->
-      <div id="tab-profile" class="tab-content">
+      <!-- 个人资料标签页 -->
+      <div id="profile-tab" class="tab-content">
         <div class="profile-container">
           <div class="profile-header">
             <div class="profile-avatar">
-              <i class="fas fa-user-circle"></i>
+              <i class="fas fa-user"></i>
             </div>
-            <div class="profile-info">
-              <h3 class="profile-name">用户</h3>
-              <div class="profile-stats">
-                <div class="profile-stat">
-                  <span class="stat-value">23</span>
-                  <span class="stat-label">睡眠记录</span>
-                </div>
-                <div class="profile-stat">
-                  <span class="stat-value">5</span>
-                  <span class="stat-label">保存的混音</span>
-                </div>
-                <div class="profile-stat">
-                  <span class="stat-value">7.5h</span>
-                  <span class="stat-label">平均睡眠</span>
-                </div>
-              </div>
+            <h3>我的资料</h3>
+          </div>
+          <div class="stats-container">
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-moon"></i></div>
+              <div class="stat-value">24</div>
+              <div class="stat-label">睡眠次数</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-clock"></i></div>
+              <div class="stat-value">48h</div>
+              <div class="stat-label">总时长</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-star"></i></div>
+              <div class="stat-value">6</div>
+              <div class="stat-label">收藏声音</div>
             </div>
           </div>
-          <div class="profile-section">
-            <h4>我的混音</h4>
-            <div class="mix-grid">
-              <!-- 混音卡片将通过JavaScript动态生成，或者可以在此处静态定义 -->
+          <div class="saved-mixes">
+            <h4>保存的混音</h4>
+            <div class="mix-list">
               <div class="mix-card">
-                <div class="mix-title">雨夜放松</div>
-                <div class="mix-description">雨声和轻柔钢琴曲的完美组合</div>
-                <div class="mix-action">
-                  <button class="mix-play-btn"><i class="fas fa-play"></i></button>
+                <div class="mix-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="mix-info">
+                  <div class="mix-title">雨夜放松</div>
+                  <div class="mix-date">2023-10-15</div>
                 </div>
+                <button class="mix-play-btn"><i class="fas fa-play"></i></button>
               </div>
               <div class="mix-card">
-                <div class="mix-title">森林冥想</div>
-                <div class="mix-description">森林声和藏音碗的组合</div>
-                <div class="mix-action">
-                  <button class="mix-play-btn"><i class="fas fa-play"></i></button>
+                <div class="mix-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="mix-info">
+                  <div class="mix-title">森林冥想</div>
+                  <div class="mix-date">2023-10-10</div>
                 </div>
+                <button class="mix-play-btn"><i class="fas fa-play"></i></button>
+              </div>
+              <div class="mix-card">
+                <div class="mix-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="mix-info">
+                  <div class="mix-title">海边工作</div>
+                  <div class="mix-date">2023-10-05</div>
+                </div>
+                <button class="mix-play-btn"><i class="fas fa-play"></i></button>
               </div>
             </div>
           </div>
-          <div class="profile-section">
-            <h4>睡眠统计</h4>
-            <div class="sleep-chart">
-              <!-- 这里可以放置一个睡眠统计图表，或者使用图片占位 -->
-              <img src="assets/images/sleep-chart.jpg" alt="睡眠统计" class="chart-image">
+          <div class="settings-section">
+            <h4>设置</h4>
+            <div class="setting-item">
+              <span>深色模式</span>
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider round"></span>
+              </label>
             </div>
-          </div>
-          <div class="profile-actions">
-            <button class="profile-action-btn">
-              <i class="fas fa-cog"></i> 设置
-            </button>
-            <button class="profile-action-btn">
-              <i class="fas fa-question-circle"></i> 帮助
-            </button>
-            <button class="profile-action-btn">
-              <i class="fas fa-sign-out-alt"></i> 退出
-            </button>
+            <div class="setting-item">
+              <span>自动关闭计时</span>
+              <select class="setting-select">
+                <option>无</option>
+                <option>30分钟</option>
+                <option>1小时</option>
+                <option>2小时</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <span>音质设置</span>
+              <select class="setting-select">
+                <option>标准</option>
+                <option>高质量</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
+    
     <!-- 播放器容器 -->
     <div id="player-container" class="player-container">
       <div class="player-info">
-        <img id="player-thumbnail" src="" alt="当前播放" class="player-thumbnail">
+        <img id="player-thumbnail" src="assets/images/sounds/rain.jpg" alt="雨声" class="player-thumbnail">
         <div class="player-text">
-          <div id="player-title" class="player-title">未选择声音</div>
-          <div id="player-subtitle" class="player-subtitle">点击声音卡片开始播放</div>
+          <div id="player-title" class="player-title">雨声</div>
+          <div id="player-subtitle" class="player-subtitle">自然</div>
         </div>
       </div>
       <div class="player-progress">
-        <div id="player-progress-bar" class="player-progress-bar"></div>
+        <div id="player-progress-bar" class="player-progress-bar" style="width: 0%;"></div>
       </div>
       <div class="player-controls">
-        <button class="player-control-btn">
-          <i class="fas fa-step-backward"></i>
-        </button>
-        <button id="player-play-btn" class="player-control-btn player-play-btn">
-          <i id="play-icon" class="fas fa-play"></i>
-        </button>
-        <button class="player-control-btn">
-          <i class="fas fa-step-forward"></i>
-        </button>
+        <button class="player-control-btn"><i class="fas fa-backward"></i></button>
+        <button id="player-play-btn" class="player-control-btn play-btn"><i id="play-icon" class="fas fa-play"></i></button>
+        <button class="player-control-btn"><i class="fas fa-forward"></i></button>
       </div>
     </div>
-
+    
     <!-- 底部导航栏 -->
     <div class="bottom-nav">
-      <div class="nav-item active" data-tab="tab-sounds">
-        <i class="fas fa-music"></i>
+      <div class="nav-item active" data-tab="sounds-tab">
+        <i class="fas fa-volume-up"></i>
         <span>声音</span>
       </div>
-      <div class="nav-item" data-tab="tab-ai">
+      <div class="nav-item" data-tab="ai-tab">
         <i class="fas fa-robot"></i>
         <span>助手</span>
       </div>
-      <div class="nav-item" data-tab="tab-map">
-        <i class="fas fa-map-marked-alt"></i>
+      <div class="nav-item" data-tab="map-tab">
+        <i class="fas fa-map-marker-alt"></i>
         <span>探索</span>
       </div>
-      <div class="nav-item" data-tab="tab-profile">
+      <div class="nav-item" data-tab="profile-tab">
         <i class="fas fa-user"></i>
         <span>我的</span>
       </div>
@@ -279,7 +277,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- 脚本 -->
   <script src="assets/js/sound-data.js"></script>
   <script src="assets/js/new-app.js"></script>

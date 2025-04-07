@@ -29,18 +29,18 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 获取实际音频URL
   function getSoundUrl(soundId) {
-    // 使用Pixabay的免费音效作为演示
+    // 使用FreeSound.org和其他开源音频资源
     const soundUrls = {
-      'rain': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0f6c318b4.mp3',
-      'forest': 'https://cdn.pixabay.com/download/audio/2022/05/16/audio_dca145d650.mp3',
-      'ocean': 'https://cdn.pixabay.com/download/audio/2021/09/06/audio_d6f899a183.mp3',
-      'river': 'https://cdn.pixabay.com/download/audio/2021/08/09/audio_5c4d07a6a6.mp3',
-      'tibetan-bowl': 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_f9eb8b8420.mp3',
-      'om-chanting': 'https://cdn.pixabay.com/download/audio/2021/02/11/audio_cb4f1212a7.mp3',
-      'white-noise': 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8b8a21bc5.mp3',
-      'pink-noise': 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_3eaffbe18b.mp3',
-      'piano-sleep': 'https://cdn.pixabay.com/download/audio/2021/11/25/audio_b5e66836e0.mp3',
-      'ambient-sleep': 'https://cdn.pixabay.com/download/audio/2021/11/23/audio_dc39bde654.mp3'
+      'rain': 'https://cdn.freesound.org/previews/346/346642_5121236-lq.mp3',
+      'forest': 'https://cdn.freesound.org/previews/617/617730_1648170-lq.mp3',
+      'ocean': 'https://cdn.freesound.org/previews/531/531947_77006-lq.mp3',
+      'river': 'https://cdn.freesound.org/previews/412/412017_7867797-lq.mp3',
+      'tibetan-bowl': 'https://cdn.freesound.org/previews/122/122647_2022494-lq.mp3',
+      'om-chanting': 'https://cdn.freesound.org/previews/207/207206_5686-lq.mp3',
+      'white-noise': 'https://cdn.freesound.org/previews/205/205966_230132-lq.mp3',
+      'pink-noise': 'https://cdn.freesound.org/previews/212/212039_5688-lq.mp3',
+      'piano-sleep': 'https://cdn.freesound.org/previews/376/376532_7037-lq.mp3',
+      'ambient-sleep': 'https://cdn.freesound.org/previews/397/397311_4921277-lq.mp3'
     };
     
     return soundUrls[soundId] || null;
@@ -113,82 +113,152 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       // 添加新声音
       const soundUrl = getSoundUrl(sound.id);
+      if (!soundUrl) {
+        showNotification('加载失败', '无法找到音频资源', 'error');
+        return;
+      }
+      
       const audio = new Audio(soundUrl);
       audio.loop = true;
       audio.volume = masterVolume;
       
-      // 尝试播放
-      audio.play().then(() => {
-        // 播放成功
-        isPlaying = true;
-        playIcon.className = 'fas fa-pause';
-        
-        // 添加到活动声音列表
-        activeSounds.push({
-          id: sound.id,
-          title: sound.title,
-          artist: sound.artist,
-          image: sound.image,
-          audio: audio
-        });
-        
-        // 更新UI
-        updateSoundCardState(sound.id, true);
-        updatePlayerInfo(sound);
-        playerContainer.classList.add('active');
-        
-        // 显示混音器（如果有多个声音）
-        if (activeSounds.length > 1) {
-          mixerContainer.style.display = 'block';
+      // 预加载音频
+      audio.load();
+      
+      // 播放准备就绪时的处理函数
+      audio.oncanplaythrough = function() {
+        startPlayingSound(audio, sound);
+        audio.oncanplaythrough = null; // 清除事件处理函数
+      };
+      
+      // 错误处理
+      audio.onerror = function() {
+        console.error('音频加载失败:', sound.id);
+        showNotification('播放失败', '无法加载音频资源，请稍后再试', 'error');
+      };
+      
+      // 设置超时，避免长时间等待
+      setTimeout(function() {
+        if (audio.readyState < 3) { // HAVE_FUTURE_DATA
+          audio.oncanplaythrough = null;
+          tryAlternativeSource(sound);
         }
-        
-        // 更新混音器
-        updateMixerChannels();
-        
-        // 显示通知
-        showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
-      }).catch(error => {
-        console.error('播放失败:', error);
-        
-        // 显示错误通知
-        showNotification('播放失败', '请点击屏幕以允许音频播放', 'error');
-        
-        // 添加一次性点击事件以启动播放
-        document.body.addEventListener('click', function playOnClick() {
-          audio.play().then(() => {
-            isPlaying = true;
-            playIcon.className = 'fas fa-pause';
-            
-            // 添加到活动声音列表
-            activeSounds.push({
-              id: sound.id,
-              title: sound.title,
-              artist: sound.artist,
-              image: sound.image,
-              audio: audio
-            });
-            
-            // 更新UI
-            updateSoundCardState(sound.id, true);
-            updatePlayerInfo(sound);
-            playerContainer.classList.add('active');
-            
-            // 显示混音器（如果有多个声音）
-            if (activeSounds.length > 1) {
-              mixerContainer.style.display = 'block';
-            }
-            
-            // 更新混音器
-            updateMixerChannels();
-            
-            // 显示通知
-            showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
+      }, 5000);
+    }
+  }
+  
+  // 尝试使用替代音源
+  function tryAlternativeSource(sound) {
+    // 替代音源URL（可以添加更多备用URL）
+    const alternativeSources = {
+      'rain': 'https://actions.google.com/sounds/v1/water/rain_on_roof.ogg',
+      'forest': 'https://actions.google.com/sounds/v1/ambiences/forest_ambience.ogg',
+      'ocean': 'https://actions.google.com/sounds/v1/water/waves_crashing_on_rock_beach.ogg',
+      'river': 'https://actions.google.com/sounds/v1/water/stream_running_in_forest.ogg',
+      'white-noise': 'https://actions.google.com/sounds/v1/ambiences/keyboard_typing.ogg',
+      'piano-sleep': 'https://actions.google.com/sounds/v1/musical_instruments/piano_music.ogg'
+    };
+    
+    const altUrl = alternativeSources[sound.id];
+    if (!altUrl) {
+      showNotification('播放失败', '无法找到可用的音频资源', 'error');
+      return;
+    }
+    
+    const audio = new Audio(altUrl);
+    audio.loop = true;
+    audio.volume = masterVolume;
+    
+    // 预加载
+    audio.load();
+    
+    audio.oncanplaythrough = function() {
+      startPlayingSound(audio, sound);
+      audio.oncanplaythrough = null;
+      showNotification('使用备用音源', '已切换到备用音频源播放', 'info');
+    };
+    
+    audio.onerror = function() {
+      showNotification('播放失败', '所有音频资源加载失败，请检查网络连接', 'error');
+    };
+  }
+  
+  // 开始播放声音
+  function startPlayingSound(audio, sound) {
+    // 尝试播放
+    audio.play().then(() => {
+      // 播放成功
+      isPlaying = true;
+      playIcon.className = 'fas fa-pause';
+      
+      // 添加到活动声音列表
+      activeSounds.push({
+        id: sound.id,
+        title: sound.title,
+        artist: sound.artist,
+        image: sound.image,
+        audio: audio
+      });
+      
+      // 更新UI
+      updateSoundCardState(sound.id, true);
+      updatePlayerInfo(sound);
+      playerContainer.classList.add('active');
+      
+      // 显示混音器（如果有多个声音）
+      if (activeSounds.length > 1) {
+        mixerContainer.style.display = 'block';
+      }
+      
+      // 更新混音器
+      updateMixerChannels();
+      
+      // 显示通知
+      showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
+    }).catch(error => {
+      console.error('播放失败:', error);
+      
+      // 显示错误通知
+      showNotification('播放失败', '请点击屏幕以允许音频播放', 'error');
+      
+      // 添加一次性点击事件以启动播放
+      document.body.addEventListener('click', function playOnClick() {
+        audio.play().then(() => {
+          isPlaying = true;
+          playIcon.className = 'fas fa-pause';
+          
+          // 添加到活动声音列表
+          activeSounds.push({
+            id: sound.id,
+            title: sound.title,
+            artist: sound.artist,
+            image: sound.image,
+            audio: audio
           });
           
-          document.body.removeEventListener('click', playOnClick);
-        }, { once: true });
-      });
-    }
+          // 更新UI
+          updateSoundCardState(sound.id, true);
+          updatePlayerInfo(sound);
+          playerContainer.classList.add('active');
+          
+          // 显示混音器（如果有多个声音）
+          if (activeSounds.length > 1) {
+            mixerContainer.style.display = 'block';
+          }
+          
+          // 更新混音器
+          updateMixerChannels();
+          
+          // 显示通知
+          showNotification('声音已添加', `${sound.title} 已添加到您的混音中`);
+        }).catch(e => {
+          console.error('用户交互后仍播放失败:', e);
+          showNotification('播放失败', '尝试使用其他浏览器或设备', 'error');
+        });
+        
+        document.body.removeEventListener('click', playOnClick);
+      }, { once: true });
+    });
   }
   
   // 更新声音卡片状态
@@ -359,10 +429,24 @@ document.addEventListener('DOMContentLoaded', function() {
       volume: sound.audio ? sound.audio.volume : masterVolume
     }));
     
-    console.log('保存混音:', mixData);
-    
-    // 模拟保存成功
-    showNotification('已保存', '您的混音已成功保存');
+    // 保存到本地存储
+    try {
+      const savedMixes = JSON.parse(localStorage.getItem('natureSleepMixes') || '[]');
+      const newMix = {
+        id: 'mix-' + Date.now(),
+        title: '我的混音 ' + (savedMixes.length + 1),
+        date: new Date().toISOString(),
+        sounds: mixData
+      };
+      
+      savedMixes.push(newMix);
+      localStorage.setItem('natureSleepMixes', JSON.stringify(savedMixes));
+      
+      showNotification('已保存', '您的混音已成功保存');
+    } catch (error) {
+      console.error('保存失败:', error);
+      showNotification('保存失败', '无法保存到本地存储', 'error');
+    }
   }
   
   // 显示通知
